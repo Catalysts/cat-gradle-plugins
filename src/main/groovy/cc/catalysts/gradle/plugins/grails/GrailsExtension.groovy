@@ -4,6 +4,6 @@ import org.gradle.api.Project
 
 class GrailsExtension {
     Project application
-    String version
-    File warFile
+    String version = '2.1.0'
+    File warFile // default value depends on project, WarTask handles this
 }

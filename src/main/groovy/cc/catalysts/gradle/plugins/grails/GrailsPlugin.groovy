@@ -48,10 +48,6 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     void addWarTask() {
-        if (project.grails.application == null) {
-            throw new InvalidUserDataException("Please specify the main grails application in your build.gradle, e.g. grails { application = project(':demo-web') }")
-        }
-
         project.task('war',
                 group: 'grails',
                 description: 'Creates a war archive of the grails application',
@@ -69,10 +65,7 @@ class GrailsPlugin implements Plugin<Project> {
                 apply plugin: GrailsPlugin
             }
 
-            // we need grailsApp setting in WarTask constructor
-            project.afterEvaluate {
-                addWarTask()
-            }
+            addWarTask()
         }
         else {
             if (project.plugins.hasPlugin(SonarPlugin)) {
