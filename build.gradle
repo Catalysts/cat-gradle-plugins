@@ -1,0 +1,14 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    groovy localGroovy()
+
+    compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0'
+}
+
+apply plugin: 'idea'
