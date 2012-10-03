@@ -8,6 +8,7 @@ dependencies {
     compile gradleApi()
     groovy localGroovy()
 
+    // cat-grails
     compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0'
 }
 

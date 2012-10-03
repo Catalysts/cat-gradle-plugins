@@ -15,7 +15,6 @@ public class WarTask extends DefaultTask {
 
             dependsOn project.grails.application.tasks.'grails-war'
         }
-
     }
 
     @TaskAction
