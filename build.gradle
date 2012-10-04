@@ -1,4 +1,12 @@
+description = 'collection of gradle plugins'
+group = 'cc.catalysts'
+version = '1.0-alpha'
+if (hasProperty('teamcity')) {
+    version += '.' + property('teamcity')['build.number']
+}
+
 apply plugin: 'groovy'
+apply plugin: 'idea'
 
 repositories {
     mavenCentral()
@@ -12,4 +20,34 @@ dependencies {
     compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0'
 }
 
-apply plugin: 'idea'
+
+configurations {
+    snapshot.extendsFrom(archives)
+}
+
+uploadSnapshot {
+    repositories {
+        ivy {
+            credentials {
+                username = System.getenv('IVY_USERNAME')
+                password = System.getenv('IVY_PASSWORD')
+            }
+            url 'http://artifactory.catalysts.local/catalysts-release-gradle'
+            layout 'maven'
+        }
+    }
+}
+
+/*
+uploadArchives {
+    repositories {
+        ivy {
+            credentials {
+                username = System.getenv('IVY_USERNAME')
+                password = System.getenv('IVY_PASSWORD')
+            }
+            url 'TODO'
+            layout 'maven'
+        }
+    }
+}*/
