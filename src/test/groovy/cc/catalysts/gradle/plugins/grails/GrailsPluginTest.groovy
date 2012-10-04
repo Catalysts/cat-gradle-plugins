@@ -8,6 +8,9 @@ import org.junit.Test
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
 
+/**
+ * @author Catalysts GmbH, www.catalysts.cc
+ */
 class GrailsPluginTest {
 
     @Test

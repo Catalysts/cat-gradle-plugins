@@ -6,6 +6,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.sonar.SonarPlugin
 import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
 
+/**
+ * @author Catalysts GmbH, www.catalysts.cc
+ */
 class GrailsPlugin implements Plugin<Project> {
     Project project
 

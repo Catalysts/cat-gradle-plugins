@@ -5,6 +5,9 @@ import org.gradle.api.IllegalOperationAtExecutionTimeException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * @author Catalysts GmbH, www.catalysts.cc
+ */
 public class WarTask extends DefaultTask {
 
     public WarTask() {
