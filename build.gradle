@@ -1,4 +1,3 @@
-name = 'catalysts-gradle-plugins'
 description = 'collection of gradle plugins'
 group = 'cc.catalysts'
 version = '1.0'
@@ -19,6 +18,9 @@ dependencies {
 
     // cat-grails
     compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0'
+
+    // cat-less
+    compile 'com.asual.lesscss:lesscss-engine:1.3.0'
 }
 
 

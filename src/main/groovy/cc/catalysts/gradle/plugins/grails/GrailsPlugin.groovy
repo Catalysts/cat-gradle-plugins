@@ -52,7 +52,7 @@ class GrailsPlugin implements Plugin<Project> {
 
     void addWarTask() {
         project.task('war',
-                group: 'grails',
+                group: 'cat-grails',
                 description: 'Creates a war archive of the grails application',
                 type: WarTask)
     }

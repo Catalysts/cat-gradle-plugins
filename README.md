@@ -33,3 +33,20 @@ grails {
 Now the ```war``` tasks build the war file with the specified grails version and puts it into ```build/ROOT.war``` (relative to the root of the multi project build).
 
 **NOTE: This plugin is intended only for multi-project builds.**
+
+LESS
+------
+
+Converts your .less files to .css.
+You don't have to install the less executable on your machine - this plugin
+includes [lesscss-engine](https://github.com/asual/lesscss-engine).
+
+**Example:**
+```
+apply plugin: 'cat-less'
+less {
+   sourceFiles = fileTree(dir: 'less', include: '*.less')
+   outputDirectory = file('web-app/css')
+}
+```
+The output gets compressed by default. You can disable this behaviour by setting ```compress = false```.
