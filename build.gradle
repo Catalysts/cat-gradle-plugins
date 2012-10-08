@@ -2,7 +2,7 @@ description = 'collection of gradle plugins'
 group = 'cc.catalysts'
 version = '1.0'
 if (hasProperty('teamcity')) {
-    version += '.' + property('teamcity')['build.number']
+    version += property('teamcity')['build.number']
 }
 
 apply plugin: 'groovy'
