@@ -35,11 +35,6 @@ class GrailsPlugin implements Plugin<Project> {
                 }
             }
         }
-
-        // overwrite standard groovy build task
-        // because we build the project with grails,
-        // not the groovy plugin
-        project.task('build', overwrite: true)
     }
 
     void applyGrailsWrapper() {
@@ -63,6 +58,8 @@ class GrailsPlugin implements Plugin<Project> {
                 description: 'Creates a war archive of the grails application',
                 type: WarTask)
 
+        // add empty build task on root project,
+        // dependsOn warTask
         Task buildTask = project.task('build')
         buildTask.dependsOn(warTask)
     }
@@ -81,12 +78,22 @@ class GrailsPlugin implements Plugin<Project> {
             addBuildTasks()
         }
         else {
+            // for all subprojects
+
             if (project.plugins.hasPlugin(SonarPlugin)) {
                 project.sonar.project.language = 'grvy'
             }
 
             applyGroovy()
             applyGrailsWrapper()
+
+            // overwrite standard groovy build task
+            // with empty task
+            project.task('build', overwrite: true)
+
+            // map test task to grails-test-app
+            Task testTask = project.task('test', overwrite: true)
+            testTask.dependsOn(project.tasks.'grails-test-app')
         }
     }
 }
