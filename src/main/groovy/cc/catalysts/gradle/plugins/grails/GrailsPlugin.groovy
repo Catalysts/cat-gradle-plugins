@@ -1,11 +1,11 @@
 package cc.catalysts.gradle.plugins.grails
 
+import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.sonar.SonarPlugin
-import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
-
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
@@ -14,6 +14,8 @@ class GrailsPlugin implements Plugin<Project> {
 
     void applyGroovy() {
         project.apply plugin: 'groovy'
+
+        // source set definitions for the sonar plugin
         project.sourceSets {
             main {
                 groovy {
@@ -33,6 +35,11 @@ class GrailsPlugin implements Plugin<Project> {
                 }
             }
         }
+
+        // overwrite standard groovy build task
+        // because we build the project with grails,
+        // not the groovy plugin
+        project.task('build', overwrite: true)
     }
 
     void applyGrailsWrapper() {
@@ -50,11 +57,14 @@ class GrailsPlugin implements Plugin<Project> {
         }
     }
 
-    void addWarTask() {
-        project.task('war',
+    void addBuildTasks() {
+        Task warTask = project.task('war',
                 group: 'cat-grails',
                 description: 'Creates a war archive of the grails application',
                 type: WarTask)
+
+        Task buildTask = project.task('build')
+        buildTask.dependsOn(warTask)
     }
 
     void apply(Project project) {
@@ -68,7 +78,7 @@ class GrailsPlugin implements Plugin<Project> {
                 apply plugin: GrailsPlugin
             }
 
-            addWarTask()
+            addBuildTasks()
         }
         else {
             if (project.plugins.hasPlugin(SonarPlugin)) {
