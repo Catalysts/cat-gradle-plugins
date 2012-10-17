@@ -16,6 +16,9 @@ dependencies {
     compile gradleApi()
     groovy localGroovy()
 
+    // cat-deploy
+    compile 'commons-net:commons-net:3.1'
+
     // cat-grails
     compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0'
 
