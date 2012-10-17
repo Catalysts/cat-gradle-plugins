@@ -32,7 +32,8 @@ grails {
 Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
 If you want to test your app before creating the archive, use the ```build``` task.
 
-You can rename (or move) the produced war file(s) with a simple gradle task, eg.
+You can rename (or move) the produced war file(s) by setting the ```grails.project.war.file``` option in your
+```BuildConfig.groovy``` or with a simple gradle task, eg.
 ```
 task build(type: Sync, dependsOn: ':your-grails-app:build') {
     from 'your-grails-app/target'
