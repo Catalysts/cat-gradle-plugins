@@ -26,7 +26,7 @@ download of the specified grails version.
 ```
 apply plugin: 'cat-grails'
 grails {
-    version = '2.1.0'
+    version = '2.1.1'
 }
 ```
 Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
