@@ -3,6 +3,7 @@ group = 'cc.catalysts'
 version = '1.0'
 if (hasProperty('teamcity')) {
     version += property('teamcity')['build.number']
+    println "##teamcity[buildNumber '" + version + "']"
 }
 
 apply plugin: 'groovy'
