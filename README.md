@@ -50,3 +50,29 @@ less {
 }
 ```
 The output gets compressed by default. You can disable this behaviour by setting ```compress = false```.
+
+GWT
+------
+Compiles GWT (to do so it gradle default plugins 'java' and 'eclipse' and mavenCentral() as repository)
+GWT version configurable in build.gradle via "ext.gwtVersion" (default: '2.4.0')
+
+**Example:**
+```
+apply plugin: 'cat-gwt'
+
+dependencies {
+	gwtCompile 'com.google.gwt:gwt-user:' + ext.gwtVersion
+	gwtCompile 'com.google.appengine:appengine:1.7.0'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		resources {
+			srcDir 'src'
+		}
+	}
+}
+```
