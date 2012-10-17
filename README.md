@@ -53,8 +53,8 @@ The output gets compressed by default. You can disable this behaviour by setting
 
 GWT
 ------
-Compiles GWT (to do so it gradle default plugins 'java' and 'eclipse' and mavenCentral() as repository)
-GWT version configurable in build.gradle via "ext.gwtVersion" (default: '2.4.0')
+Compiles GWT (to do so it applies gradle default plugins 'java' and 'eclipse' and mavenCentral() as repository)  
+GWT version is configurable in build.gradle via "ext.gwtVersion" (default: '2.4.0')
 
 **Example:**
 ```
