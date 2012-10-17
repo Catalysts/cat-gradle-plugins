@@ -17,22 +17,32 @@ List of plugins
 Grails
 ------
 
-Applies grails nature to your project by updating the source sets, configure sonar (if available), and adding a
-```war``` task for generating the war file. It includes [gradle-grails-wrapper](https://github.com/ConnorWGarvey/gradle-grails-wrapper)
-for the grails-* tasks and automatic download of the specified grails version.
+Applies grails nature to your project by updating the source sets, configure sonar (if available), and adding test and
+build tasks. If the project is an grails application (not a plugin), it adds a war task. It includes
+[gradle-grails-wrapper](https://github.com/ConnorWGarvey/gradle-grails-wrapper) for the grails-* tasks and automatic
+download of the specified grails version.
 
 **Example:**
 ```
 apply plugin: 'cat-grails'
 grails {
-    application = project(':demo-web')
     version = '2.1.0'
-    warFile = file('build/ROOT.war')
 }
 ```
-Now the ```war``` tasks build the war file with the specified grails version and puts it into ```build/ROOT.war``` (relative to the root of the multi project build).
+Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
+If you want to test your app before creating the archive, use the ```build``` task.
 
-**NOTE: This plugin is intended only for multi-project builds.**
+You can rename (or move) the produced war file(s) with a simple gradle task, eg.
+```
+task build(type: Sync, dependsOn: ':your-grails-app:build') {
+    from 'your-grails-app/target'
+	into 'build'
+	include '*.war'
+	rename '(.*).war', 'ROOT.war'
+}
+```
+
+**NOTE: This plugin is currently intended only for multi-project builds.**
 
 LESS
 ------
