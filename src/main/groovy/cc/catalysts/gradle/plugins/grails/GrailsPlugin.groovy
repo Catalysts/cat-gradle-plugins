@@ -58,6 +58,9 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     void addSubProjectTasks() {
+        // clean depends on grails-clean
+        project.tasks.clean.dependsOn(project.tasks.'grails-clean')
+
         // map test task to grails-test-app
         Task testTask = project.task('test',
                 group: 'cat-grails',
