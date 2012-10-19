@@ -37,14 +37,10 @@ class GwtPlugin implements Plugin<Project> {
 
         project.dependencies {
             gwtBuild (
-                //[group: 'cc.catalysts.cp', name: 'cp-build-gwt', version: project.cpVersion, configuration: 'runtime', classifier:'sources'],
                 [group: 'com.google.gwt', name: 'gwt-dev', version: project.gwtVersion]
             )
             gwtCompile (
-//             	[group: 'com.google.gwt', name: 'gwt-user', version: project.gwtVersion]
-//				[group: 'com.allen-sauer.gwt.log', name: 'gwt-log', version:'3.1.6'],
-//				[group: 'javax.validation', name: 'validation-api', version: '1.0.0.GA', classifier:''],
-//				[group: 'javax.validation', name: 'validation-api', version: '1.0.0.GA', classifier:'sources']
+             	[group: 'com.google.gwt', name: 'gwt-user', version: project.gwtVersion]
             )
         }
 
@@ -87,7 +83,6 @@ class GwtPlugin implements Plugin<Project> {
                 setDescription("Libraries that are required for GWT compilation");
         Configuration buildGwtConfiguration = configurationContainer.add(BUILD_GWT_CONFIGURATION_NAME).setVisible(false).
                 setDescription("Libraries that are required for the GWT compiler at runtime.");
-        configurationContainer.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(compileGwtConfiguration);
-        //configurationContainer.getByName(JavaPlugin.RUNTIME_CONFIGURATION_NAME).extendsFrom(buildGwtConfiguration);
+        configurationContainer.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(compileGwtConfiguration)
     }
 }

@@ -9,10 +9,14 @@ public class GwtExtension {
 
     final private NamedDomainObjectContainer<GwtModule> modules;
     private String style
+    private String workers
+    private String warFolder
 
     public GwtExtension(NamedDomainObjectContainer<GwtModule> modules) {
         this.modules = modules
         style = 'OBF'
+        workers = '1'
+        warFolder = 'src/main/webapp'
         codeSrvStartupUrl = 'http://localhost:8888/'
     }
 

@@ -60,9 +60,12 @@ GWT version is configurable in build.gradle via "ext.gwtVersion" (default: '2.4.
 ```
 apply plugin: 'cat-gwt'
 
-dependencies {
-	gwtCompile 'com.google.gwt:gwt-user:' + ext.gwtVersion
-	gwtCompile 'com.google.appengine:appengine:1.7.0'
+dependencies {	
+	gwtBuild (
+		[project(path: ':', configuration: 'gwtCompile')]
+	)
+	
+	compile 'com.google.gwt:gwt-servlet:' + ext.gwtVersion
 }
 
 sourceSets {
@@ -74,5 +77,20 @@ sourceSets {
 			srcDir 'src'
 		}
 	}
+}
+
+gwt {
+	modules {
+		StockWatcher {
+			modulename = 'com.google.gwt.sample.stockwatcher.StockWatcher'
+		}
+	}
+	
+	eclipse {
+		codeSrvStartupUrl 'http://localhost:8888/index.html'
+	}
+	
+	warFolder = 'war'
+	workers = '2'
 }
 ```

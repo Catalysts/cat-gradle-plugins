@@ -14,9 +14,12 @@ class CleanGwtTask extends DefaultTask {
 
     @TaskAction
     def run() {
+        println "Deleting: "
         for (module in project.gwt.modules) {
-            project.delete 'src/main/webapp/' + module.name
+            println '     ' + project.gwt.warFolder + '/' + module.name
+            project.delete project.gwt.warFolder + '/'  + module.name
         }
-        project.delete 'src/main/webapp/WEB-INF/deploy/'
+        println '     ' + project.gwt.warFolder + '/WEB-INF/deploy/'
+        project.delete project.gwt.warFolder + '/WEB-INF/deploy/'
     }
 }

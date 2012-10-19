@@ -18,8 +18,7 @@ class CompileGwtTask extends DefaultTask {
 
     @TaskAction
     def compile() {
-        FileResolver fileResolver = getServices().get(FileResolver.class);
-        String workers = '1';
+        FileResolver fileResolver = getServices().get(FileResolver.class)
 
         for (module in project.gwt.modules) {
             println '\n' + ('#' * 50) + '\n'
@@ -31,8 +30,19 @@ class CompileGwtTask extends DefaultTask {
                     project.configurations.gwtBuild
             ]
 
-            project.configurations.gwtCompile.each { File file -> println '    ' + file.name }
-            project.configurations.gwtBuild.each { File file -> println '    ' + file.name }
+            def printedPath = new HashSet()
+            project.configurations.gwtCompile.each {
+                File file -> if(!printedPath.contains(file.name)) {
+                    println '    ' + file.name
+                    printedPath.add(file.name)
+                }
+            }
+            project.configurations.gwtBuild.each {
+                File file -> if(!printedPath.contains(file.name)) {
+                    println '    ' + file.name
+                    printedPath.add(file.name)
+                }
+            }
 
             println ''
 
@@ -41,8 +51,8 @@ class CompileGwtTask extends DefaultTask {
             javaExec.setMain('com.google.gwt.dev.Compiler')
             javaExec.classpath(project.ext.classpath_list)
             javaExec.args(module.modulename,
-                    '-war', "src/main/webapp",
-                    '-localWorkers', workers,
+                    '-war', project.gwt.warFolder,
+                    '-localWorkers', project.gwt.workers,
                     '-style', project.gwt.style)
 
             javaExec.execute();
