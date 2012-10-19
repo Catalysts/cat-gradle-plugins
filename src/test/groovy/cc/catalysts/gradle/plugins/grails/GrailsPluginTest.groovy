@@ -19,12 +19,12 @@ class GrailsPluginTest {
         Project subProject = ProjectBuilder.builder().withParent(rootProject).build()
 
         rootProject.ext.grails = new GrailsExtension()
-        rootProject.grails.application = subProject
         rootProject.grails.version = '2.1.0'
 
         rootProject.apply plugin: 'cat-grails'
 
-        assertTrue(rootProject.tasks.war instanceof WarTask)
+        // throws exception if task not found
+        subProject.tasks.getByName('war')
     }
 
     @Test

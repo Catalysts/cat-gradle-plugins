@@ -52,16 +52,37 @@ class GrailsPlugin implements Plugin<Project> {
         }
     }
 
-    void addBuildTasks() {
-        Task warTask = project.task('war',
-                group: 'cat-grails',
-                description: 'Creates a war archive of the grails application',
-                type: WarTask)
+    boolean isGrailsApplication() {
+        // if the project doesn't contain a *GrailsPlugin.groovy file, it's a grails application
+        project.fileTree(dir: project.projectDir, include: '*GrailsPlugin.groovy').isEmpty()
+    }
 
-        // add empty build task on root project,
-        // dependsOn warTask
-        Task buildTask = project.task('build')
-        buildTask.dependsOn(warTask)
+    void addSubProjectTasks() {
+        // clean depends on grails-clean
+        project.tasks.clean.dependsOn(project.tasks.'grails-clean')
+
+        // map test task to grails-test-app
+        Task testTask = project.task('test',
+                group: 'cat-grails',
+                description: 'Tests the project',
+                overwrite: true)
+        testTask.dependsOn(project.tasks.'grails-test-app')
+
+        // empty build task, depends on test (and if it's a grails app) on war
+        Task buildTask = project.task('build',
+                group: 'cat-grails',
+                description: 'Tests the project and (if it is an application) builds the war archive',
+                overwrite: true)
+        buildTask.dependsOn(testTask)
+
+        if (isGrailsApplication()) {
+            Task warTask = project.task('war',
+                    group: 'cat-grails',
+                    description: 'Creates a war archive of the grails application')
+            warTask.dependsOn(project.tasks.'grails-war')
+
+            buildTask.dependsOn(warTask)
+        }
     }
 
     void apply(Project project) {
@@ -74,8 +95,6 @@ class GrailsPlugin implements Plugin<Project> {
             project.subprojects {
                 apply plugin: GrailsPlugin
             }
-
-            addBuildTasks()
         }
         else {
             // for all subprojects
@@ -86,14 +105,7 @@ class GrailsPlugin implements Plugin<Project> {
 
             applyGroovy()
             applyGrailsWrapper()
-
-            // overwrite standard groovy build task
-            // with empty task
-            project.task('build', overwrite: true)
-
-            // map test task to grails-test-app
-            Task testTask = project.task('test', overwrite: true)
-            testTask.dependsOn(project.tasks.'grails-test-app')
+            addSubProjectTasks()
         }
     }
 }
