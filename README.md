@@ -67,41 +67,16 @@ GWT
 Compiles GWT (to do so it applies gradle default plugins 'java' and 'eclipse' and mavenCentral() as repository)  
 GWT version is configurable in build.gradle via "ext.gwtVersion" (default: '2.4.0')
 
-**Example:**
-```
-apply plugin: 'cat-gwt'
+Example for single / multi project projects [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-gwt)
 
-dependencies {	
-	gwtBuild (
-		[project(path: ':', configuration: 'gwtCompile')]
-	)
-	
-	compile 'com.google.gwt:gwt-servlet:' + ext.gwtVersion
-}
+DEPLOY
+------
+TODO: readme
 
-sourceSets {
-	main {
-		java {
-			srcDir 'src'
-		}
-		resources {
-			srcDir 'src'
-		}
-	}
-}
+JAXB
+------
+TODO: readme
 
-gwt {
-	modules {
-		StockWatcher {
-			modulename = 'com.google.gwt.sample.stockwatcher.StockWatcher'
-		}
-	}
-	
-	eclipse {
-		codeSrvStartupUrl 'http://localhost:8888/index.html'
-	}
-	
-	warFolder = 'war'
-	workers = '2'
-}
-```
+CODEGEN
+------
+TODO: readme
