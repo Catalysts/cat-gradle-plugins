@@ -2,7 +2,7 @@ package cc.catalysts.gradle.plugins.deploy
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.file.FileResolver
-import org.gradle.api.internal.project.ProjectInternal;
+import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.DefaultJavaExecAction
@@ -11,15 +11,13 @@ import org.gradle.process.internal.JavaExecAction
 import java.util.zip.ZipOutputStream
 import java.util.zip.ZipEntry
 import java.nio.channels.FileChannel
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.Channel;
-
-import cc.catalysts.gradle.plugins.NoParameterException
+import org.apache.commons.net.ftp.FTP
+import org.apache.commons.net.ftp.FTPClient
+import org.apache.commons.net.ftp.FTPReply
+import com.jcraft.jsch.Session
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelExec
+import com.jcraft.jsch.Channel
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
@@ -27,9 +25,6 @@ import cc.catalysts.gradle.plugins.NoParameterException
 class DeployTask extends DefaultTask {
     @TaskAction
     def deploy() {
-        if (!project.ext.has('version')){
-            throw new NoParameterException("No Version defined in build.gradle. Please define it before applying cat-deploy!")
-        }
         def usedConfig
         if(project.hasProperty("depConfig")) {
             if(project.deploy.findByName(project.depConfig) != null) {
@@ -55,6 +50,7 @@ class DeployTask extends DefaultTask {
 
         switch(usedConfig.type) {
             case 'lancopy':
+
                 File logDir = new File(usedConfig.webappDir + "\\logs")
                 File webappDir = new File(usedConfig.webappDir + "\\webapps")
                 File pluginDir = new File(usedConfig.webappDir + "\\plugins")
@@ -72,7 +68,7 @@ class DeployTask extends DefaultTask {
 
                 logDir.mkdir()
 
-                println '-- Copying ' + usedConfig.webappWar + ' to ' + usedConfig.webappDir + project.ext.version
+                println '-- Copying ' + usedConfig.webappWar + ' to ' + usedConfig.webappDir + project.version
                 project.copy {
                     from usedConfig.webappWar
                     into usedConfig.webappDir
@@ -81,27 +77,27 @@ class DeployTask extends DefaultTask {
                 println "-- Starting Tomcat Service.."
                 RunCommand(true, ["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService])
 
-                break;
+                break
             case 'upload':
                 def rootWar = usedConfig.webappWar + "/webapps/ROOT.war"
                 def tempDir = System.getProperty('java.io.tmpdir')
 
                 println 'Uploading ' + rootWar + ' to ' + usedConfig.uploadTarget
 
-                deleteDir(new File(tempDir + project.ext.version))
-                new File(tempDir + project.ext.version).mkdir();
+                deleteDir(new File(tempDir + project.version))
+                new File(tempDir + project.version).mkdir()
 
-                println '  -- Copying ' + rootWar + ' to ' + tempDir + project.ext.version
+                println '  -- Copying ' + rootWar + ' to ' + tempDir + project.version
                 project.copy {
                     from rootWar
-                    into tempDir + project.ext.version
+                    into tempDir + project.version
                 }
 
                 sendFiles(usedConfig, tempDir)
 
-                deleteDir(new File(tempDir + project.ext.version))
+                deleteDir(new File(tempDir + project.version))
 
-                break;
+                break
             case 'ftpupload':
                 def ftpServer = usedConfig.uploadTarget
                 def ftpUser = usedConfig.username
@@ -110,31 +106,31 @@ class DeployTask extends DefaultTask {
                 def rootWar = usedConfig.webappWar + "/webapps/ROOT.war"
                 def tempDir = System.getProperty('java.io.tmpdir')
 
-                def zipWebApp = tempDir + 'taskmind-' + project.ext.version + '.zip'
-                def zipPlugins = tempDir + 'taskmind-plugins-' + project.ext.version + '.zip'
+                def zipWebApp = tempDir + 'taskmind-' + project.version + '.zip'
+                def zipPlugins = tempDir + 'taskmind-plugins-' + project.version + '.zip'
 
 
                 println 'Upload Task'
 
-                deleteDir(new File(tempDir + project.ext.version))
+                deleteDir(new File(tempDir + project.version))
 
                 // Svn-Export to Temp-Dir
 
-                RunCommand(false, ["svn", "export", "--force", "http://svn.catalysts.local/svn/source/tm/trunk/tm-setup", tempDir + project.ext.version])
+                RunCommand(false, ["svn", "export", "--force", "http://svn.catalysts.local/svn/source/tm/trunk/tm-setup", tempDir + project.version])
 
                 // Svn-Export to Temp-Dir
 
                 // Copying Root.war
-                println '  -- Copying ' + rootWar + ' to ' + tempDir + project.ext.version + '/webapps'
+                println '  -- Copying ' + rootWar + ' to ' + tempDir + project.version + '/webapps'
                 project.copy {
                     from rootWar
-                    into tempDir + project.ext.version + '/webapps'
+                    into tempDir + project.version + '/webapps'
                 }
                 // Copying Root.war
 
                 // Zipping
-                println '  -- Zipping ' + tempDir + project.ext.version + ' to ' + zipWebApp
-                zipDirectory(tempDir + project.ext.version, zipWebApp)
+                println '  -- Zipping ' + tempDir + project.version + ' to ' + zipWebApp
+                zipDirectory(tempDir + project.version, zipWebApp)
                 println '  -- Zipping ' + usedConfig.webappWar + '/plugins' + ' to ' + zipPlugins
                 zipDirectory(usedConfig.webappWar + '/plugins', zipPlugins)
                 // Zipping
@@ -169,10 +165,10 @@ class DeployTask extends DefaultTask {
                 ftpClient.disconnect()
                 // FTP-Upload
 
-                deleteDir(new File(tempDir + project.ext.version))
+                deleteDir(new File(tempDir + project.version))
                 new File(zipWebApp).delete()
                 new File(zipPlugins).delete()
-                break;
+                break
             default:
                 println 'ERROR: invalid Type Property "' + usedConfig.type + '" in Configuration "' + usedConfig.name + '"!'
                 throw new Exception("Deploy-Configuration has no type")
@@ -189,7 +185,6 @@ class DeployTask extends DefaultTask {
             InputStream stdout = proc.getInputStream()
             BufferedReader reader = new BufferedReader(new InputStreamReader(stdout))
             if(PrintOutput) {
-                def line
                 while((line = reader.readLine ()) != null) {
                     if(line != "") {
                         println (line)
@@ -201,17 +196,18 @@ class DeployTask extends DefaultTask {
             if(proc.exitValue()) {
                 println sout
                 println serr
-                return false;
+                return false
             }
-            return true;
+            return true
         } catch (Throwable t) {
-            return false;
+            return false
         }
     }
 
-    private static void zipDirectory(String dir2zip, String zipFileName) {
-        File zipDirf = new File(dir2zip);
-        String[] dirList = zipDirf.list();
+    private static void zipDirectory(String dir2zip, String zipFileName)
+    {
+        File zipDirf = new File(dir2zip)
+        String[] dirList = zipDirf.list()
         if(dirList == null || dirList.length == 0) {
             createEmptyZip(new File(zipFileName))
         } else {
@@ -221,32 +217,33 @@ class DeployTask extends DefaultTask {
         }
     }
 
-    private static void zipDir(String dir2zip, String zipOutFolder, ZipOutputStream zos) {
-        File zipDirf = new File(dir2zip);
-        String[] dirList = zipDirf.list();
-        byte[] readBuffer = new byte[2156];
-        int bytesIn = 0;
+    private static void zipDir(String dir2zip, String zipOutFolder, ZipOutputStream zos)
+    {
+        File zipDirf = new File(dir2zip)
+        String[] dirList = zipDirf.list()
+        byte[] readBuffer = new byte[2156]
+        int bytesIn = 0
         //loop through dirList, and zip the files
 
         for(int i=0; i<dirList.length; i++) {
-            File f = new File(zipDirf, dirList[i]);
+            File f = new File(zipDirf, dirList[i])
             if(f.isDirectory()) {
-                String filePath = f.getPath();
-                ZipEntry anEmptyEntry = new ZipEntry(zipOutFolder + f.getName() + '/');
-                zos.putNextEntry(anEmptyEntry);
-                zos.closeEntry();
-                zipDir(filePath, zipOutFolder + f.getName() + '/', zos);
-                continue;
+                String filePath = f.getPath()
+                ZipEntry anEmptyEntry = new ZipEntry(zipOutFolder + f.getName() + '/')
+                zos.putNextEntry(anEmptyEntry)
+                zos.closeEntry()
+                zipDir(filePath, zipOutFolder + f.getName() + '/', zos)
+                continue
             }
-            FileInputStream fis = new FileInputStream(f);
-            ZipEntry anEntry = new ZipEntry(zipOutFolder + f.getName());
-            zos.putNextEntry(anEntry);
+            FileInputStream fis = new FileInputStream(f)
+            ZipEntry anEntry = new ZipEntry(zipOutFolder + f.getName())
+            zos.putNextEntry(anEntry)
             while((bytesIn = fis.read(readBuffer)) != -1)
             {
-                zos.write(readBuffer, 0, bytesIn);
+                zos.write(readBuffer, 0, bytesIn)
             }
-            zos.closeEntry();
-            fis.close();
+            zos.closeEntry()
+            fis.close()
         }
     }
 
@@ -254,113 +251,114 @@ class DeployTask extends DefaultTask {
         // In this case using java.util.zip will not work
         // because it does not permit a zero-entry archive.
         // Must create it manually.
-        OutputStream os = new FileOutputStream(zipFile);
+        OutputStream os = new FileOutputStream(zipFile)
         // Cf. PKZIP specification.
-        byte[] empty = new byte[22];
-        empty[0] = 80; // P
-        empty[1] = 75; // K
-        empty[2] = 5;
-        empty[3] = 6;
+        byte[] empty = new byte[22]
+        empty[0] = 80 // P
+        empty[1] = 75 // K
+        empty[2] = 5
+        empty[3] = 6
 
-        os.write(empty);
+        os.write(empty)
 
-        os.close();
+        os.close()
     }
 
 
     private void sendFiles(usedConfig, tempDir) {
-        Session session = null;
+
+        Session session = null
 
         println '  -- Connecting to ' + usedConfig.uploadTarget
         try {
-            JSch jsch = new JSch();
+            JSch jsch = new JSch()
             println '    -- getting Session'
-            session = jsch.getSession(usedConfig.username, usedConfig.uploadTarget, 22);
-            session.setConfig("StrictHostKeyChecking", "no");
+            session = jsch.getSession(usedConfig.username, usedConfig.uploadTarget, 22)
+            session.setConfig("StrictHostKeyChecking", "no")
             println '    -- set password'
-            session.setPassword(usedConfig.password);
+            session.setPassword(usedConfig.password)
             println '    -- connect'
-            session.connect();
+            session.connect()
 
-            File sendDir = new File(tempDir + project.ext.version);
-            String[] dirList = sendDir.list();
+            File sendDir = new File(tempDir + project.version)
+            String[] dirList = sendDir.list()
             if(dirList != null && dirList.length > 0) {
                 for(int i=0; i<dirList.length; i++) {
-                    File f = new File(sendDir, dirList[i]);
+                    File f = new File(sendDir, dirList[i])
                     if(!f.isDirectory()) {
                         println '    -- Sending ' + f.getPath() + ' to ' + usedConfig.uploadDir + '/' + f.getName()
                         def destFilename = usedConfig.uploadDir + '/' + f.getName()
                         def sourceFilename = f.getPath()
 
-                        FileInputStream fis = null;
+                        FileInputStream fis = null
 
-                        String command = "scp -p -t " + destFilename;
-                        Channel channel = session.openChannel("exec");
-                        ((ChannelExec) channel).setCommand(command);
+                        String command = "scp -p -t " + destFilename
+                        Channel channel = session.openChannel("exec")
+                        ((ChannelExec) channel).setCommand(command)
 
-                        OutputStream out = channel.getOutputStream();
-                        InputStream inStream = channel.getInputStream();
+                        OutputStream out = channel.getOutputStream()
+                        InputStream inStream = channel.getInputStream()
 
-                        channel.connect();
+                        channel.connect()
 
-                        long fileSize = (new File(sourceFilename)).length();
-                        command = "C0644 " + fileSize + " ";
+                        long filesize = (new File(sourceFilename)).length()
+                        command = "C0644 " + filesize + " "
                         if (sourceFilename.lastIndexOf('/') > 0) {
-                            command += sourceFilename.substring(sourceFilename.lastIndexOf('/') + 1);
+                            command += sourceFilename.substring(sourceFilename.lastIndexOf('/') + 1)
                         } else {
-                            command += sourceFilename;
+                            command += sourceFilename
                         }
-                        command += "\n";
+                        command += "\n"
 
-                        out.write(command.getBytes());
-                        out.flush();
+                        out.write(command.getBytes())
+                        out.flush()
 
-                        fis = new FileInputStream(sourceFilename);
-                        byte[] buf = new byte[1024];
+                        fis = new FileInputStream(sourceFilename)
+                        byte[] buf = new byte[1024]
                         while (true) {
-                            int len = fis.read(buf, 0, buf.length);
+                            int len = fis.read(buf, 0, buf.length)
                             if (len <= 0) {
-                                break;
+                                break
                             }
-                            out.write(buf, 0, len);
+                            out.write(buf, 0, len)
                         }
 
-                        fis.close();
-                        fis = null;
+                        fis.close()
+                        fis = null
 
                         //send '\0' to end it
-                        buf[0] = 0;
-                        out.write(buf, 0, 1);
-                        out.flush();
+                        buf[0] = 0
+                        out.write(buf, 0, 1)
+                        out.flush()
 
-                        out.close();
+                        out.close()
 
-                        channel.disconnect();
+                        channel.disconnect()
                     }
                 }
             }
-            session.disconnect();
-            session = null;
+            session.disconnect()
+            session = null
         } catch (Throwable t) {
             println '  -- Connection failed! ' + t.toString()
         }
         if(session != null) {
-            session.disconnect();
+            session.disconnect()
         }
     }
 
     private static boolean deleteDir(File path) {
         if( path.exists() ) {
-            File[] files = path.listFiles();
+            File[] files = path.listFiles()
             for(int i=0; i<files.length; i++) {
                 if(files[i].isDirectory()) {
-                    deleteDir(files[i]);
+                    deleteDir(files[i])
                 }
                 else {
-                    files[i].delete();
+                    files[i].delete()
                 }
             }
         }
-        return( path.delete() );
+        return path.delete()
     }
 }
