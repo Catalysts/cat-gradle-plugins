@@ -80,3 +80,11 @@ TODO: readme
 CODEGEN
 ------
 TODO: readme
+
+JPA
+------
+TODO: readme
+
+QUERYDSL
+------
+TODO: readme
