@@ -15,43 +15,39 @@ class GrailsPluginTest {
 
     @Test
     public void warTask() {
-        Project rootProject = ProjectBuilder.builder().build()
-        Project subProject = ProjectBuilder.builder().withParent(rootProject).build()
+        Project project = ProjectBuilder.builder().build()
 
-        rootProject.ext.grails = new GrailsExtension()
-        rootProject.grails.version = '2.1.0'
-
-        rootProject.apply plugin: 'cat-grails'
+        project.apply plugin: 'cat-grails'
 
         // throws exception if task not found
-        subProject.tasks.getByName('war')
+        project.tasks.getByName('war')
+        project.tasks.getByName('build')
+        project.tasks.getByName('test')
     }
 
     @Test
     public void sonarLanguageSetting() {
-        Project rootProject = ProjectBuilder.builder().build()
-        Project subProject = ProjectBuilder.builder().withParent(rootProject).build()
+        Project project = ProjectBuilder.builder().build()
 
-        subProject.apply plugin: SonarPlugin
-        rootProject.apply plugin: 'cat-grails'
+        project.apply plugin: SonarPlugin
+        project.apply plugin: 'cat-grails'
 
-        assertEquals('grvy', subProject.sonar.project.language)
+        assertEquals('grvy', project.sonar.project.language)
     }
 
     @Test
     public void groovySourceSets() {
-        Project rootProject = ProjectBuilder.builder().build()
-        Project subProject = ProjectBuilder.builder().withParent(rootProject).build()
+        Project project = ProjectBuilder.builder().build()
 
-        rootProject.apply plugin: 'cat-grails'
+        project.apply plugin: 'cat-grails'
 
         // check if grails-app is in sourceSets for main/groovy
-        assertEquals(1, subProject.sourceSets.main.groovy.srcDirs.count {
+        assertEquals(1, project.sourceSets.main.groovy.srcDirs.count {
             it.name == 'grails-app'
         })
 
         // check if unit directory is in sourceSets for test/groovy
-        assertEquals(1, subProject.sourceSets.test.groovy.srcDirs.count {
+        assertEquals(1, project.sourceSets.test.groovy.srcDirs.count {
             it.name == 'unit'
         })
     }
