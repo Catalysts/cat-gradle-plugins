@@ -133,67 +133,6 @@ class DeployTask extends DefaultTask {
         }
     }
 
-    private static void zipDirectory(String dir2zip, String zipFileName)
-    {
-        File zipDirf = new File(dir2zip)
-        String[] dirList = zipDirf.list()
-        if(dirList == null || dirList.length == 0) {
-            createEmptyZip(new File(zipFileName))
-        } else {
-            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName))
-            zipDir(dir2zip, '', zos)
-            zos.close()
-        }
-    }
-
-    private static void zipDir(String dir2zip, String zipOutFolder, ZipOutputStream zos)
-    {
-        File zipDirf = new File(dir2zip)
-        String[] dirList = zipDirf.list()
-        byte[] readBuffer = new byte[2156]
-        int bytesIn = 0
-        //loop through dirList, and zip the files
-
-        for(int i=0; i<dirList.length; i++) {
-            File f = new File(zipDirf, dirList[i])
-            if(f.isDirectory()) {
-                String filePath = f.getPath()
-                ZipEntry anEmptyEntry = new ZipEntry(zipOutFolder + f.getName() + '/')
-                zos.putNextEntry(anEmptyEntry)
-                zos.closeEntry()
-                zipDir(filePath, zipOutFolder + f.getName() + '/', zos)
-                continue
-            }
-            FileInputStream fis = new FileInputStream(f)
-            ZipEntry anEntry = new ZipEntry(zipOutFolder + f.getName())
-            zos.putNextEntry(anEntry)
-            while((bytesIn = fis.read(readBuffer)) != -1)
-            {
-                zos.write(readBuffer, 0, bytesIn)
-            }
-            zos.closeEntry()
-            fis.close()
-        }
-    }
-
-    private static void createEmptyZip(File zipFile) {
-        // In this case using java.util.zip will not work
-        // because it does not permit a zero-entry archive.
-        // Must create it manually.
-        OutputStream os = new FileOutputStream(zipFile)
-        // Cf. PKZIP specification.
-        byte[] empty = new byte[22]
-        empty[0] = 80 // P
-        empty[1] = 75 // K
-        empty[2] = 5
-        empty[3] = 6
-
-        os.write(empty)
-
-        os.close()
-    }
-
-
     private void sendFiles(usedConfig, tempDir) {
 
         Session session = null
