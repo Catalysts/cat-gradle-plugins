@@ -68,7 +68,7 @@ class DeployTask extends DefaultTask {
 
                 logDir.mkdir()
 
-                println '-- Copying ' + usedConfig.webappWar + ' to ' + usedConfig.webappDir + project.version
+                println '-- Copying ' + usedConfig.webappWar + ' to ' + usedConfig.webappDir
                 project.copy {
                     from usedConfig.webappWar
                     into usedConfig.webappDir
@@ -84,90 +84,19 @@ class DeployTask extends DefaultTask {
 
                 println 'Uploading ' + rootWar + ' to ' + usedConfig.uploadTarget
 
-                deleteDir(new File(tempDir + project.version))
-                new File(tempDir + project.version).mkdir()
+                deleteDir(new File(tempDir))
+                new File(tempDir).mkdir()
 
-                println '  -- Copying ' + rootWar + ' to ' + tempDir + project.version
+                println '  -- Copying ' + rootWar + ' to ' + tempDir
                 project.copy {
                     from rootWar
-                    into tempDir + project.version
+                    into tempDir
                 }
 
                 sendFiles(usedConfig, tempDir)
 
-                deleteDir(new File(tempDir + project.version))
+                deleteDir(new File(tempDir))
 
-                break
-            case 'ftpupload':
-                def ftpServer = usedConfig.uploadTarget
-                def ftpUser = usedConfig.username
-                def ftpPass = usedConfig.password
-
-                def rootWar = usedConfig.webappWar + "/webapps/ROOT.war"
-                def tempDir = System.getProperty('java.io.tmpdir')
-
-                def zipWebApp = tempDir + 'taskmind-' + project.version + '.zip'
-                def zipPlugins = tempDir + 'taskmind-plugins-' + project.version + '.zip'
-
-
-                println 'Upload Task'
-
-                deleteDir(new File(tempDir + project.version))
-
-                // Svn-Export to Temp-Dir
-
-                RunCommand(false, ["svn", "export", "--force", "http://svn.catalysts.local/svn/source/tm/trunk/tm-setup", tempDir + project.version])
-
-                // Svn-Export to Temp-Dir
-
-                // Copying Root.war
-                println '  -- Copying ' + rootWar + ' to ' + tempDir + project.version + '/webapps'
-                project.copy {
-                    from rootWar
-                    into tempDir + project.version + '/webapps'
-                }
-                // Copying Root.war
-
-                // Zipping
-                println '  -- Zipping ' + tempDir + project.version + ' to ' + zipWebApp
-                zipDirectory(tempDir + project.version, zipWebApp)
-                println '  -- Zipping ' + usedConfig.webappWar + '/plugins' + ' to ' + zipPlugins
-                zipDirectory(usedConfig.webappWar + '/plugins', zipPlugins)
-                // Zipping
-
-                println '  -- Uploading to ' + usedConfig.uploadTarget
-
-                // FTP-Upload
-                def ftpClient = new FTPClient()
-                ftpClient.connect( ftpServer )
-                ftpClient.login( ftpUser, ftpPass )
-                print "    -- Connected to $ftpServer. $ftpClient.replyString"
-
-                ftpClient.changeWorkingDirectory(usedConfig.uploadDir  )
-                print "    -- Directory changed. $ftpClient.replyString"
-
-                ftpClient.enterLocalPassiveMode()
-                ftpClient.setFileType(FTP.BINARY_FILE_TYPE)
-                print "    -- Transfermode changed. $ftpClient.replyString"
-
-                def upFile = new File(zipWebApp)
-                println '    -- Uploading ' + zipWebApp
-                upFile.withInputStream{ fis -> ftpClient.storeFile( upFile.name, fis ) }
-                print "      -- Upload completed: $ftpClient.replyString"
-
-                upFile = new File(zipPlugins)
-                println '    -- Uploading ' + zipPlugins
-                upFile.withInputStream{ fis -> ftpClient.storeFile( upFile.name, fis ) }
-
-                print "      -- Upload completed: $ftpClient.replyString"
-
-                ftpClient.logout()
-                ftpClient.disconnect()
-                // FTP-Upload
-
-                deleteDir(new File(tempDir + project.version))
-                new File(zipWebApp).delete()
-                new File(zipPlugins).delete()
                 break
             default:
                 println 'ERROR: invalid Type Property "' + usedConfig.type + '" in Configuration "' + usedConfig.name + '"!'

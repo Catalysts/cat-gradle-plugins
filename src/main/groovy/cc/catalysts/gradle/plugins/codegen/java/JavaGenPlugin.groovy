@@ -11,7 +11,7 @@ import cc.catalysts.gradle.plugins.codegen.CodegenTask
 class JavaGenPlugin implements Plugin<Project> {
 	
 	void apply(Project project) {
-		project.apply plugin: 'cp-java'
+		project.apply plugin: 'java'
 		
 		project.repositories {
 			mavenCentral()
