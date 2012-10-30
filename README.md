@@ -29,6 +29,7 @@ grails {
     version = '2.1.1'
 }
 ```
+
 Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
 If you want to test your app before creating the archive, use the ```build``` task.
 
@@ -43,7 +44,6 @@ task build(type: Sync, dependsOn: ':your-grails-app:build') {
 }
 ```
 
-**NOTE: This plugin is currently intended only for multi-project builds.**
 
 LESS
 ------

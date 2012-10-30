@@ -39,25 +39,9 @@ class GrailsPlugin implements Plugin<Project> {
 
     void applyGrailsWrapper() {
         project.apply plugin: GradleGrailsWrapperPlugin
-
-        project.rootProject.afterEvaluate {
-            if (project.rootProject.grails.version == null) {
-                throw new InvalidUserDataException("Please specify the grails version in your build.gradle, e.g. grails { version = '2.1.0' }")
-            }
-
-            // in subproject here, project.grails = Extension from GradleGrailsWrapperPlugin
-            project.grails {
-                version project.rootProject.grails.version
-            }
-        }
     }
 
-    boolean isGrailsApplication() {
-        // if the project doesn't contain a *GrailsPlugin.groovy file, it's a grails application
-        project.fileTree(dir: project.projectDir, include: '*GrailsPlugin.groovy').isEmpty()
-    }
-
-    void addSubProjectTasks() {
+    void addTasks() {
         // clean depends on grails-clean
         project.tasks.clean.dependsOn(project.tasks.'grails-clean')
 
@@ -75,7 +59,7 @@ class GrailsPlugin implements Plugin<Project> {
                 overwrite: true)
         buildTask.dependsOn(testTask)
 
-        if (isGrailsApplication()) {
+        if (GrailsUtils.isGrailsApplication(project)) {
             Task warTask = project.task('war',
                     group: 'cat-grails',
                     description: 'Creates a war archive of the grails application')
@@ -87,25 +71,13 @@ class GrailsPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         this.project = project
-        Boolean isRoot = project.rootProject == project
 
-        if (isRoot) {
-            project.extensions.create('grails', GrailsExtension)
-
-            project.subprojects {
-                apply plugin: GrailsPlugin
-            }
+        if (project.plugins.hasPlugin(SonarPlugin)) {
+            project.sonar.project.language = 'grvy'
         }
-        else {
-            // for all subprojects
 
-            if (project.plugins.hasPlugin(SonarPlugin)) {
-                project.sonar.project.language = 'grvy'
-            }
-
-            applyGroovy()
-            applyGrailsWrapper()
-            addSubProjectTasks()
-        }
+        applyGroovy()
+        applyGrailsWrapper()
+        addTasks()
     }
 }
