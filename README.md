@@ -76,12 +76,25 @@ For usage example see [Wiki](https://github.com/Catalysts/catalysts-gradle-plugi
 
 JAXB
 ------
-TODO: readme
-
-CODEGEN
-------
-TODO: readme
+Generates code from all JAXB sources specified in build.gradle (may be a list)
+Example for wsdl:
+```
+apply plugin: 'cat-jaxb'
+jaxb {
+	wsdl {
+		convert 'FILENAME.wsdl'
+	}
+}
+```
 
 QUERYDSL
+------
+Generates QueryDsl for given Project to 'target/generated-sources/querydsl' (extends compileJava task)
+Example:
+```
+apply plugin: 'cat-querydsl'
+```
+
+CODEGEN
 ------
 TODO: readme
