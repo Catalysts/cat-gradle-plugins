@@ -95,6 +95,14 @@ Example:
 apply plugin: 'cat-querydsl'
 ```
 
-CODEGEN
+JAVAGEN
 ------
-TODO: readme
+Gradle wrapper plugin for [cdoclet](https://github.com/Catalysts/cdoclet)
+Target path for generated source: "${project.projectDir}/target/generated-sources"
+Example:
+```
+apply plugin: 'cat-javagen'
+dependencies  {
+	javagen project(':PROJECTNAME')
+}
+```
