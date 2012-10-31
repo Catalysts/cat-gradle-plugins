@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue
 class GwtpPluginTest {
 
     @Test
-    public void gwtCompileTask() {
+    public void gwtpCompileTask() {
         Project rootProject = ProjectBuilder.builder().build()
 
         rootProject.apply plugin: 'cat-gwt'

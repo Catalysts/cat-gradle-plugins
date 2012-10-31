@@ -89,7 +89,10 @@ jaxb {
 
 QUERYDSL
 ------
-Generates QueryDsl for given Project to 'target/generated-sources/querydsl' (extends compileJava task)
+Generates QueryDsl for given Project to 'target/generated-sources/querydsl' (extends compileJava task).
+This folder will be added to the SourceSet.
+The '/target' directory will be deleted when running 'gradle clean'.
+
 Example:
 ```
 apply plugin: 'cat-querydsl'

@@ -10,6 +10,7 @@ import org.gradle.api.tasks.SourceSet
 class QuerydslPlugin implements Plugin<Project> {
 	
 	void apply(Project project) {
+        project.apply plugin: 'java'
 		if(project.tasks.findByPath('cleanTarget') == null) {
 			project.task('cleanTarget') << {
 				new File(project.projectDir.absolutePath + '/target').deleteDir()

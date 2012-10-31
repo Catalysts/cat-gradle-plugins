@@ -15,10 +15,6 @@ class JavaGenPlugin implements Plugin<Project> {
 		
 		project.repositories {
 			mavenCentral()
-			ivy {
-				url project.repositoryUrl + "/" + project.repositoryGradle
-				layout 'maven'
-			}
 		}
 		
 		project.configurations {

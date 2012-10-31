@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue
 class DeployPluginTest {
 
     @Test
-    public void warTask() {
+    public void deployTask() {
         Project rootProject = ProjectBuilder.builder().build()
 
         rootProject.apply plugin: 'cat-deploy'

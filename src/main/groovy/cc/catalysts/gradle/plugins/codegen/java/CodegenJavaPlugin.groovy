@@ -10,6 +10,7 @@ import cc.catalysts.gradle.plugins.codegen.CodegenTask
  */
 class CodegenJavaPlugin implements Plugin<Project> {
 	void apply(Project project) {
+        project.apply plugin: 'java'
 		
 		if(project.tasks.findByPath('codegen') == null) {
 			project.task('codegen', type: CodegenTask)
