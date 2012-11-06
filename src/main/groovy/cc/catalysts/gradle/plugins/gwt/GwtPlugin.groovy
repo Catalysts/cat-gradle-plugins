@@ -57,9 +57,9 @@ class GwtPlugin implements Plugin<Project> {
             from project.sourceSets.main.allJava
         }
 
-        project.task('cleanGwt', type: CleanGwtTask)
-        project.task('compileGwt', type: CompileGwtTask)
-        project.task('generateLaunchConfig', type: EclipseLaunchConfigGwtTask)
+        project.task('cleanGwt', type: CleanGwtTask, group: 'Gwt')
+        project.task('compileGwt', type: CompileGwtTask, group: 'Gwt')
+        project.task('generateLaunchConfig', type: EclipseLaunchConfigGwtTask, group: 'Gwt')
 
         if (project.plugins.findPlugin('war')) {
             project.war.dependsOn 'compileGwt'
