@@ -50,6 +50,7 @@ class GrailsPlugin implements Plugin<Project> {
                 group: 'cat-grails',
                 description: 'Tests the project',
                 overwrite: true)
+        testTask.convention.testResultsDir = project.file("target/test-reports")
         testTask.dependsOn(project.tasks.'grails-test-app')
 
         // empty build task, depends on test (and if it's a grails app) on war
