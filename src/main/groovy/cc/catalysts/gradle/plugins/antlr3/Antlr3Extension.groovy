@@ -10,7 +10,7 @@ public class Antlr3Extension {
 
     Antlr3Extension(){
         grammarList = []
-        antlrSource = '' // Default empty!
+        antlrSource = "src" + File.separatorChar + "main" + File.separatorChar + "antlr"
         destinationDir = "target" + File.separatorChar + "generated-sources" + File.separatorChar + "antlr"
     }
 
