@@ -30,7 +30,7 @@ class QuerydslPlugin implements Plugin<Project> {
 		project.compileJava {
 			options.compilerArgs = [
 					'-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor',
-					'-s', project.projectDir.absolutePath + project.querydsl.destinationDir
+					'-s', project.projectDir.absolutePath + File.separatorChar + project.querydsl.destinationDir
             ]
 		}
 	}
