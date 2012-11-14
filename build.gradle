@@ -25,6 +25,10 @@ dependencies {
 
     // cat-less
     compile 'com.asual.lesscss:lesscss-engine:1.3.0'
+
+    // cat-sass
+    runtime group: 'org.jruby', name: 'jruby-complete', version: '1.6.8'
+    runtime group: 'me.n4u.sass', name: 'sass-gems', version: '3.2.1'
 }
 
 

@@ -63,6 +63,22 @@ less {
 ```
 The output gets compressed by default. You can disable this behaviour by setting ```compress = false```.
 
+SASS
+------
+
+Converts your .sass files to .css.
+You don't have to install the sass executable on your machine - this plugin
+includes [sass-gems](https://github.com/dmitrye/sass-gems) and [JRuby](https://github.com/jruby/jruby).
+
+**Example:**
+```
+apply plugin: 'cat-sass'
+sass {
+   sourceFiles = fileTree(dir: 'sass', include: '*.s*ss') # .sass and .scss
+   outputDirectory = file('web-app/css')
+}
+```
+
 GWT
 ------
 Compiles GWT (to do so it applies gradle default plugins 'java' and 'eclipse' and mavenCentral() as repository)  

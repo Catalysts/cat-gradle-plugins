@@ -1,0 +1,7 @@
+.border {
+  padding: 5/2;
+  margin: 10/2;
+  border-color: black; }
+
+#main .example {
+  color: red; }

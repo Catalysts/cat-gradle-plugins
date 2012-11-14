@@ -8,3 +8,4 @@
 * added **cat-jaxb** plugin
 * added **cat-codgen-java** plugin
 * added **cat-querydsl** plugin
+* added **cat-sass** plugin
