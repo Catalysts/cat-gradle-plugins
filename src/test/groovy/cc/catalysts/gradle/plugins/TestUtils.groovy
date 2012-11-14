@@ -9,7 +9,7 @@ class TestUtils {
         int outputFiles = 0
         output.eachFileRecurse { File file ->
             File expectationFile = new File(expectation, file.name)
-            assert file.text == expectationFile.text, "File $file.path and $expectationFile.path differ"
+            assert file.text.normalize() == expectationFile.text.normalize(), "File $file.path and $expectationFile.path differ"
             outputFiles++
         }
 
