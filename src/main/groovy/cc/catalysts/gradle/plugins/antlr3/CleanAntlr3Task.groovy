@@ -12,10 +12,7 @@ class CleanAntlr3Task extends DefaultTask {
         File f = new File(project.projectDir.absolutePath + File.separatorChar + project.antlr3.destinationDir);
         if (f.exists()){
             println "     Deleting '" + f.getPath() + "'"
-            while(f.getParent() != null){
-                f = new File(f.getParent())
-            }
-            if (!project.delete(f.getPath())){
+            if (!f.delete()){
                 println "          Error in deleting directory"
             }
         }
