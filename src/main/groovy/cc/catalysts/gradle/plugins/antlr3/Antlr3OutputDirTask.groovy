@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction
 class Antlr3OutputDirTask extends DefaultTask {
     @TaskAction
     def createAntlr3OutputDir() {
-        File f = new File(project.projectDir.absolutePath + project.antlr3.destinationDir);
+        File f = new File(project.projectDir.absolutePath + File.separatorChar + project.antlr3.destinationDir);
         if (!f.exists()){
             println "     Creating '" + f.getPath() + "'"
            if (!f.mkdirs()){
