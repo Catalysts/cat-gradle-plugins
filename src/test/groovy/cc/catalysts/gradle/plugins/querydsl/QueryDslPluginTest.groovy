@@ -17,7 +17,7 @@ class QueryDslPluginTest {
 
         rootProject.apply plugin: 'cat-querydsl'
 
-        assertTrue(rootProject.tasks.getByName('cleanTarget') != null)
-        assertTrue(rootProject.tasks.getByName('createTarget') != null)
+        assertTrue(rootProject.tasks.getByName('cleanQueryDsl') instanceof  CleanQueryDslTask)
+        assertTrue(rootProject.tasks.getByName('createQueryDslOut') instanceof QueryDslOutputDirTask)
     }
 }
