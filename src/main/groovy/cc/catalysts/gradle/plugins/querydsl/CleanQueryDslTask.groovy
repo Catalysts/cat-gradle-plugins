@@ -12,7 +12,7 @@ class CleanQueryDslTask extends DefaultTask {
         File f = new File(project.projectDir.absolutePath + File.separatorChar + project.querydsl.destinationDir);
         if (f.exists()){
             println "     cat-querydsl: Deleting '" + f.getPath() + "'"
-            if (!f.delete()){
+            if (!f.deleteDir()){
                 println "          Error in deleting directory"
             }
         }
