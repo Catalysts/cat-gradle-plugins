@@ -94,6 +94,7 @@ Generates QueryDsl for given Project to 'target/generated-sources/querydsl' (ext
 This folder will be added to the SourceSet.
 The '/target' directory will be deleted when running 'gradle clean'.
 
+
 Example:
 ```
 apply plugin: 'cat-querydsl'
@@ -108,5 +109,17 @@ Example:
 apply plugin: 'cat-javagen'
 dependencies  {
 	javagen project(':PROJECTNAME')
+}
+```
+
+ANTLR3
+------
+Gradle wrapper plugin for [antlr v3](http://www.antlr.org/)
+For extended usage example see [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
+Example:
+```
+apply plugin: 'cat-antlr3'
+antlr3 {
+    generate 'XYZ.g->cc.catalysts.example.parser'
 }
 ```
