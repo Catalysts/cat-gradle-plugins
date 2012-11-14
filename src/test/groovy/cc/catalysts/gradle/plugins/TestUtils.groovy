@@ -6,19 +6,21 @@ package cc.catalysts.gradle.plugins
 class TestUtils {
 
     static public void compareDirectories(File output, File expectation) {
-        int outputFiles = 0
+        List outputFiles = []
         output.eachFileRecurse { File file ->
             File expectationFile = new File(expectation, file.name)
             assert file.text.normalize() == expectationFile.text.normalize(), "File $file.path and $expectationFile.path differ"
-            outputFiles++
+            outputFiles.add(file)
         }
 
-        int expectationFiles = 0
-        expectation.eachFileRecurse {
-            expectationFiles++
+        List expectationFiles = []
+        expectation.eachFileRecurse { File file ->
+            expectationFiles.add(file)
         }
 
-        assert outputFiles == expectationFiles, "Number of files in output directory ($outputFiles files) and expectation directory ($expectationFiles files) differ"
+        assert outputFiles.size() == expectationFiles.size(), "Number of files in output directory $output and expectation directory $expectation differ!\n"+
+                "Output files: $outputFiles\n"+
+                "Expectation files: $expectationFiles"
     }
 
     static public File getTempDirectory() {
