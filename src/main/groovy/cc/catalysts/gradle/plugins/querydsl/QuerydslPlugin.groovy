@@ -3,6 +3,8 @@ package cc.catalysts.gradle.plugins.querydsl
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.Task
+import org.gradle.api.internal.TaskInternal
+import org.gradle.api.specs.AndSpec
 import org.gradle.api.tasks.SourceSet
 
 /**
@@ -25,7 +27,10 @@ class QuerydslPlugin implements Plugin<Project> {
         project.tasks.getByName('clean').dependsOn(clean)
         Task create = project.task("createQueryDslOut", type: QueryDslOutputDirTask, dependsOn: clean, description: 'Creates output directory of QueryDsl',group: "QueryDsl")
 
-        project.tasks.getByName('compileJava').dependsOn(create)
+        project.compileJava.doFirst {
+            clean.execute()
+            create.execute()
+        }
 
 		project.compileJava {
 			options.compilerArgs = [
