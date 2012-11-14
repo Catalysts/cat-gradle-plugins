@@ -8,8 +8,8 @@ import org.gradle.api.tasks.TaskAction
  */
 class Antlr3OutputDirTask extends DefaultTask {
     @TaskAction
-    def generateGrammarSource() {
-        File f = new File(project.antlr3.destinationDir);
+    def createAntlr3OutputDir() {
+        File f = new File(project.projectDir.absolutePath + project.antlr3.destinationDir);
         if (!f.exists()){
             println "     Creating '" + f.getPath() + "'"
            if (!f.mkdirs()){

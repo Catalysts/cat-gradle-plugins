@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.plugins.antlr3
+package cc.catalysts.gradle.plugins.querydsl
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
@@ -6,12 +6,12 @@ import org.gradle.api.tasks.TaskAction
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
-class CleanAntlr3Task extends DefaultTask {
+class CleanQueryDslTask extends DefaultTask {
     @TaskAction
-    def cleanAntlr3() {
-        File f = new File(project.projectDir.absolutePath + project.antlr3.destinationDir);
+    def cleanQueryDslTargetDir() {
+        File f = new File(project.projectDir.absolutePath + project.querydsl.destinationDir);
         if (f.exists()){
-            println "     Deleting '" + f.getPath() + "'"
+            println "     cat-querydsl: Deleting '" + f.getPath() + "'"
             while(f.getParent() != null){
                 f = new File(f.getParent())
             }

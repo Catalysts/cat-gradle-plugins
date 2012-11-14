@@ -31,10 +31,9 @@ class Antlr3Plugin implements Plugin<Project> {
             }
         }
 
-
-        Task clean = project.task("cleanAntlr3", type: CleanAntlr3Task, description: 'Cleans output directory',group: "Antlr3")
+        Task clean = project.task("cleanAntlr3", type: CleanAntlr3Task, description: 'Cleans output directory of antlr3',group: "Antlr3")
         project.tasks.getByName('clean').dependsOn(clean)
-        Task create = project.task("createAntlr3Out", type: Antlr3OutputDirTask, dependsOn: clean, description: 'Creates output directory',group: "Antlr3")
+        Task create = project.task("createAntlr3Out", type: Antlr3OutputDirTask, dependsOn: clean, description: 'Creates output directory of antlr3',group: "Antlr3")
         Task generate = project.task("generateGrammarSource", type: GenerateGrammarSourceTask, dependsOn: create, description: "Generates Java sources from Antlr3 grammars.", group: "Antlr3")
         project.tasks.getByName('compileJava').configure {
             dependsOn generate
