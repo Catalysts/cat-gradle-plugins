@@ -24,7 +24,7 @@ class JavaGenPlugin implements Plugin<Project> {
 		}
 		
 		project.ext.velocityVersion = project.hasProperty("velocityVersion") ? project.velocityVersion : '1.7'
-		project.ext.cdocletVersion = project.hasProperty("cdocletVersion") ? project.cdocletVersion : '2.0.2'
+		project.ext.cdocletVersion = project.hasProperty("cdocletVersion") ? project.cdocletVersion : '2.0.3'
 		
 		project.dependencies {
 			javagenRuntime group: 'org.apache.velocity', name: 'velocity', version: project.velocityVersion
