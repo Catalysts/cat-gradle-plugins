@@ -11,7 +11,7 @@ class CleanAntlr3Task extends DefaultTask {
     def cleanAntlr3() {
         File f = new File(project.projectDir.absolutePath + File.separatorChar + project.antlr3.destinationDir);
         if (f.exists()){
-            println "     cat-antlr3: Deleting '" + f.getPath() + "'"
+            println "     Deleting '" + f.getPath() + "'"
             if (!f.deleteDir()){
                 println "          Error in deleting directory"
             }

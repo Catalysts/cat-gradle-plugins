@@ -6,13 +6,26 @@ A collection of reusable gradle plugins.
 
 Usage
 =====
-**catalysts-gradle-plugins** is *work-in-progress* and not yet published on maven central.
+**catalysts-gradle-plugins** is *work-in-progress* and not yet published on maven central.  
 If you 're curious, you can try it out by downloading the source and placing it into the ```buildSrc``` directory
 of your gradle project.
 
 
 List of plugins
 ===============
+
+* GRAILS
+* LESS
+* [GWT](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-gwt)
+* [DEPLOY](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-deploy)
+* JAXB
+* QUERYDSL
+* JAVAGEN
+* [CODEGEN-JAVA](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
+* [ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
+
+------
+
 
 Grails
 ------
@@ -31,7 +44,7 @@ grails {
 ```
 
 Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
-If you want to test your app before creating the archive, use the ```build``` task.
+If you want to test your app before creating the archive, use the ```build``` task.  
 
 You can rename (or move) the produced war file(s) by setting the ```grails.project.war.file``` option in your
 ```BuildConfig.groovy``` or with a simple gradle task, eg.
@@ -79,21 +92,24 @@ sass {
 }
 ```
 
-GWT
+[GWT](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-gwt)
 ------
 Compiles GWT (to do so it applies gradle default plugins 'java' and 'eclipse' and mavenCentral() as repository)  
-GWT version is configurable in build.gradle via "ext.gwtVersion" (default: '2.4.0')
+GWT version is configurable in build.gradle via "ext.gwtVersion" (default: '2.4.0')  
 
 Example for single / multi project projects [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-gwt)
 
-DEPLOY
+[DEPLOY](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-deploy)
 ------
-Stops specified running tomcat service, copy the artifacts into the desired server directory(appends /webapps/, clears log and work directory) and then starts the tomcat service
+Stops specified running tomcat service, copy the artifacts into the desired server directory(appends /webapps/, clears log and work directory) and then starts the tomcat service  
 For usage example see [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-deploy)
 
 JAXB
 ------
-Generates code from all JAXB sources specified in build.gradle (may be a list)
+Generates code from all JAXB sources specified in build.gradle (may be a list)  
+WSDL files will be generated to '/target/generated-sources/${sourceSet.name}/wsdl' from schema files from 'src/${sourceSet.name}/wsdl'  
+XSD files will be generated to '/target/generated-sources/${sourceSet.name}/xsd' from schema files from 'src/${sourceSet.name}/xsd'  
+
 Example for wsdl:
 ```
 apply plugin: 'cat-jaxb'
@@ -104,11 +120,22 @@ jaxb {
 }
 ```
 
+Example for xsd:
+```
+apply plugin: 'cat-jaxb'
+jaxb {
+	xsd {
+		convert 'FILENAME.wsdl'
+	}
+}
+```
+
+
 QUERYDSL
 ------
-Generates QueryDsl for given Project to 'target/generated-sources/querydsl' (extends compileJava task).
-This folder will be added to the SourceSet.
-The '/target' directory will be deleted when running 'gradle clean'.
+Generates QueryDsl for given Project to (default) 'target/generated-sources/querydsl' (extends compileJava task).  
+This folder will be added to the SourceSet.  
+The 'target/generated-sources/querydsl' directory will be deleted when running 'gradle clean'.  
 
 
 Example:
@@ -116,10 +143,19 @@ Example:
 apply plugin: 'cat-querydsl'
 ```
 
+Example: Change destination directory to something else then the default value
+```
+apply plugin: 'cat-querydsl'
+
+querydsl {
+    destinationDir 'PATH'
+}
+```
+
 JAVAGEN
 ------
-Gradle wrapper plugin for [cdoclet](https://github.com/Catalysts/cdoclet)
-Target path for generated source: "${project.projectDir}/target/generated-sources"
+Gradle wrapper plugin for [cdoclet](https://github.com/Catalysts/cdoclet)  
+Target path for generated source: "${project.projectDir}/target/generated-sources"  
 Example:
 ```
 apply plugin: 'cat-javagen'
@@ -128,10 +164,17 @@ dependencies  {
 }
 ```
 
-ANTLR3
+[CODEGEN-JAVA](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
 ------
-Gradle wrapper plugin for [antlr v3](http://www.antlr.org/)
-For extended usage example see [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
+
+This plugin can be used to create the build file 'Build.java' into '/target/generated-sources/main/' + package path.  
+For more details see [codegen-java](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
+
+
+[ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
+------
+Gradle wrapper plugin for [antlr v3](http://www.antlr.org/)  
+For extended usage example see [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)  
 Example:
 ```
 apply plugin: 'cat-antlr3'
