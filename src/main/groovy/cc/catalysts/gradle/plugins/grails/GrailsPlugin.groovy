@@ -47,6 +47,7 @@ class GrailsPlugin implements Plugin<Project> {
                 group: 'cat-grails',
                 description: 'Tests the project',
                 overwrite: true)
+        testTask.dependsOn(project.tasks.'grails-test-app')
         testTask.convention.testResultsDir = project.file('target/test-reports')
         return testTask
     }
@@ -64,6 +65,7 @@ class GrailsPlugin implements Plugin<Project> {
         Task warTask = project.task('war',
                 group: 'cat-grails',
                 description: 'Creates a war archive of the grails application')
+        warTask.dependsOn(project.tasks.'grails-war')
         return warTask
     }
 
@@ -72,14 +74,12 @@ class GrailsPlugin implements Plugin<Project> {
         project.tasks.clean.dependsOn(project.tasks.'grails-clean')
 
         Task testTask = addTestTask()
-        testTask.dependsOn(project.tasks.'grails-test-app')
 
         Task buildTask = addBuildTask()
         buildTask.dependsOn(testTask)
 
         if (GrailsUtils.isGrailsApplication(project)) {
             Task warTask = addWarTask()
-            warTask.dependsOn(project.tasks.'grails-war')
             buildTask.dependsOn(warTask)
         }
     }

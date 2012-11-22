@@ -14,13 +14,14 @@ of your gradle project.
 List of plugins
 ===============
 
-* GRAILS
-* LESS
+* [GRAILS](#grails)
+* [LESS](#less)
+* [SASS](#sass)
 * [GWT](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-gwt)
 * [DEPLOY](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-deploy)
-* JAXB
-* QUERYDSL
-* JAVAGEN
+* [JAXB](#jaxb)
+* [QUERYDSL](#querydsl)
+* [JAVAGEN](#javagen)
 * [CODEGEN-JAVA](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
 * [ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
 
@@ -64,7 +65,7 @@ LESS
 
 Converts your .less files to .css.
 You don't have to install the less executable on your machine - this plugin
-includes [lesscss-engine](https://github.com/asual/lesscss-engine).
+includes [lesscss-java](https://github.com/marceloverdijk/lesscss-java).
 
 **Example:**
 ```
