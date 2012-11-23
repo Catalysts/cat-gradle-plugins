@@ -126,7 +126,7 @@ Example for xsd:
 apply plugin: 'cat-jaxb'
 jaxb {
 	xsd {
-		convert 'FILENAME.wsdl'
+		convert 'FILENAME.xsd'
 	}
 }
 ```
