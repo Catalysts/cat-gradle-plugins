@@ -58,8 +58,6 @@ task build(type: Sync, dependsOn: ':your-grails-app:build') {
 }
 ```
 
-**NOTE:** If you 're using sonar (with the groovy plugin), don't forget to add ```sonar.project.language = 'grvy'``` to your (root) project's ```build.gradle```!
-
 LESS
 ------
 
