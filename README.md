@@ -94,9 +94,9 @@ Example for single / multi project projects [Wiki](https://github.com/Catalysts/
 Supports two different deploy scenarios:
 * lancopy  
   Stops specified running tomcat service, copy the artifacts into the desired server directory(appends /webapps/, clears log and work directory) and then starts the tomcat service
-* upload
+* upload  
   Upload all files and subfolder from specified directory to target host (using ssh (scp))
-
+  
 For usage example see [Wiki](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-deploy)
 
 JAXB
