@@ -1,19 +1,9 @@
 package cc.catalysts.gradle.plugins.deploy
 
+import cc.catalysts.gradle.plugins.FileDeleteException
+import cc.catalysts.gradle.plugins.FileUploadException
 import org.gradle.api.DefaultTask
-import org.gradle.api.internal.file.FileResolver
-import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
-import org.gradle.process.internal.DefaultJavaExecAction
-import org.gradle.process.internal.JavaExecAction
-
-import java.util.zip.ZipOutputStream
-import java.util.zip.ZipEntry
-import java.nio.channels.FileChannel
-import org.apache.commons.net.ftp.FTP
-import org.apache.commons.net.ftp.FTPClient
-import org.apache.commons.net.ftp.FTPReply
 import com.jcraft.jsch.Session
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.ChannelExec
@@ -51,20 +41,28 @@ class DeployTask extends DefaultTask {
         switch(usedConfig.type) {
             case 'lancopy':
 
-                File logDir = new File(usedConfig.webappDir + "\\logs")
-                File webappDir = new File(usedConfig.webappDir + "\\webapps")
-                File pluginDir = new File(usedConfig.webappDir + "\\plugins")
-                File workDir = new File(usedConfig.webappDir + "\\work")
+                File logDir = new File(usedConfig.webappDir + File.separator +"logs")
+                File webappDir = new File(usedConfig.webappDir + File.separator +"webapps")
+                File pluginDir = new File(usedConfig.webappDir + File.separator +"plugins")
+                File workDir = new File(usedConfig.webappDir + File.separator +"work")
 
                 println "Deploying " + usedConfig.webappWar + " to " + usedConfig.tomcatHost
 
                 println "-- Stopping Tomcat Service.."
                 RunCommand(true, ["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
 
-                deleteDir(logDir)
-                deleteDir(webappDir)
-                deleteDir(pluginDir)
-                deleteDir(workDir)
+                if (deleteDir(logDir)){
+                    println "   Successfully deleted " + logDir.getPath()
+                }
+                if (deleteDir(webappDir)){
+                    println "   Successfully deleted " + webappDir.getPath()
+                }
+                if (deleteDir(pluginDir)){
+                    println "   Successfully deleted " + pluginDir.getPath()
+                }
+                if (deleteDir(workDir)){
+                    println "   Successfully deleted " + workDir.getPath()
+                }
 
                 logDir.mkdir()
 
@@ -79,23 +77,11 @@ class DeployTask extends DefaultTask {
 
                 break
             case 'upload':
-                def rootWar = usedConfig.webappWar + "/webapps/ROOT.war"
-                def tempDir = System.getProperty('java.io.tmpdir')
+                def webappDir = usedConfig.webappDir
 
-                println 'Uploading ' + rootWar + ' to ' + usedConfig.uploadTarget
+                println 'Uploading ' + webappDir + ' to ' + usedConfig.uploadTarget
 
-                deleteDir(new File(tempDir))
-                new File(tempDir).mkdir()
-
-                println '  -- Copying ' + rootWar + ' to ' + tempDir
-                project.copy {
-                    from rootWar
-                    into tempDir
-                }
-
-                sendFiles(usedConfig, tempDir)
-
-                deleteDir(new File(tempDir))
+                sendFiles(usedConfig, webappDir)
 
                 break
             default:
@@ -133,100 +119,230 @@ class DeployTask extends DefaultTask {
         }
     }
 
-    private void sendFiles(usedConfig, tempDir) {
+    private void sendFiles(usedConfig, webappDir) {
 
         Session session = null
 
         println '  -- Connecting to ' + usedConfig.uploadTarget
-        try {
-            JSch jsch = new JSch()
-            println '    -- getting Session'
-            session = jsch.getSession(usedConfig.username, usedConfig.uploadTarget, 22)
-            session.setConfig("StrictHostKeyChecking", "no")
-            println '    -- set password'
-            session.setPassword(usedConfig.password)
-            println '    -- connect'
-            session.connect()
+        JSch jsch = new JSch()
+        println '    -- getting Session'
+        session = jsch.getSession(usedConfig.username, usedConfig.uploadTarget, 22)
+        session.setConfig("StrictHostKeyChecking", "no")
+        println '    -- set password'
+        session.setPassword(usedConfig.password)
+        println '    -- connect'
+        session.connect()
+        session.sendKeepAliveMsg()
 
-            File sendDir = new File(tempDir + project.version)
-            String[] dirList = sendDir.list()
-            if(dirList != null && dirList.length > 0) {
-                for(int i=0; i<dirList.length; i++) {
-                    File f = new File(sendDir, dirList[i])
-                    if(!f.isDirectory()) {
-                        println '    -- Sending ' + f.getPath() + ' to ' + usedConfig.uploadDir + '/' + f.getName()
-                        def destFilename = usedConfig.uploadDir + '/' + f.getName()
-                        def sourceFilename = f.getPath()
+        
+        String baseUploadDir = usedConfig.uploadDir + '/' + project.version
 
-                        FileInputStream fis = null
-
-                        String command = "scp -p -t " + destFilename
-                        Channel channel = session.openChannel("exec")
-                        ((ChannelExec) channel).setCommand(command)
-
-                        OutputStream out = channel.getOutputStream()
-                        InputStream inStream = channel.getInputStream()
-
-                        channel.connect()
-
-                        long filesize = (new File(sourceFilename)).length()
-                        command = "C0644 " + filesize + " "
-                        if (sourceFilename.lastIndexOf('/') > 0) {
-                            command += sourceFilename.substring(sourceFilename.lastIndexOf('/') + 1)
-                        } else {
-                            command += sourceFilename
-                        }
-                        command += "\n"
-
-                        out.write(command.getBytes())
-                        out.flush()
-
-                        fis = new FileInputStream(sourceFilename)
-                        byte[] buf = new byte[1024]
-                        while (true) {
-                            int len = fis.read(buf, 0, buf.length)
-                            if (len <= 0) {
-                                break
-                            }
-                            out.write(buf, 0, len)
-                        }
-
-                        fis.close()
-                        fis = null
-
-                        //send '\0' to end it
-                        buf[0] = 0
-                        out.write(buf, 0, 1)
-                        out.flush()
-
-                        out.close()
-
-                        channel.disconnect()
-                    }
-                }
-            }
-            session.disconnect()
-            session = null
-        } catch (Throwable t) {
-            println '  -- Connection failed! ' + t.toString()
+        File sendDir = new File(webappDir)
+        File[] dirList = sendDir.listFiles()
+        if ( dirList.size() == 0){
+            '    -- webApp directory is empty - no files to upload'
+        }else{
+            createRemoteDir(session, baseUploadDir)
+            
+            uploadDir(session, usedConfig, dirList, baseUploadDir)
         }
-        if(session != null) {
-            session.disconnect()
+        println '    -- Finished'
+        session.disconnect()
+        session = null
+    }
+
+    private static void uploadDir(Session session, def usedConfig,File[] dirList, String directory) {
+        if (dirList == null || session == null || directory == null || usedConfig == null){
+            return;
+        }
+        for(int i=0; i < dirList.length; i++) {
+            File f = dirList[i]
+            if (f.isDirectory()){
+                String newDir = directory + '/' +f.getName()
+                createRemoteDir(session, newDir)
+                uploadDir(session, usedConfig, f.listFiles(), newDir)
+            }else{
+                uploadSshFile(session, f, f.getPath(), directory + '/' + f.getName())
+            }
         }
     }
 
-    private static boolean deleteDir(File path) {
-        if( path.exists() ) {
-            File[] files = path.listFiles()
-            for(int i=0; i<files.length; i++) {
-                if(files[i].isDirectory()) {
-                    deleteDir(files[i])
+    private static void uploadSshFile(Session session, File f, String sourceFilename, String destFilename) {
+        String command = null
+        OutputStream out = null
+        InputStream inStream = null
+        Channel channel = null
+        
+        long fileSize = f.length()
+
+        println '    -- Sending ' + sourceFilename + ' to ' + destFilename + ' (~' + (long)(fileSize / 1024) + ' KB)'
+
+        FileInputStream fis = null
+
+        // SCP UPLOAD
+        command = "scp -p -t '" + destFilename + "'"
+        channel = session.openChannel("exec")
+        ((ChannelExec) channel).setCommand(command)
+
+        out = channel.getOutputStream()
+        inStream = channel.getInputStream()
+
+        channel.connect()
+
+        println "         Command: " + command
+
+        if(checkAck(inStream) != 0 ){
+            throw new FileUploadException(sourceFilename);
+        }else{
+            println "           Acknowledge successful"
+        }
+
+        // create File and upload
+        command = "C0644 " + fileSize + " "
+        if (sourceFilename.lastIndexOf('/') > 0) {
+            command += sourceFilename.substring(sourceFilename.lastIndexOf('/') + 1)
+        } else {
+            command += sourceFilename
+        }
+        command += "\n"
+
+        print "         Command: " + command
+
+        out.write(command.getBytes())
+        out.flush()
+
+        if(checkAck(inStream) != 0 ){
+            throw new FileUploadException(sourceFilename);
+        }else{
+            println "           Acknowledge successful"
+        }
+
+        fis = new FileInputStream(sourceFilename)
+        boolean showProgress = false
+        byte[] buf = new byte[1024]
+        int sendBuffer = 0
+        long fivePercent = fileSize / 20
+        int completed = 0
+        if (fileSize > 1024 * 50){
+            showProgress = true
+            System.out.print "           \"|\" = 5% ["
+            System.out.flush()
+        }
+        while (true) {
+            int len = fis.read(buf, 0, buf.length)
+            if (len <= 0) {
+                break
+            }
+            out.write(buf, 0, len)
+            sendBuffer += buf.size()
+            if(showProgress && sendBuffer > fivePercent){
+                // 5% sended
+                sendBuffer = sendBuffer - fivePercent
+                completed += 5
+                if(completed == 25){
+                    System.out.print '25%'
+                } else if(completed == 50){
+                    System.out.print '50%'
+                } else if(completed == 75){
+                    System.out.print '75%'
+                } else if(completed == 100){
+                    System.out.print '100%'
+                } else {
+                    System.out.print '|'
                 }
-                else {
-                    files[i].delete()
+                System.out.flush()
+            }
+        }
+        out.flush()
+        fis.close()
+        fis = null
+
+        //send '\0' to end it
+        buf[0] = 0
+        out.write(buf, 0, 1)
+        out.flush()
+        if (showProgress){
+            System.out.print "]"
+            System.out.println()
+        }
+        println '       Successfully uploaded'
+
+        if(checkAck(inStream) != 0 ){
+            throw new FileUploadException(sourceFilename);
+        }
+
+        out.close()
+
+        channel.disconnect()
+    }
+
+    private static void createRemoteDir(Session session, String path) {
+        String command = "mkdir '" + path + "'"
+        Channel channel = session.openChannel("exec")
+
+        ((ChannelExec) channel).setCommand(command)
+
+        OutputStream out = channel.getOutputStream()
+        InputStream inStream = channel.getInputStream()
+
+        channel.connect()
+
+        println "    -- Creating directory: '" + path + "'"
+        println "         Command: " + command
+        
+        channel.close()
+        out = null
+        inStream = null
+    }
+
+    private static boolean deleteDir(File path) throws FileDeleteException {
+        if( path.exists() ) {
+            if (path.isDirectory()){
+                if (!path.deleteDir()){
+                    new FileDeleteException(path)
+                }
+            }else{
+                if (!path.delete()){
+                    new FileDeleteException(path)
                 }
             }
         }
-        return path.delete()
+        return true
+    }
+
+    public static int checkAck(InputStream stream) throws IOException {
+        int b = stream.read()
+        // b may be 0 for success,
+        // 1 for error,
+        // 2 for fatal error,
+        // -1
+        if(b == 0) return b
+        if(b == -1) return b
+
+        if(b == 1 || b == 2){
+            StringBuffer sb = new StringBuffer()
+            sb.append("           ")
+            int c
+            while(c != '\n' && c != -1){
+                c = stream.read()
+                sb.append((char)c)
+            }
+            if(b == 1 ){ // error
+                print sb.toString()
+            }
+            if(b == 2 ){ // fatal error
+                print sb.toString()
+            }
+        }
+        return b
+    }
+    
+    private static disconnect(Session session, Channel channel){
+        if (channel != null){
+            channel.disconnect()
+        }
+        if(session != null){
+            session.disconnect()
+        }
     }
 }
