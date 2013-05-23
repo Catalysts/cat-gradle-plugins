@@ -42,9 +42,6 @@ apply plugin: 'cat-grails'
 grails {
     version '2.1.1'
 }
-catgrails {
-    coverage true
-}
 ```
 
 Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
@@ -52,8 +49,7 @@ If you want to test your app before creating the archive, use the ```build``` ta
 
 You can customize the path of the produced war file(s) by setting the ```grails.project.war.file``` option in your ```BuildConfig.groovy```.
 
-**test task notes**
-In order to generate a code coverage report with the grails code-coverage plugin, you have to set coverage to true in the catgrails extension (default: false).
+In order to generate a code coverage report with the grails code-coverage plugin, you can use the ``testCoverage`` task.
 
 LESS
 ------

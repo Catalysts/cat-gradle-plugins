@@ -45,10 +45,15 @@ class GrailsPlugin implements Plugin<Project> {
         Task testTask = project.task('test',
                 group: 'cat-grails',
                 description: 'Tests the project',
-                overwrite: true,
-                type: GrailsTestTask)
-
+                overwrite: true)
+        testTask.dependsOn(project.tasks.'grails-test-app')
         testTask.convention.testResultsDir = project.file('target/test-reports')
+
+        Task testCoverageTask = project.task('testCoverage',
+                group: 'cat-grails',
+                description: 'Tests the project and generates a coverage report',
+                type: GrailsTestCoverageTask)
+
         return testTask
     }
 
@@ -86,7 +91,6 @@ class GrailsPlugin implements Plugin<Project> {
 
     public void apply(Project project) {
         this.project = project
-        project.extensions.create('catgrails', GrailsExtension)
 
         // in case there is no rootProject, rootProject simply points to the current project
         if (project.plugins.hasPlugin(SonarPlugin) || project.rootProject.plugins.hasPlugin(SonarPlugin)) {
