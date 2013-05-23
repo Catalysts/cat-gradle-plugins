@@ -1,11 +1,11 @@
 package cc.catalysts.gradle.plugins.grails
 
 import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
-import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.sonar.SonarPlugin
+
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
@@ -41,13 +41,13 @@ class GrailsPlugin implements Plugin<Project> {
         project.apply plugin: GradleGrailsWrapperPlugin
     }
 
-    private  Task addTestTask() {
-        // map test task to grails-test-app
+    private Task addTestTask() {
         Task testTask = project.task('test',
                 group: 'cat-grails',
                 description: 'Tests the project',
-                overwrite: true)
-        testTask.dependsOn(project.tasks.'grails-test-app')
+                overwrite: true,
+                type: GrailsTestTask)
+
         testTask.convention.testResultsDir = project.file('target/test-reports')
         return testTask
     }
@@ -86,6 +86,7 @@ class GrailsPlugin implements Plugin<Project> {
 
     public void apply(Project project) {
         this.project = project
+        project.extensions.create('catgrails', GrailsExtension)
 
         // in case there is no rootProject, rootProject simply points to the current project
         if (project.plugins.hasPlugin(SonarPlugin) || project.rootProject.plugins.hasPlugin(SonarPlugin)) {

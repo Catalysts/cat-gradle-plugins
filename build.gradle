@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    groovy localGroovy()
+    compile localGroovy()
 
     // cat-deploy
     compile 'commons-net:commons-net:3.2'
@@ -52,17 +52,3 @@ uploadSnapshot {
         }
     }
 }
-
-/*
-uploadArchives {
-    repositories {
-        ivy {
-            credentials {
-                username = System.getenv('IVY_USERNAME')
-                password = System.getenv('IVY_PASSWORD')
-            }
-            url 'TODO'
-            layout 'maven'
-        }
-    }
-}*/

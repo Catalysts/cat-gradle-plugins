@@ -30,7 +30,7 @@ public class WsdlPlugin implements Plugin<Project> {
 	}
 	
 	private Task createWsdlTaskFor(SourceSet sourceSet, Project project) {
-		def wsdlTask = project.tasks.add(taskName(sourceSet), GenerateWsdlTask)
+		def wsdlTask = project.tasks.create(taskName(sourceSet), GenerateWsdlTask)
 		wsdlTask.sourceDirectory = "src/${sourceSet.name}/wsdl"
 		wsdlTask.group = GenerateWsdlTask.GENERATE_GROUP
 		wsdlTask.description = "Generates code from the ${sourceSet.name} WSDL sources."

@@ -30,7 +30,7 @@ public class XsdPlugin implements Plugin<Project> {
 	}
 	
 	private Task createXsdTaskFor(SourceSet sourceSet, Project project) {
-		def xsdTask = project.tasks.add(taskName(sourceSet), GenerateJaxbTask)
+		def xsdTask = project.tasks.create(taskName(sourceSet), GenerateJaxbTask)
 		xsdTask.sourceDirectory = "src/${sourceSet.name}/xsd"
 		xsdTask.group = GenerateJaxbTask.GENERATE_GROUP
 		xsdTask.description = "Generates code from the ${sourceSet.name} XSD sources."

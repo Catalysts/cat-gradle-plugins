@@ -38,7 +38,7 @@ public class JaxbPlugin implements Plugin<Project> {
 			jaxb 'axis:axis:' + project.axisVersion
 		}
 		
-		def jaxbTask = project.tasks.add("jaxb", JaxbTask)
+		def jaxbTask = project.tasks.create("jaxb", JaxbTask)
 		jaxbTask.group = GenerateJaxbTask.GENERATE_GROUP
 		jaxbTask.description = "Generates code from all JAXB sources."
 		

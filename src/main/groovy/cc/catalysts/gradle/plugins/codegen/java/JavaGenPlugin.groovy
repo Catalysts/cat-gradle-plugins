@@ -38,7 +38,7 @@ class JavaGenPlugin implements Plugin<Project> {
 				
 				if(prjName != "cdoclet") {
 					if(project.tasks.findByPath('javagen') == null) {
-						project.tasks.add(name: 'javagen', type: JavaGenTask)
+						project.tasks.create(name: 'javagen', type: JavaGenTask)
 						project.tasks.compileJava.dependsOn('javagen')
 						if(project.tasks.findByPath('codegen') == null) {
 							project.task('codegen', type: CodegenTask)
