@@ -31,7 +31,7 @@ dependencies {
     runtime 'commons-io:commons-io:2.4'
 
     // cat-querydsl
-    runtime 'com.mysema.querydsl:querydsl-root:3.2.0'
+    runtime 'com.mysema.querydsl:querydsl-root:2.9.0'
 
     // cat-sass
     runtime group: 'org.jruby', name: 'jruby-complete', version: '1.6.8'
