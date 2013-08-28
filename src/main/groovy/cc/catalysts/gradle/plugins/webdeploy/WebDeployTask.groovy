@@ -17,13 +17,14 @@ class WebDeployTask extends DefaultTask {
         ant.taskdef(name: 'scp2', classname: 'org.apache.tools.ant.taskdefs.optional.ssh.Scp', classpath: project.buildscript.configurations.classpath.asPath)
         ant.scp2(todir: project.webdeploy.destination, keyfile: project.webdeploy.privateKeyPath, trust: true) {
             ant.fileset(dir: '.') {
+                if (project.webdeploy.onlyModifiedFiles)
+                    modified()
+                if (hasProductionConfiguration)
+                    exclude(name: "${project.webdeploy.productionConfiguration}/")
+
                 exclude(name: 'build.gradle')
                 exclude(name: '.gradle/')
                 exclude(name: 'buildSrc/')
-
-                if (hasProductionConfiguration) {
-                    exclude(name: "${project.webdeploy.productionConfiguration}/")
-                }
             }
         }
 
