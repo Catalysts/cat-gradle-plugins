@@ -8,5 +8,6 @@ class WebDeployExtension {
     String destination
     String privateKeyPath
     String productionConfiguration
+    Boolean onlyModifiedFiles = true
 
 }

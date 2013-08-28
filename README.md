@@ -200,3 +200,6 @@ In the first step all files (except ```build.gradle```, ```.gradle/``` and ```bu
 If the ```productionConfiguration``` setting is specified, all files of this folder will be transferred to the remote destination,
 and the original files will be overwritten. This setting is useful if you need special configuration files
 (e.g. ```wp-config.php``` for wordpress) on the remote server.
+
+With the ```onlyModifiedFiles``` (boolean) setting you can configure if only local modified files should be copied to the server,
+or every file should be copied. Default is ```true``` (only modified files get transferred to the server).
