@@ -24,6 +24,7 @@ List of plugins
 * [JAVAGEN](#javagen)
 * [CODEGEN-JAVA](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
 * [ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
+* [WEBDEPLOY](#webdeploy)
 
 ------
 
@@ -179,3 +180,23 @@ antlr3 {
     generate 'XYZ.g->cc.catalysts.example.parser'
 }
 ```
+
+
+WEBDEPLOY
+------
+Deploys files to a remote webserver over SSH (using the SCP protocol).
+
+Example:
+```
+apply plugin: 'cat-webdeploy'
+webdeploy {
+	destination 'user@remotehost.com:/var/www/www.example.com'
+	privateKeyPath System.getProperty('user.home') + '/ssh/deploykey.key'
+	productionConfiguration 'productionconfig'
+}
+```
+
+In the first step all files (except ```build.gradle```, ```.gradle/``` and ```buildSrc/```) will be copied to the remote destination.
+If the ```productionConfiguration``` setting is specified, all files of this folder will be transferred to the remote destination,
+and the original files will be overwritten. This setting is useful if you need special configuration files
+(e.g. ```wp-config.php``` for wordpress) on the remote server.

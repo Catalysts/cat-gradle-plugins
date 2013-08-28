@@ -13,6 +13,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    snapshot.extendsFrom(archives)
+}
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
@@ -33,11 +37,9 @@ dependencies {
     // cat-sass
     runtime group: 'org.jruby', name: 'jruby-complete', version: '1.6.8'
     runtime group: 'me.n4u.sass', name: 'sass-gems', version: '3.2.1'
-}
 
-
-configurations {
-    snapshot.extendsFrom(archives)
+    // cat-webdeploy
+    runtime group: 'org.apache.ant', name: 'ant-jsch', version: '1.9.2'
 }
 
 uploadSnapshot {
