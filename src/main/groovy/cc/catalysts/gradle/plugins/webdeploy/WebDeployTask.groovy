@@ -20,8 +20,16 @@ class WebDeployTask extends DefaultTask {
                 if (project.webdeploy.onlyModifiedFiles)
                     modified()
 
-                if (hasProductionConfiguration)
+                if (hasProductionConfiguration) {
+                    String rootPath = project.file('.').absolutePath
+
                     exclude(name: "${project.webdeploy.productionConfiguration}/")
+                    // exclude config files from root directory too; they get copied later
+                    project.file(project.webdeploy.productionConfiguration).eachFileRecurse { File file ->
+                        String relativeFile = file.absolutePath.substring(rootPath.length() + project.webdeploy.productionConfiguration.length() + 2)
+                        exclude(name: relativeFile)
+                    }
+                }
 
                 for(String excludeName: project.webdeploy.excludes) {
                     exclude(name: excludeName)
