@@ -9,5 +9,10 @@ class WebDeployExtension {
     String privateKeyPath
     String productionConfiguration
     Boolean onlyModifiedFiles = true
+    List<String> excludes = []
+
+    void exclude(String exclude) {
+        excludes.add(exclude)
+    }
 
 }

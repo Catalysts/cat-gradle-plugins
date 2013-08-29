@@ -183,7 +183,7 @@ antlr3 {
 
 
 WEBDEPLOY
-------
+---------
 Deploys files to a remote webserver over SSH (using the SCP protocol).
 
 Example:
@@ -193,13 +193,19 @@ webdeploy {
 	destination 'user@remotehost.com:/var/www/www.example.com'
 	privateKeyPath System.getProperty('user.home') + '/ssh/deploykey.key'
 	productionConfiguration 'productionconfig'
+	exclude 'dir1/'
+	exclude 'file.txt'
 }
 ```
 
-In the first step all files (except ```build.gradle```, ```.gradle/``` and ```buildSrc/```) will be copied to the remote destination.
-If the ```productionConfiguration``` setting is specified, all files of this folder will be transferred to the remote destination,
+All files (except ```build.gradle```, ```.gradle/``` and ```buildSrc/```) will be copied to the remote destination.
+
+**Settings:**
+
+```productionConfiguration```: If this setting is specified, all files of this folder will be transferred to the remote destination,
 and the original files will be overwritten. This setting is useful if you need special configuration files
 (e.g. ```wp-config.php``` for wordpress) on the remote server.
 
-With the ```onlyModifiedFiles``` (boolean) setting you can configure if only local modified files should be copied to the server,
-or every file should be copied. Default is ```true``` (only modified files get transferred to the server).
+```onlyModifiedFiles```: (boolean) if true, only local modified files get transferred to the server. Default: true
+
+```exclude```: (String) exclude files and directories. This can be specified multiple times (see the example above).

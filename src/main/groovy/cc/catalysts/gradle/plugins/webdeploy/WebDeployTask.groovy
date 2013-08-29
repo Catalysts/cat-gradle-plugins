@@ -19,8 +19,13 @@ class WebDeployTask extends DefaultTask {
             ant.fileset(dir: '.') {
                 if (project.webdeploy.onlyModifiedFiles)
                     modified()
+
                 if (hasProductionConfiguration)
                     exclude(name: "${project.webdeploy.productionConfiguration}/")
+
+                for(String excludeName: project.webdeploy.excludes) {
+                    exclude(name: excludeName)
+                }
 
                 exclude(name: 'build.gradle')
                 exclude(name: '.gradle/')
