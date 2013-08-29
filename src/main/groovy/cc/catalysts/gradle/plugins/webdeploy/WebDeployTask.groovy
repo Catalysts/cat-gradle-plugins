@@ -30,6 +30,7 @@ class WebDeployTask extends DefaultTask {
                 exclude(name: 'build.gradle')
                 exclude(name: '.gradle/')
                 exclude(name: 'buildSrc/')
+                exclude(name: 'cache.properties')
             }
         }
 
