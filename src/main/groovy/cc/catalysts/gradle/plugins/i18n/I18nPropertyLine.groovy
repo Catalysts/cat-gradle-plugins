@@ -4,10 +4,12 @@ package cc.catalysts.gradle.plugins.i18n
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class I18nPropertyLine {
+    final long line
     final I18nLineType type
     final I18nProperty property
 
-    private I18nPropertyLine(String line) {
+    private I18nPropertyLine(String line, long lineNr) {
+        this.line = lineNr
         if (line == null || line.isEmpty()) {
             type = I18nLineType.EMPTY_LINE
             property = null
@@ -20,11 +22,11 @@ class I18nPropertyLine {
         }
     }
 
-    static I18nPropertyLine parseLine(String line) {
+    static I18nPropertyLine parseLine(String line, long lineNr) {
         if (line == null) {
             return null
         }
-        return new I18nPropertyLine(line.trim())
+        return new I18nPropertyLine(line.trim(), lineNr)
     }
 
     @Override
@@ -34,9 +36,8 @@ class I18nPropertyLine {
         }
         if (type == I18nLineType.PROPERTY) {
             return property.getName().compareTo(o.getProperty().getName())
-        } else {
-            return -1
         }
+        return 0
     }
 
     @Override

@@ -39,7 +39,7 @@ class I18nTemplate {
 
     void addLine(String line) {
         lines++
-        I18nPropertyLine l = parseLine(line)
+        I18nPropertyLine l = parseLine(line, lines)
         switch (l.getType()) {
             case I18nLineType.PROPERTY:
                 properties++
@@ -58,9 +58,11 @@ class I18nTemplate {
 
     boolean compareWith(File file, I18nExtension e) {
         I18nTemplate t = create(file)
+        println('Comparing "' + templateFileName + '" with "' + t.getTemplateFileName() + '"')
         Set<String> missingPropertiesTemplate = []
         missingPropertiesTemplate.addAll(propertySet)
         boolean orderError = false;
+        int firstOccurence = 0;
         for (int i = 0; i < t.getContent().size(); i++) {
             I18nPropertyLine curLineTemplate = content.get(i)
             I18nPropertyLine curLine = t.getContent().get(i)
@@ -73,11 +75,12 @@ class I18nTemplate {
             }
 
             if (e.checkOrder && curLineTemplate.compareTo(curLine) != 0) {
-                orderError = true;
+                orderError = true
+                firstOccurence = curLineTemplate.line
             }
         }
         if (orderError) {
-            e.getErrors().add('Properties in file "' + t.getTemplateFileName() + '" and "' + templateFileName + '" are not in the same order')
+            e.getErrors().add('Properties in file "' + t.getTemplateFileName() + '" and "' + templateFileName + '" are not in the same order (first occurence: ' + firstOccurence + ')')
         }
         if (missingPropertiesTemplate.size() != 0) {
             e.getErrors().add('File "' + t.getTemplateFileName() + '" is missing the following properties: ')
@@ -85,6 +88,5 @@ class I18nTemplate {
                 e.getErrors().add('\t\t' + m)
             }
         }
-        println('Comparing "' + templateFileName + '" with "' + t.getTemplateFileName() + '"')
     }
 }

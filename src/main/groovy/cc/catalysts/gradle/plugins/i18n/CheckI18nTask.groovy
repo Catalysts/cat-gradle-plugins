@@ -37,7 +37,7 @@ public class CheckI18nTask extends DefaultTask {
             g.verify(root, e)
         }
 
-        if (e.getErrors() != null) {
+        if (e.getErrors() != null && e.getErrors().size() > 0) {
             String LF = System.getProperty("line.separator"); ;
             StringBuilder errorMsg = new StringBuilder()
             errorMsg.append("The following errors occured: ")
