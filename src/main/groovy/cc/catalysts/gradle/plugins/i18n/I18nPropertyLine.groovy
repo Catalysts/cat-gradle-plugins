@@ -1,0 +1,49 @@
+package cc.catalysts.gradle.plugins.i18n
+
+/**
+ * @author Catalysts GmbH, www.catalysts.cc
+ */
+class I18nPropertyLine {
+    final I18nLineType type
+    final I18nProperty property
+
+    private I18nPropertyLine(String line) {
+        if (line == null || line.isEmpty()) {
+            type = I18nLineType.EMPTY_LINE
+            property = null
+        } else if (line.startsWith('#')) {
+            type = I18nLineType.COMMENT
+            property = null
+        } else {
+            type = I18nLineType.PROPERTY
+            property = I18nProperty.createFromLine(line)
+        }
+    }
+
+    static I18nPropertyLine parseLine(String line) {
+        if (line == null) {
+            return null
+        }
+        return new I18nPropertyLine(line.trim())
+    }
+
+    @Override
+    public int compareTo(I18nPropertyLine o) {
+        if (type != o.getType()) {
+            return 2
+        }
+        if (type == I18nLineType.PROPERTY) {
+            return property.getName().compareTo(o.getProperty().getName())
+        } else {
+            return -1
+        }
+    }
+
+    @Override
+    boolean equals(Object obj) {
+        if (!obj instanceof I18nPropertyLine) {
+            return false;
+        }
+        return compareTo(obj) == 0
+    }
+}
