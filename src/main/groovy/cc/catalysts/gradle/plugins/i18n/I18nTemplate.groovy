@@ -62,10 +62,14 @@ class I18nTemplate {
         Set<String> missingPropertiesTemplate = []
         missingPropertiesTemplate.addAll(propertySet)
         boolean orderError = false;
-        int firstOccurence = 0;
+        int firstOccurrence = 0;
+        I18nPropertyLine curLineTemplate;
+        I18nPropertyLine curLine
         for (int i = 0; i < t.getContent().size(); i++) {
-            I18nPropertyLine curLineTemplate = content.get(i)
-            I18nPropertyLine curLine = t.getContent().get(i)
+            if (i < content.size()) {
+                curLineTemplate = content.get(i)
+            }
+            curLine = t.getContent().get(i)
 
             if (curLine.type == I18nLineType.PROPERTY) {
                 if (!propertySet.contains(curLine.getProperty().getName())) {
@@ -74,13 +78,13 @@ class I18nTemplate {
                 missingPropertiesTemplate.remove(curLine.getProperty().getName())
             }
 
-            if (e.checkOrder && curLineTemplate.compareTo(curLine) != 0) {
+            if (e.checkOrder && curLine.compareTo(curLineTemplate) != 0) {
                 orderError = true
-                firstOccurence = curLineTemplate.line
+                firstOccurrence = i + 1;
             }
         }
         if (orderError) {
-            e.getErrors().add('Properties in file "' + t.getTemplateFileName() + '" and "' + templateFileName + '" are not in the same order (first occurence: ' + firstOccurence + ')')
+            e.getErrors().add('Properties in file "' + t.getTemplateFileName() + '" and "' + templateFileName + '" are not in the same order (first occurrence: ' + firstOccurrence + ')')
         }
         if (missingPropertiesTemplate.size() != 0) {
             e.getErrors().add('File "' + t.getTemplateFileName() + '" is missing the following properties: ')

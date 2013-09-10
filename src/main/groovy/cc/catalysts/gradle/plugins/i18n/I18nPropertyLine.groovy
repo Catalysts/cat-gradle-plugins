@@ -31,6 +31,9 @@ class I18nPropertyLine {
 
     @Override
     public int compareTo(I18nPropertyLine o) {
+        if(o == null){
+            return -1
+        }
         if (type != o.getType()) {
             return 2
         }
