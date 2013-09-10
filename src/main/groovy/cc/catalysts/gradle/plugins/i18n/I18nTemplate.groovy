@@ -34,6 +34,7 @@ class I18nTemplate {
             t.addLine(curLine)
             curLine = reader.readLine()
         }
+        reader.close()
         return t
     }
 
