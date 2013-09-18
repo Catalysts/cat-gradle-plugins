@@ -80,8 +80,10 @@ class I18nTemplate {
             }
 
             if (e.checkOrder && curLine.compareTo(curLineTemplate) != 0) {
+                if (!orderError) {
+                    firstOccurrence = i + 1;
+                }
                 orderError = true
-                firstOccurrence = i + 1;
             }
         }
         if (orderError) {
