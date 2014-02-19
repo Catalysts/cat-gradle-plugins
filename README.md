@@ -21,6 +21,7 @@ List of plugins
 * [DEPLOY](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-deploy)
 * [JAXB](#jaxb)
 * [QUERYDSL](#querydsl)
+* [HIBERNATE](#hibernate)
 * [JAVAGEN](#javagen)
 * [CODEGEN-JAVA](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
 * [ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
@@ -149,6 +150,31 @@ querydsl {
     destinationDir 'PATH'
 }
 ```
+
+
+HIBERNATE
+------
+Generates static metamodel classes for Hibernate JPA. The sources will be generated to (default) 'target/generated-sources/hibernate' (extends compileJava task).  
+This folder will be added to the SourceSet.  
+The 'target/generated-sources/hibernate' directory will be deleted when running 'gradle clean'.  
+To activate the generation for a project, just apply the plugin in the build.gradle file. Additionally you can choose the used hibernate version by defining the hibernateVersion variable on the project (or any parent project).
+
+Example:
+```
+apply plugin: 'cat-hibernate'
+```
+
+Example: Change destination directory to something else then the default value and use a specific hibernate Version
+```
+ext.hibernateVersion = '4.3.1.Final'
+
+apply plugin: 'cat-hibernate'
+
+hibernate {
+    destinationDir 'PATH'
+}
+```
+
 
 JAVAGEN
 ------
