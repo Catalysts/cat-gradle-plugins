@@ -9,6 +9,10 @@ if (hasProperty('teamcity')) {
 apply plugin: 'groovy'
 apply plugin: 'idea'
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
 repositories {
     mavenCentral()
 }
