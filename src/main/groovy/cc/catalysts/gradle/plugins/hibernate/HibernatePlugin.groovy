@@ -16,6 +16,12 @@ class HibernatePlugin implements Plugin<Project> {
 
         project.extensions.hibernate = new HibernateExtension()
 
+        project.convention.plugins.java.sourceSets.all { SourceSet sourceSet ->
+            if (!sourceSet.name.toLowerCase().contains("test")) {
+                sourceSet.java { srcDir project.hibernate.destinationDir }
+            }
+        }
+
         Task clean = project.task("cleanHibernate", type: CleanHibernateTask, description: 'Cleans output directory of Hibernate', group: "Hibernate")
         project.tasks.getByName('clean').dependsOn(clean)
 
