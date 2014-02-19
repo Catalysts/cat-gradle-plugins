@@ -50,7 +50,6 @@ class HibernatePlugin implements Plugin<Project> {
 
         project.compileJava {
             dependsOn generateMetamodel
-            source generateMetamodel.destinationDir
         }
 
     }
