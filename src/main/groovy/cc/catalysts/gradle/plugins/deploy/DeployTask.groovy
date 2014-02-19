@@ -41,10 +41,10 @@ class DeployTask extends DefaultTask {
         switch(usedConfig.type) {
             case 'lancopy':
 
-                File logDir = new File(usedConfig.webappDir + File.separator +"logs")
-                File webappDir = new File(usedConfig.webappDir + File.separator +"webapps")
-                File pluginDir = new File(usedConfig.webappDir + File.separator +"plugins")
-                File workDir = new File(usedConfig.webappDir + File.separator +"work")
+                File logDir = new File(usedConfig.webappDir, "logs")
+                File webappDir = new File(usedConfig.webappDir, "webapps")
+                File pluginDir = new File(usedConfig.webappDir, "plugins")
+                File workDir = new File(usedConfig.webappDir, "work")
 
                 println "Deploying " + usedConfig.webappWar + " to " + usedConfig.tomcatHost
 

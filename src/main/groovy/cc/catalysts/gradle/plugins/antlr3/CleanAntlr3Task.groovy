@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction
 class CleanAntlr3Task extends DefaultTask {
     @TaskAction
     def cleanAntlr3() {
-        File f = new File(project.projectDir.absolutePath + File.separatorChar + project.antlr3.destinationDir);
+        File f = new File(project.projectDir.absolutePath, project.antlr3.destinationDir);
         if (f.exists()){
             println "     Deleting '" + f.getPath() + "'"
             if (!f.deleteDir()){

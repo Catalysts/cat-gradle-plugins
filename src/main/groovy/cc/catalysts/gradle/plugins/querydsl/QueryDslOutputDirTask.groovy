@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction
 class QueryDslOutputDirTask extends DefaultTask {
     @TaskAction
     def createQueryDslOutputDir() {
-        File f = new File(project.projectDir.absolutePath + File.separatorChar + project.querydsl.destinationDir);
+        File f = new File(project.projectDir.absolutePath, project.querydsl.destinationDir);
         if (!f.exists()){
             println "     cat-querydsl: Creating '" + f.getPath() + "'"
            if (!f.mkdirs()){
