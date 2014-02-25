@@ -48,20 +48,20 @@ class DeployTask extends DefaultTask {
 
                 println "Deploying " + usedConfig.webappWar + " to " + usedConfig.tomcatHost
 
+
                 println "-- Stopping Tomcat Service.."
-                int exitCode = RunCommand(true, ["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
-                if (exitCode != 0 && exitCode != 1062) // exit code 1062 = service not active
-                    throw new Exception ("Error stopping tomcat service")
+                String state = executeServiceCommand(["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
 
                 int i = 1;
                 int maxChecks = 5;
-                while (!isTomcatStopped(usedConfig)) {
+                while (state.equals("STOP_PENDING")) {
                     println "--    Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ..."
                     i++
                     if (i > maxChecks) {
                         throw new Exception("Couldn't stop tomcat service")
                     }
                     Thread.sleep(5000)
+                    state = executeServiceCommand(["sc", usedConfig.tomcatHost, "query", usedConfig.tomcatService])
                 }
 
                 if (deleteDir(logDir)){
@@ -86,8 +86,7 @@ class DeployTask extends DefaultTask {
                 }
 
                 println "-- Starting Tomcat Service.."
-                if (RunCommand(true, ["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService]) != 0)
-                    throw new Exception ("Error starting tomcat service")
+                executeServiceCommand(["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService])
 
                 break
             case 'upload':
@@ -104,45 +103,23 @@ class DeployTask extends DefaultTask {
         }
     }
 
-    private boolean isTomcatStopped(def usedConfig) {
-        Process status = "sc ${usedConfig.tomcatHost} query ${usedConfig.tomcatService}".execute()
+    private String executeServiceCommand(List<String> command) {
+        Process proc = command.execute()
+        proc.waitFor()
 
-        for(String line: status.getText().split("\n")) {
-            if (line.contains("STATE") && line.contains("STOPPED")) {
-                return true
+        String stdout = proc.in.text
+        println "stderr: ${proc.err.text}"
+        println "stdout: ${stdout}"
+        println "return code: ${proc.exitValue()}"
+
+        for(String line: stdout.split("\n")) {
+            if (line.contains("STATE")) {
+                String[] spl = line.split("\\s+")
+                return spl[4]
             }
         }
 
-        return false
-    }
-
-    private int RunCommand(boolean PrintOutput, ArrayList<String> command) {
-        try {
-            def sout = new StringBuffer()
-            def serr = new StringBuffer()
-            ProcessBuilder pb = new ProcessBuilder(command)
-            pb.directory(project.file("/"))
-            Process proc = pb.start()
-            InputStream stdout = proc.getInputStream()
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stdout))
-            if(PrintOutput) {
-                while((line = reader.readLine ()) != null) {
-                    if(line != "") {
-                        println (line)
-                    }
-                }
-            }
-            proc.waitFor()
-            proc.consumeProcessOutput(sout,serr)
-
-            println sout
-            println serr
-            println "exit code: " + proc.exitValue()
-
-            return proc.exitValue()
-        } catch (Throwable t) {
-            return -1
-        }
+        return ""
     }
 
     private void sendFiles(usedConfig, webappDir) {
