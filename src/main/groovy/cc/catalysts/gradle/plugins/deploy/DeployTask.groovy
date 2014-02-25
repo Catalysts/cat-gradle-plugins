@@ -49,7 +49,8 @@ class DeployTask extends DefaultTask {
                 println "Deploying " + usedConfig.webappWar + " to " + usedConfig.tomcatHost
 
                 println "-- Stopping Tomcat Service.."
-                if (!RunCommand(true, ["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService]))
+                int exitCode = RunCommand(true, ["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
+                if (exitCode != 0 && exitCode != 1062) // exit code 1062 = service not active
                     throw new Exception ("Error stopping tomcat service")
 
                 int i = 1;
@@ -85,7 +86,7 @@ class DeployTask extends DefaultTask {
                 }
 
                 println "-- Starting Tomcat Service.."
-                if (!RunCommand(true, ["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService]))
+                if (RunCommand(true, ["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService]) != 0)
                     throw new Exception ("Error starting tomcat service")
 
                 break
@@ -115,7 +116,7 @@ class DeployTask extends DefaultTask {
         return false
     }
 
-    private boolean RunCommand(boolean PrintOutput, ArrayList<String> command) {
+    private int RunCommand(boolean PrintOutput, ArrayList<String> command) {
         try {
             def sout = new StringBuffer()
             def serr = new StringBuffer()
@@ -136,14 +137,11 @@ class DeployTask extends DefaultTask {
 
             println sout
             println serr
+            println "exit code: " + proc.exitValue()
 
-            if(proc.exitValue() != 0) {
-                println "exit code: " + proc.exitValue()
-                return false
-            }
-            return true
+            return proc.exitValue()
         } catch (Throwable t) {
-            return false
+            return -1
         }
     }
 
