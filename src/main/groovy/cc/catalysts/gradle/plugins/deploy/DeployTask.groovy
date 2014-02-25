@@ -49,7 +49,19 @@ class DeployTask extends DefaultTask {
                 println "Deploying " + usedConfig.webappWar + " to " + usedConfig.tomcatHost
 
                 println "-- Stopping Tomcat Service.."
-                RunCommand(true, ["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
+                if (!RunCommand(true, ["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService]))
+                    throw new Exception ("Error stopping tomcat service")
+
+                int i = 1;
+                int maxChecks = 5;
+                while (!isTomcatStopped(usedConfig)) {
+                    println "--    Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ..."
+                    i++
+                    if (i > maxChecks) {
+                        throw new Exception("Couldn't stop tomcat service")
+                    }
+                    Thread.sleep(5000)
+                }
 
                 if (deleteDir(logDir)){
                     println "   Successfully deleted " + logDir.getPath()
@@ -73,7 +85,8 @@ class DeployTask extends DefaultTask {
                 }
 
                 println "-- Starting Tomcat Service.."
-                RunCommand(true, ["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService])
+                if (!RunCommand(true, ["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService]))
+                    throw new Exception ("Error starting tomcat service")
 
                 break
             case 'upload':
@@ -88,6 +101,18 @@ class DeployTask extends DefaultTask {
                 println 'ERROR: invalid Type Property "' + usedConfig.type + '" in Configuration "' + usedConfig.name + '"!'
                 throw new Exception("Deploy-Configuration has no type")
         }
+    }
+
+    private boolean isTomcatStopped(def usedConfig) {
+        Process status = "sc ${usedConfig.tomcatHost} query ${usedConfig.tomcatService}".execute()
+
+        for(String line: status.getText().split("\n")) {
+            if (line.contains("STATE") && line.contains("STOPPED")) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private boolean RunCommand(boolean PrintOutput, ArrayList<String> command) {
@@ -108,9 +133,12 @@ class DeployTask extends DefaultTask {
             }
             proc.waitFor()
             proc.consumeProcessOutput(sout,serr)
-            if(proc.exitValue()) {
-                println sout
-                println serr
+
+            println sout
+            println serr
+
+            if(proc.exitValue() != 0) {
+                println "exit code: " + proc.exitValue()
                 return false
             }
             return true
