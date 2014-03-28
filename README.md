@@ -26,6 +26,7 @@ List of plugins
 * [CODEGEN-JAVA](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/codegen-java)
 * [ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
 * [WEBDEPLOY](#webdeploy)
+* [CLASSYCLE](#classycle)
 
 ------
 
@@ -235,3 +236,32 @@ and the original files will be overwritten. This setting is useful if you need s
 ```onlyModifiedFiles```: (boolean) if true, only local modified files get transferred to the server. Default: true
 
 ```exclude```: (String) exclude files and directories. This can be specified multiple times (see the example above).
+
+
+CLASSYCLE
+------
+
+(see [classycle.sourceforge.net](http://classycle.sourceforge.net/))
+
+Static dependency analysis to find cyclic dependencies.
+
+**Example:**
+```
+apply plugin: 'cat-classycle'
+
+// default settings
+classycle {
+    definitionFile = "classycle.ddf"
+    checkOutputFile = "classycleCheck.xml"
+    graphOutputFile = "classycleGraph.xml"
+    outputDirectory = "reports"
+}
+```
+
+Generates the two xml files into the project subfolder "reports" and converts the analysis into readable html.
+The classycle task will be triggered automatically before the check task, so gradlew check will trigger the analysis.
+Make sure to have a valid ddf file in your project folder, according to the definitionFile parameter. The simplest one looks like this:
+
+```
+show allResults
+```
