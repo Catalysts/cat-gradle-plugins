@@ -2,6 +2,8 @@ package cc.catalysts.gradle.plugins.grails
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.sonar.SonarPlugin
+import org.gradle.api.sonar.runner.SonarRunnerExtension
+import org.gradle.api.sonar.runner.SonarRunnerPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
@@ -29,10 +31,10 @@ class GrailsPluginTest {
     public void sonarLanguageSetting() {
         Project project = ProjectBuilder.builder().build()
 
-        project.apply plugin: SonarPlugin
+        project.apply plugin: SonarRunnerPlugin
         project.apply plugin: 'cat-grails'
-
-        assertEquals('grvy', project.sonar.project.language)
+        def properties = project.tasks.findByName("sonarRunner").sonarProperties
+        assertEquals('grvy', properties."sonar.language")
     }
 
     @Test

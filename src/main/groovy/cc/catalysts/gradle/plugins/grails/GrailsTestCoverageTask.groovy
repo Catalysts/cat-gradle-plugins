@@ -14,7 +14,7 @@ class GrailsTestCoverageTask extends DefaultTask {
 
     @TaskAction
     public void executeGrailsTestCoverage() {
-        GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage"], false);
+        GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
     }
 
 }

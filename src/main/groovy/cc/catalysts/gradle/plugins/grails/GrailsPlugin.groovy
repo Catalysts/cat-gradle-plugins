@@ -4,7 +4,8 @@ import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.plugins.sonar.SonarPlugin
+import org.gradle.api.internal.tasks.testing.DefaultTestTaskReports
+import org.gradle.api.sonar.runner.SonarRunnerPlugin
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
@@ -45,9 +46,16 @@ class GrailsPlugin implements Plugin<Project> {
         Task testTask = project.task('test',
                 group: 'cat-grails',
                 description: 'Tests the project',
-                overwrite: true)
-        testTask.dependsOn(project.tasks.'grails-test-app')
+                overwrite: true) << {
+            if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
+                GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
+            } else {
+                GrailsUtils.executeGrailsCommand(project, ["test-app"], false)
+            }
+        }
         testTask.convention.testResultsDir = project.file('target/test-reports')
+        testTask.convention.reports = new DefaultTestTaskReports(testTask)
+        testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
 
         Task testCoverageTask = project.task('testCoverage',
                 group: 'cat-grails',
@@ -92,18 +100,22 @@ class GrailsPlugin implements Plugin<Project> {
     public void apply(Project project) {
         this.project = project
 
-        // in case there is no rootProject, rootProject simply points to the current project
-        if (project.plugins.hasPlugin(SonarPlugin) || project.rootProject.plugins.hasPlugin(SonarPlugin)) {
-            project.sonar.project {
-                language = 'grvy'
-                testReportPath = project.file('target/test-reports')
-                coberturaReportPath = project.file('target/test-reports/cobertura/coverage.xml')
-                dynamicAnalysis = 'reuseReports'
-            }
-        }
-
         applyGroovy()
         applyGrailsWrapper()
         addTasks()
+
+        // in case there is no rootProject, rootProject simply points to the current project
+        if (project.plugins.hasPlugin(SonarRunnerPlugin) || project.rootProject.plugins.hasPlugin(SonarRunnerPlugin)) {
+            project.sonarRunner.sonarProperties {
+                property "sonar.language", "grvy"
+                property "sonar.sources", "src/groovy, grails-app"
+                property "sonar.sourceEncoding", "UTF-8"
+                property "sonar.tests", "test/unit,test/integration"
+                property "sonar.dynamicAnalysis", "reuseReports"
+                property "sonar.surefire.reportsPath", "target/test-reports"
+                property "sonar.cobertura.reportPath", "target/test-reports/cobertura/coverage.xml"
+                property "sonar.groovy.cobertura.reportPath", "target/test-reports/cobertura/coverage.xml"
+            }
+        }
     }
 }

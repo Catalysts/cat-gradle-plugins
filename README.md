@@ -43,7 +43,7 @@ download of the specified grails version.
 ```
 apply plugin: 'cat-grails'
 grails {
-    version '2.1.1'
+    version '2.3.7'
 }
 ```
 
@@ -52,7 +52,7 @@ If you want to test your app before creating the archive, use the ```build``` ta
 
 You can customize the path of the produced war file(s) by setting the ```grails.project.war.file``` option in your ```BuildConfig.groovy```.
 
-In order to generate a code coverage report with the grails code-coverage plugin, you can use the ``testCoverage`` task.
+In order to generate a code coverage report with the grails code-coverage plugin, you can use the ``testCoverage`` task or use -PgrailsCoverage=true
 
 LESS
 ------
