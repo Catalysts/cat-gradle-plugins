@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.plugins.less
+package cc.catalysts.gradle.plugins.teamcity
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
