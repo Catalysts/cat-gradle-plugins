@@ -1,6 +1,6 @@
 description = 'collection of gradle plugins'
 group = 'cc.catalysts'
-version = '1.0'
+version = '2.0'
 if (hasProperty('teamcity')) {
     version += property('teamcity')['build.number']
     println "##teamcity[buildNumber '" + version + "']"
@@ -10,7 +10,7 @@ apply plugin: 'groovy'
 apply plugin: 'idea'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '2.0'
 }
 
 repositories {
