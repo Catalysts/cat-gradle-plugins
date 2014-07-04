@@ -27,6 +27,7 @@ List of plugins
 * [ANTLR3](https://github.com/Catalysts/catalysts-gradle-plugins/wiki/cat-antlr3)
 * [WEBDEPLOY](#webdeploy)
 * [CLASSYCLE](#classycle)
+* [JDEPS](#jdeps)
 
 ------
 
@@ -264,4 +265,34 @@ Make sure to have a valid ddf file in your project folder, according to the defi
 
 ```
 show allResults
+```
+
+
+JDEPS
+------
+
+(see [official oracle docs](http://docs.oracle.com/javase/8/docs/technotes/tools/unix/jdeps.html))
+
+Static dependency analysis to find cyclic dependencies.
+
+**Example:**
+```
+apply plugin: 'cat-jdeps'
+
+// default settings
+classycle {
+    consolePrint    = false
+    generateDotFile = false
+    generateGraph   = false
+    jdepsPath       = null
+    outputFile      = "jdeps.txt"
+    outputDirectory = "reports"
+    packages        = []
+    profile         = false
+    recursive       = false
+    regex           = null
+    summary         = false
+    verbose         = false
+    verboseLevel    = null
+}
 ```
