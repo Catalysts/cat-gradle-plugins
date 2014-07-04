@@ -74,8 +74,10 @@ public class JDepsTask extends DefaultTask {
 		if (project.jdeps.summary) args.add('-summary')
 		if (project.jdeps.verbose) args.add('-verbose')
 		if (project.jdeps.verboseLevel != null) args.add('-verbose:' + project.jdeps.verboseLevel)
-		args.add('-classpath')
-		args.add('\"\"' + classpath + '\"\"')
+		if (!StringUtils.isEmpty(classpath)) {
+			args.add('-classpath')
+			args.add('\"\"' + classpath + '\"\"')
+		}
 		for (String p : project.jdeps.packages) {
 			args.add('-package')
 			args.add(p)
