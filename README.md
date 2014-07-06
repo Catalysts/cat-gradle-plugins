@@ -280,7 +280,7 @@ Static dependency analysis to find cyclic dependencies.
 apply plugin: 'cat-jdeps'
 
 // default settings
-classycle {
+jdeps {
     consolePrint    = false
     generateDotFile = false
     generateGraph   = false
