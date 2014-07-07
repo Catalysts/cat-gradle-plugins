@@ -79,9 +79,9 @@ class GwtPlugin implements Plugin<Project> {
     }
 
     public void configureConfigurations(ConfigurationContainer configurationContainer) {
-        Configuration compileGwtConfiguration = configurationContainer.add(COMPILE_GWT_CONFIGURATION_NAME).setVisible(false).
+        Configuration compileGwtConfiguration = configurationContainer.create(COMPILE_GWT_CONFIGURATION_NAME).setVisible(false).
                 setDescription("Libraries that are required for GWT compilation");
-        Configuration buildGwtConfiguration = configurationContainer.add(BUILD_GWT_CONFIGURATION_NAME).setVisible(false).
+        Configuration buildGwtConfiguration = configurationContainer.create(BUILD_GWT_CONFIGURATION_NAME).setVisible(false).
                 setDescription("Libraries that are required for the GWT compiler at runtime.");
         configurationContainer.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(compileGwtConfiguration)
     }
