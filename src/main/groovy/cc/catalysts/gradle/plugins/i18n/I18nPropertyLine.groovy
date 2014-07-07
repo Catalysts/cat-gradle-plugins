@@ -29,7 +29,6 @@ class I18nPropertyLine {
         return new I18nPropertyLine(line.trim(), lineNr)
     }
 
-    @Override
     public int compareTo(I18nPropertyLine o) {
         if(o == null){
             return -1
@@ -48,6 +47,6 @@ class I18nPropertyLine {
         if (!obj instanceof I18nPropertyLine) {
             return false;
         }
-        return compareTo(obj) == 0
+        return compareTo(obj as I18nPropertyLine) == 0
     }
 }
