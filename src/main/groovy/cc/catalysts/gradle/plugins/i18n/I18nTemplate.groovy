@@ -2,7 +2,10 @@ package cc.catalysts.gradle.plugins.i18n
 
 import static cc.catalysts.gradle.plugins.i18n.I18nPropertyLine.parseLine
 
-
+/**
+ * TODO: add TCLogger
+ * @author Catalysts GmbH, www.catalysts.cc
+ */
 class I18nTemplate {
     String templateFileName
     long lines;
@@ -25,7 +28,7 @@ class I18nTemplate {
 
     static I18nTemplate create(File f) {
         if (f == null) {
-            throw new FileNotFoundException(f)
+            throw new FileNotFoundException("File is null")
         }
         I18nTemplate t = new I18nTemplate(f.getName())
         BufferedReader reader = new BufferedReader(new FileReader(f))
@@ -57,14 +60,14 @@ class I18nTemplate {
         content.add(l)
     }
 
-    boolean compareWith(File file, I18nExtension e) {
+    def compareWith(File file, I18nExtension e) {
         I18nTemplate t = create(file)
         println('Comparing "' + templateFileName + '" with "' + t.getTemplateFileName() + '"')
         Set<String> missingPropertiesTemplate = []
         missingPropertiesTemplate.addAll(propertySet)
         boolean orderError = false;
         int firstOccurrence = 0;
-        I18nPropertyLine curLineTemplate;
+        I18nPropertyLine curLineTemplate = null;
         I18nPropertyLine curLine
         for (int i = 0; i < t.getContent().size(); i++) {
             if (i < content.size()) {
