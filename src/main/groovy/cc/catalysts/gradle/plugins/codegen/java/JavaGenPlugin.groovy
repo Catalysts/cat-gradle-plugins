@@ -14,7 +14,7 @@ import org.gradle.api.tasks.SourceSet
 class JavaGenPlugin implements Plugin<Project> {
 
     void apply(Project project) {
-        private TCLogger log = new TCLogger(project, Logging.getLogger(Task.class))
+        TCLogger log = new TCLogger(project, Logging.getLogger(Task.class))
         project.apply plugin: 'java'
 
         project.repositories {

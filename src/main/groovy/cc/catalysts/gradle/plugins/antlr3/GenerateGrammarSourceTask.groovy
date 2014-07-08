@@ -12,7 +12,7 @@ import org.gradle.process.internal.JavaExecAction
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class GenerateGrammarSourceTask extends DefaultTask {
-    private static final TCLogger log = new TCLogger(project, logger)
+    private TCLogger log = new TCLogger(project, logger)
 
     @TaskAction
     def generateGrammarSource() {
