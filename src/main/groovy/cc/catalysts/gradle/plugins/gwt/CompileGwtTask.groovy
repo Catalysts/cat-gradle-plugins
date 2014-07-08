@@ -1,8 +1,8 @@
 package cc.catalysts.gradle.plugins.gwt
 
+import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.file.FileResolver
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.DefaultJavaExecAction
 import org.gradle.process.internal.JavaExecAction
@@ -11,6 +11,8 @@ import org.gradle.process.internal.JavaExecAction
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class CompileGwtTask extends DefaultTask {
+    private static final String GWT_COMPILE = "gwt-compile"
+    private TCLogger log = new TCLogger(project, logger)
 
     CompileGwtTask() {
         dependsOn "cleanGwt"
@@ -18,11 +20,12 @@ class CompileGwtTask extends DefaultTask {
 
     @TaskAction
     def compile() {
+        log.openBlock(GWT_COMPILE)
         FileResolver fileResolver = getServices().get(FileResolver.class)
 
         for (module in project.gwt.modules) {
-            logger.lifecycle '\n' + ('#' * 50) + '\n'
-            logger.lifecycle "cat-gwt: Compiling ${module.name} with GWT ${project.gwtVersion} using the following jars:"
+            log.lifecycle '\n' + ('#' * 50) + '\n'
+            log.lifecycle "cat-gwt: Compiling ${module.name} with GWT ${project.gwtVersion} using the following jars:"
 
 
             project.ext.classpath_list = [
@@ -32,19 +35,21 @@ class CompileGwtTask extends DefaultTask {
 
             def printedPath = new HashSet()
             project.configurations.gwtCompile.each {
-                File file -> if(!printedPath.contains(file.name)) {
-                    logger.lifecycle '    ' + file.name
-                    printedPath.add(file.name)
-                }
+                File file ->
+                    if (!printedPath.contains(file.name)) {
+                        log.lifecycle '    ' + file.name
+                        printedPath.add(file.name)
+                    }
             }
             project.configurations.gwtBuild.each {
-                File file -> if(!printedPath.contains(file.name)) {
-                    logger.lifecycle '    ' + file.name
-                    printedPath.add(file.name)
-                }
+                File file ->
+                    if (!printedPath.contains(file.name)) {
+                        log.lifecycle '    ' + file.name
+                        printedPath.add(file.name)
+                    }
             }
 
-            logger.lifecycle ''
+            log.lifecycle ''
 
             JavaExecAction javaExec = new DefaultJavaExecAction(fileResolver);
 
@@ -57,5 +62,6 @@ class CompileGwtTask extends DefaultTask {
 
             javaExec.execute();
         }
+        log.closeBlock(GWT_COMPILE)
     }
 }
