@@ -1,7 +1,5 @@
 package cc.catalysts.gradle.plugins.deploy
 
-import cc.catalysts.gradle.plugins.FileDeleteException
-import cc.catalysts.gradle.plugins.FileUploadException
 import cc.catalysts.gradle.utils.TCLogger
 import com.jcraft.jsch.Channel
 import com.jcraft.jsch.ChannelExec
@@ -15,24 +13,21 @@ import org.gradle.api.tasks.TaskAction
  */
 class DeployTask extends DefaultTask {
     private static String DEPLOY_BLOCK = "deploy"
-    private TCLogger log
+    private TCLogger log = new TCLogger(project, logger)
 
     @TaskAction
     def deploy() {
-        log = new TCLogger(project, logger)
         log.openBlock(DEPLOY_BLOCK)
-        def usedConfig
+        def usedConfig = null
         if (project.hasProperty("depConfig")) {
             if (project.deploy.findByName(project.depConfig) != null) {
                 usedConfig = project.deploy.findByName(project.depConfig)
             } else {
-                log.failure("Could not find Deploy-Configuration for '${project.depConfig}'!")
-                throw new Exception("Deploy-Configuration not defined")
+                log.failure("Could not find Deploy-Configuration for '${project.depConfig}'!", true)
             }
         } else {
             if (project.deploy.size() == 0) {
-                log.failure("Could not find any Deploy-Configuration!")
-                throw new Exception("Deploy-Configuration not defined")
+                log.failure("Could not find any Deploy-Configuration!", true)
             } else if (project.deploy.size() == 1) {
                 usedConfig = project.deploy.iterator().next()
             } else {
@@ -40,12 +35,11 @@ class DeployTask extends DefaultTask {
                 for (target in project.deploy) {
                     msg = msg + "\n  ${target.name}"
                 }
-                log.failure(msg)
-                throw new Exception("Deploy-Configuration not defined")
+                log.failure(msg, true)
             }
         }
 
-        switch (usedConfig.type) {
+        switch (usedConfig?.type) {
             case 'lancopy':
                 File logDir = new File(usedConfig.webappDir as String, "logs")
                 File webappDir = new File(usedConfig.webappDir as String, "webapps")
@@ -63,12 +57,11 @@ class DeployTask extends DefaultTask {
                     log.warn("Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ...")
                     i++
                     if (i > maxChecks) {
-                        throw new Exception("Couldn't stop tomcat service")
+                        log.failure("Couldn't stop tomcat service", true)
                     }
                     Thread.sleep(5000)
                     state = executeServiceCommand(["sc", usedConfig.tomcatHost, "query", usedConfig.tomcatService])
                 }
-                log.debug "Tomcat State: ${state}"
                 log.lifecycle "Waiting 5s for file handle release"
                 Thread.sleep(5000)
 
@@ -79,7 +72,7 @@ class DeployTask extends DefaultTask {
                 }
 
                 if (logDir.mkdir()) {
-                    log.debug "Created '${logDir.path}' folder"
+                    log.lifecycle "Created '${logDir.path}' folder"
                 }
 
                 log.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
@@ -102,8 +95,7 @@ class DeployTask extends DefaultTask {
 
                 break
             default:
-                log.failure("Invalid Type Property '${usedConfig.type}' in Configuration '${usedConfig.name}'!")
-                throw new Exception("Deploy-Configuration has no type")
+                log.failure("Deploy-Configuration: Invalid Type Property '${usedConfig.type}' in Configuration '${usedConfig.name}'!", true)
         }
         log.closeBlock(DEPLOY_BLOCK)
     }
@@ -124,7 +116,7 @@ class DeployTask extends DefaultTask {
             log.debug "process read: ${line}"
             if (line.contains("STATE")) {
                 String[] spl = line.split("\\s+")
-                log.debug "Tomcat Status: ${spl[4]}"
+                log.info "Tomcat State: ${spl[4]}"
                 return spl[4]
             }
         }
@@ -133,8 +125,7 @@ class DeployTask extends DefaultTask {
     }
 
     private void sendFiles(usedConfig, String webappDir) {
-
-        Session session = null
+        Session session
 
         log.lifecycle "Connecting to '${usedConfig.uploadTarget}'"
         JSch jsch = new JSch()
@@ -161,7 +152,6 @@ class DeployTask extends DefaultTask {
         }
         log.lifecycle "Finished"
         session.disconnect()
-        session = null
     }
 
     private void uploadDir(Session session, def usedConfig, File[] dirList, String directory) {
@@ -181,16 +171,16 @@ class DeployTask extends DefaultTask {
     }
 
     private void uploadSshFile(Session session, File f, String sourceFilename, String destFilename) {
-        String command = null
-        OutputStream out = null
-        InputStream inStream = null
-        Channel channel = null
+        String command
+        OutputStream out
+        InputStream inStream
+        Channel channel
 
         long fileSize = f.length()
 
         log.lifecycle "Sending '${sourceFilename}' to '${destFilename}' (~ ${(long) (fileSize / 1024)} KB)"
 
-        FileInputStream fis = null
+        FileInputStream fis
 
         // SCP UPLOAD
         command = "scp -p -t '" + destFilename + "'"
@@ -205,7 +195,7 @@ class DeployTask extends DefaultTask {
         log.debug "Executing $command"
 
         if (checkAck(inStream) != 0) {
-            throw new FileUploadException(sourceFilename);
+            log.failure("File \"${sourceFilename}\" could not be uploaded", true)
         } else {
             log.debug "Acknowledge successful"
         }
@@ -225,7 +215,7 @@ class DeployTask extends DefaultTask {
         out.flush()
 
         if (checkAck(inStream) != 0) {
-            throw new FileUploadException(sourceFilename);
+            log.failure("File \"${sourceFilename}\" could not be uploaded", true)
         } else {
             log.debug "Acknowledge successful"
         }
@@ -313,7 +303,7 @@ class DeployTask extends DefaultTask {
         if (checkAck(inStream) != 0) {
             out.close()
             channel.disconnect()
-            throw new FileUploadException(sourceFilename);
+            log.failure("File \"${sourceFilename}\" could not be uploaded", true)
         }
 
         log.lifecycle "Successfully uploaded"
@@ -341,13 +331,12 @@ class DeployTask extends DefaultTask {
         inStream = null
     }
 
-    private boolean deleteDir(File path) throws FileDeleteException {
+    private boolean deleteDir(File path) {
 
         if (path.exists()) {
             if (path.isDirectory()) {
                 if (!path.deleteDir()) {
-                    log.failure("Could not delete directory ${path.path}")
-                    new FileDeleteException(path)
+                    log.failure("Could not delete directory ${path.path}", true)
                 }
                 if (path.exists()) {
                     log.failure("Could not delete directory ${path.path}")
@@ -356,11 +345,10 @@ class DeployTask extends DefaultTask {
                 }
             } else {
                 if (!path.delete()) {
-                    log.failure("Could not delete ${path.path}")
-                    new FileDeleteException(path)
+                    log.failure("Could not delete ${path.path}", true)
                 }
                 if (path.exists()) {
-                    log.failure("Could not delete directory ${path.path}")
+                    log.failure("Could not delete ${path.path}")
                 } else {
                     log.lifecycle "Successfully deleted '${path.path}'"
                 }
@@ -369,7 +357,7 @@ class DeployTask extends DefaultTask {
         return true
     }
 
-    public static int checkAck(InputStream stream) throws IOException {
+    public int checkAck(InputStream stream) throws IOException {
         int b = stream.read()
         // b may be 0 for success,
         // 1 for error,
@@ -380,17 +368,16 @@ class DeployTask extends DefaultTask {
 
         if (b == 1 || b == 2) {
             StringBuffer sb = new StringBuffer()
-            sb.append("           ")
-            int c
+            int c = stream.read()
             while (c != '\n' && c != -1) {
-                c = stream.read()
                 sb.append((char) c)
+                c = stream.read()
             }
             if (b == 1) { // error
-                print sb.toString()
+                log.error sb.toString()
             }
             if (b == 2) { // fatal error
-                print sb.toString()
+                log.failure sb.toString()
             }
         }
         return b

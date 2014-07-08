@@ -64,9 +64,12 @@ class TCLogger {
     /**
      * formats as teamcity build stopping message if teamcity build is detected
      */
-    void failure(String message) {
+    void failure(String message, boolean stopBuild = false) {
         if (isTeamCityBuild) {
             println "##teamcity[buildProblem description='${escapeString(message)}']"
+            if (stopBuild) {
+                throw new RuntimeException(message)
+            }
         } else {
             logger.error(message)
         }
