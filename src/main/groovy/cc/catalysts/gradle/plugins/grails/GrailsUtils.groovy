@@ -1,8 +1,11 @@
 package cc.catalysts.gradle.plugins.grails
 
+import cc.catalysts.gradle.utils.TCLogger
 import com.connorgarvey.gradlegrails.Path
 import org.apache.commons.lang3.SystemUtils
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.logging.Logging
 import org.gradle.process.ExecResult
 
 /**
@@ -16,9 +19,12 @@ class GrailsUtils {
     }
 
     static ExecResult executeGrailsCommand(Project project, List<String> arguments, boolean interactive) {
+        TCLogger log = new TCLogger(project, Logging.getLogger(Task.class))
+
         String grailsFolder = Path.join(SystemUtils.userHome.path, '.gradlegrails', 'grails', project.grails.version);
         String extension = SystemUtils.IS_OS_WINDOWS ? '.bat' : '';
         String grailsExecutable = Path.join(grailsFolder, 'bin', "grails${extension}");
+        log.debug("grails executable: ${grailsExecutable}${extension}")
 
         Map<String, String> env = new HashMap(System.getenv());
         env['GRAILS_HOME'] = grailsFolder;
@@ -29,6 +35,9 @@ class GrailsUtils {
 
         if (!interactive)
             command.add("--non-interactive");
+
+        log.debug("grails command: $command")
+        log.debug("env: $env")
 
         return project.exec {
             commandLine command
