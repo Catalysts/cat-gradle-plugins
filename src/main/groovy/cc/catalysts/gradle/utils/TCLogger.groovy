@@ -72,6 +72,9 @@ class TCLogger {
             }
         } else {
             logger.error(message)
+            if (stopBuild) {
+                throw new RuntimeException(message)
+            }
         }
     }
 
