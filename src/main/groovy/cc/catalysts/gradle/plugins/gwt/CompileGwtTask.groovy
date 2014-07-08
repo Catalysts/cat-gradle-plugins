@@ -21,8 +21,8 @@ class CompileGwtTask extends DefaultTask {
         FileResolver fileResolver = getServices().get(FileResolver.class)
 
         for (module in project.gwt.modules) {
-            println '\n' + ('#' * 50) + '\n'
-            println 'cat-gwt: Compiling ' + module.name + ' with GWT ' + project.gwtVersion + ' using the following jars:'
+            logger.lifecycle '\n' + ('#' * 50) + '\n'
+            logger.lifecycle "cat-gwt: Compiling ${module.name} with GWT ${project.gwtVersion} using the following jars:"
 
 
             project.ext.classpath_list = [
@@ -33,18 +33,18 @@ class CompileGwtTask extends DefaultTask {
             def printedPath = new HashSet()
             project.configurations.gwtCompile.each {
                 File file -> if(!printedPath.contains(file.name)) {
-                    println '    ' + file.name
+                    logger.lifecycle '    ' + file.name
                     printedPath.add(file.name)
                 }
             }
             project.configurations.gwtBuild.each {
                 File file -> if(!printedPath.contains(file.name)) {
-                    println '    ' + file.name
+                    logger.lifecycle '    ' + file.name
                     printedPath.add(file.name)
                 }
             }
 
-            println ''
+            logger.lifecycle ''
 
             JavaExecAction javaExec = new DefaultJavaExecAction(fileResolver);
 

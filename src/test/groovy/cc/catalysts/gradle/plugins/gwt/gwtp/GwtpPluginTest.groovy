@@ -20,9 +20,9 @@ class GwtpPluginTest {
         rootProject.apply plugin: 'cat-gwt'
         rootProject.apply plugin: 'cat-gwtp'
 
-        assertTrue(rootProject.tasks.compileGwt instanceof CompileGwtTask)
-        assertTrue(rootProject.tasks.cleanGwt instanceof CleanGwtTask)
-        assertTrue(rootProject.tasks.generateLaunchConfig instanceof EclipseLaunchConfigGwtTask)
+        assertTrue(rootProject.tasks.findByName('compileGwt') instanceof CompileGwtTask)
+        assertTrue(rootProject.tasks.findByName('cleanGwt') instanceof CleanGwtTask)
+        assertTrue(rootProject.tasks.findByName('generateLaunchConfig') instanceof EclipseLaunchConfigGwtTask)
 
         assertTrue(rootProject.tasks.findByName('cleanTarget') != null)
         assertTrue(rootProject.tasks.findByName('createTarget') != null)

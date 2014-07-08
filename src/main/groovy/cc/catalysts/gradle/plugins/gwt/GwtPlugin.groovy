@@ -1,10 +1,10 @@
 package cc.catalysts.gradle.plugins.gwt
 
-import org.gradle.api.Project
 import org.gradle.api.Plugin
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.plugins.JavaPlugin
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
@@ -17,7 +17,7 @@ class GwtPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.apply plugin: 'java'
-        project.apply plugin:  'eclipse'
+        project.apply plugin: 'eclipse'
 
         project.repositories {
             mavenCentral()
@@ -25,7 +25,7 @@ class GwtPlugin implements Plugin<Project> {
 
         project.extensions.gwt = new GwtExtension(project.container(GwtModule))
 
-        if(!project.hasProperty("gwtVersion")) {
+        if (!project.hasProperty("gwtVersion")) {
             project.ext.gwtVersion = "2.4.0"
         }
 
@@ -36,11 +36,11 @@ class GwtPlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            gwtBuild (
-                [group: 'com.google.gwt', name: 'gwt-dev', version: project.gwtVersion]
+            gwtBuild(
+                    [group: 'com.google.gwt', name: 'gwt-dev', version: project.gwtVersion]
             )
-            gwtCompile (
-             	[group: 'com.google.gwt', name: 'gwt-user', version: project.gwtVersion]
+            gwtCompile(
+                    [group: 'com.google.gwt', name: 'gwt-user', version: project.gwtVersion]
             )
         }
 
@@ -78,7 +78,7 @@ class GwtPlugin implements Plugin<Project> {
         }
     }
 
-    public void configureConfigurations(ConfigurationContainer configurationContainer) {
+    void configureConfigurations(ConfigurationContainer configurationContainer) {
         Configuration compileGwtConfiguration = configurationContainer.create(COMPILE_GWT_CONFIGURATION_NAME).setVisible(false).
                 setDescription("Libraries that are required for GWT compilation");
         Configuration buildGwtConfiguration = configurationContainer.create(BUILD_GWT_CONFIGURATION_NAME).setVisible(false).
