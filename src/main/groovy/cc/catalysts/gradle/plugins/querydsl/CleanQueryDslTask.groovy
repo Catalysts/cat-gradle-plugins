@@ -12,7 +12,7 @@ class CleanQueryDslTask extends DefaultTask {
 
     @TaskAction
     def cleanQueryDslTargetDir() {
-        File f = new File(project.projectDir.absolutePath, project.querydsl.destinationDir);
+        File f = new File(project.projectDir.absolutePath, project.querydsl.destinationDir as String);
         if (f.exists()) {
             log.lifecycle "Deleting '${f.getPath()}'"
             if (!f.deleteDir()) {

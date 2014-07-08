@@ -12,7 +12,7 @@ class QueryDslOutputDirTask extends DefaultTask {
 
     @TaskAction
     def createQueryDslOutputDir() {
-        File f = new File(project.projectDir.absolutePath, project.querydsl.destinationDir);
+        File f = new File(project.projectDir.absolutePath, project.querydsl.destinationDir as String);
         if (!f.exists()) {
             log.lifecycle "Creating '${f.getPath()}'"
             if (!f.mkdirs()) {
