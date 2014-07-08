@@ -338,8 +338,9 @@ class DeployTask extends DefaultTask {
                 if (!path.deleteDir()) {
                     log.failure("Could not delete directory ${path.path}", true)
                 }
+                Thread.sleep(1000)
                 if (path.exists()) {
-                    log.failure("Could not delete directory ${path.path}")
+                    log.failure("Could not delete directory ${path.path}", true)
                 } else {
                     log.lifecycle "Successfully deleted directory '${path.path}'"
                 }
@@ -347,8 +348,9 @@ class DeployTask extends DefaultTask {
                 if (!path.delete()) {
                     log.failure("Could not delete ${path.path}", true)
                 }
+                Thread.sleep(1000)
                 if (path.exists()) {
-                    log.failure("Could not delete ${path.path}")
+                    log.failure("Could not delete ${path.path}", true)
                 } else {
                     log.lifecycle "Successfully deleted '${path.path}'"
                 }
