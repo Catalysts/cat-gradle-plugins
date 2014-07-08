@@ -2,6 +2,7 @@ package cc.catalysts.gradle.plugins.deploy
 
 import cc.catalysts.gradle.plugins.FileDeleteException
 import cc.catalysts.gradle.plugins.FileUploadException
+import cc.catalysts.gradle.utils.TCLogger
 import com.jcraft.jsch.Channel
 import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.JSch
@@ -9,34 +10,37 @@ import com.jcraft.jsch.Session
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-import static cc.catalysts.gradle.utils.TCUtiles.error
-import static cc.catalysts.gradle.utils.TCUtiles.warn
-
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class DeployTask extends DefaultTask {
+    private static String DEPLOY_BLOCK = "deploy"
+    private TCLogger log
+
     @TaskAction
     def deploy() {
+        log = new TCLogger(project, logger)
+        log.openBlock(DEPLOY_BLOCK)
         def usedConfig
         if (project.hasProperty("depConfig")) {
             if (project.deploy.findByName(project.depConfig) != null) {
                 usedConfig = project.deploy.findByName(project.depConfig)
             } else {
-                error(project, logger, "Could not find Deploy-Configuration for '${project.depConfig}'!")
+                log.failure("Could not find Deploy-Configuration for '${project.depConfig}'!")
                 throw new Exception("Deploy-Configuration not defined")
             }
         } else {
             if (project.deploy.size() == 0) {
-                error(project, logger, "Could not find any Deploy-Configuration!")
+                log.failure("Could not find any Deploy-Configuration!")
                 throw new Exception("Deploy-Configuration not defined")
             } else if (project.deploy.size() == 1) {
                 usedConfig = project.deploy.iterator().next()
             } else {
-                error(project, logger, "More than one Deploy-Configurations are defined, please choose one with 'gradle deploy -PdepConfig=confName' where confName is one of the following:")
+                def msg = "More than one Deploy-Configurations are defined, please choose one with 'gradle deploy -PdepConfig=confName' where confName is one of the following:"
                 for (target in project.deploy) {
-                    error(project, logger, "  ${target.name}")
+                    msg = msg + "\n  ${target.name}"
                 }
+                log.failure(msg)
                 throw new Exception("Deploy-Configuration not defined")
             }
         }
@@ -48,15 +52,15 @@ class DeployTask extends DefaultTask {
                 File pluginDir = new File(usedConfig.webappDir as String, "plugins")
                 File workDir = new File(usedConfig.webappDir as String, "work")
 
-                logger.lifecycle "Deploying ${usedConfig.webappWar} to ${usedConfig.tomcatHost}"
-                logger.lifecycle "Stopping Tomcat Service.."
+                log.lifecycle "Deploying ${usedConfig.webappWar} to ${usedConfig.tomcatHost}"
+                log.lifecycle "Stopping Tomcat Service.."
 
                 String state = executeServiceCommand(["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
 
                 int i = 1;
                 int maxChecks = 5;
                 while (state.equals("STOP_PENDING")) {
-                    warn(project, logger, "Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ...")
+                    log.warn("Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ...")
                     i++
                     if (i > maxChecks) {
                         throw new Exception("Couldn't stop tomcat service")
@@ -64,64 +68,63 @@ class DeployTask extends DefaultTask {
                     Thread.sleep(5000)
                     state = executeServiceCommand(["sc", usedConfig.tomcatHost, "query", usedConfig.tomcatService])
                 }
-                logger.debug "Tomcat State: ${state}"
-                logger.lifecycle "Waiting 5s for file handle release"
+                log.debug "Tomcat State: ${state}"
+                log.lifecycle "Waiting 5s for file handle release"
                 Thread.sleep(5000)
 
                 def folders = [logDir, webappDir, pluginDir, workDir]
 
                 for (def folder : folders) {
-                    if (deleteDir(folder)) {
-                        logger.lifecycle "Successfully deleted ${folder.path}"
-                    } else {
-                        error(project, logger, "Could not delete ${folder.path}")
-                    }
+                    deleteDir(folder)
                 }
 
                 if (logDir.mkdir()) {
-                    logger.debug "Created '${logDir.path}' folder"
+                    log.debug "Created '${logDir.path}' folder"
                 }
 
-                logger.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
+                log.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
 
                 project.copy {
                     from usedConfig.webappWar
                     into usedConfig.webappDir
                 }
 
-                logger.lifecycle "Starting Tomcat Service.."
+                log.lifecycle "Starting Tomcat Service.."
                 executeServiceCommand(["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService])
 
                 break
             case 'upload':
                 def webappDir = usedConfig.webappDir
 
-                logger.lifecycle "Uploading '${webappDir}' to '${usedConfig.uploadTarget}'"
+                log.lifecycle "Uploading '${webappDir}' to '${usedConfig.uploadTarget}'"
 
                 sendFiles(usedConfig, webappDir as String)
 
                 break
             default:
-                error(project, logger, "invalid Type Property '${usedConfig.type}' in Configuration '${usedConfig.name}'!")
+                log.failure("Invalid Type Property '${usedConfig.type}' in Configuration '${usedConfig.name}'!")
                 throw new Exception("Deploy-Configuration has no type")
         }
+        log.closeBlock(DEPLOY_BLOCK)
     }
 
     private String executeServiceCommand(List<String> command) {
-        logger.debug "Executing: ${command}"
+        log.debug "Executing: ${command}"
         Process proc = command.execute()
         proc.waitFor()
 
         String stdout = proc.in.text
-        logger.info "stderr: ${proc.err.text}"
-        logger.info "stdout: ${stdout}"
-        logger.info "return code: ${proc.exitValue()}"
+        if (proc.err.text) {
+            log.debug "stderr: ${proc.err.text}"
+        }
+        log.debug "stdout: ${stdout}"
+        log.debug "return code: ${proc.exitValue()}"
 
         for (String line : stdout.split("\n")) {
-            logger.debug "process read: ${line}"
+            log.debug "process read: ${line}"
             if (line.contains("STATE")) {
                 String[] spl = line.split("\\s+")
-                logger.debug "Tomcat Status: ${spl[4]}"
+                log.debug "Tomcat Status: ${spl[4]}"
                 return spl[4]
             }
         }
@@ -133,14 +136,14 @@ class DeployTask extends DefaultTask {
 
         Session session = null
 
-        logger.lifecycle "Connecting to '${usedConfig.uploadTarget}'"
+        log.lifecycle "Connecting to '${usedConfig.uploadTarget}'"
         JSch jsch = new JSch()
-        logger.lifecycle "getting session ..."
+        log.lifecycle "getting session ..."
         session = jsch.getSession(usedConfig.username as String, usedConfig.uploadTarget as String, 22)
         session.setConfig("StrictHostKeyChecking", "no")
-        logger.lifecycle "setting password ..."
+        log.lifecycle "setting password ..."
         session.setPassword(usedConfig.password as String)
-        logger.lifecycle "connecting"
+        log.lifecycle "connecting"
         session.connect()
         session.sendKeepAliveMsg()
 
@@ -150,13 +153,13 @@ class DeployTask extends DefaultTask {
         File sendDir = new File(webappDir)
         File[] dirList = sendDir.listFiles()
         if (dirList.size() == 0) {
-            warn(project, logger, "webApp directory is empty - no files to upload")
+            log.warn("webApp directory is empty - no files to upload")
         } else {
             createRemoteDir(session, baseUploadDir)
 
             uploadDir(session, usedConfig, dirList, baseUploadDir)
         }
-        logger.lifecycle "Finished"
+        log.lifecycle "Finished"
         session.disconnect()
         session = null
     }
@@ -185,7 +188,7 @@ class DeployTask extends DefaultTask {
 
         long fileSize = f.length()
 
-        logger.lifecycle "Sending '${sourceFilename}' to '${destFilename}' (~ ${(long) (fileSize / 1024)} KB)"
+        log.lifecycle "Sending '${sourceFilename}' to '${destFilename}' (~ ${(long) (fileSize / 1024)} KB)"
 
         FileInputStream fis = null
 
@@ -199,12 +202,12 @@ class DeployTask extends DefaultTask {
 
         channel.connect()
 
-        logger.debug "Executing $command"
+        log.debug "Executing $command"
 
         if (checkAck(inStream) != 0) {
             throw new FileUploadException(sourceFilename);
         } else {
-            logger.debug "Acknowledge successful"
+            log.debug "Acknowledge successful"
         }
 
         // create File and upload
@@ -216,7 +219,7 @@ class DeployTask extends DefaultTask {
         }
         command += "\n"
 
-        logger.debug "Executing $command"
+        log.debug "Executing $command"
 
         out.write(command.getBytes())
         out.flush()
@@ -224,7 +227,7 @@ class DeployTask extends DefaultTask {
         if (checkAck(inStream) != 0) {
             throw new FileUploadException(sourceFilename);
         } else {
-            logger.debug "Acknowledge successful"
+            log.debug "Acknowledge successful"
         }
 
         fis = new FileInputStream(sourceFilename)
@@ -235,8 +238,12 @@ class DeployTask extends DefaultTask {
         int completed = 0
         if (fileSize > 1024 * 50) {
             showProgress = true
-            System.out.print "           \"|\" = 5% ["
-            System.out.flush()
+            if (log.isTeamCityBuild) {
+                log.progressStart("Uploading ...")
+            } else {
+                System.out.print "           \"|\" = 5% ["
+                System.out.flush()
+            }
         }
         while (true) {
             int len = fis.read(buf, 0, buf.length)
@@ -250,17 +257,39 @@ class DeployTask extends DefaultTask {
                 sendBuffer = sendBuffer - fivePercent
                 completed += 5
                 if (completed == 25) {
-                    System.out.print '25%'
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('25%')
+                    } else {
+                        System.out.print '25%'
+                    }
                 } else if (completed == 50) {
-                    System.out.print '50%'
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('50%')
+                    } else {
+                        System.out.print '50%'
+                    }
                 } else if (completed == 75) {
-                    System.out.print '75%'
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('75%')
+                    } else {
+                        System.out.print '75%'
+                    }
                 } else if (completed == 100) {
-                    System.out.print '100%'
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('100%')
+                    } else {
+                        System.out.print '100%'
+                    }
                 } else {
-                    System.out.print '|'
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage("$completed%")
+                    } else {
+                        System.out.print '|'
+                    }
                 }
-                System.out.flush()
+                if (!log.isTeamCityBuild) {
+                    System.out.flush()
+                }
             }
         }
         out.flush()
@@ -272,8 +301,13 @@ class DeployTask extends DefaultTask {
         out.write(buf, 0, 1)
         out.flush()
         if (showProgress) {
-            System.out.print "]"
-            System.out.println()
+
+            if (log.isTeamCityBuild) {
+                log.progressFinish("Upload complete")
+            } else {
+                System.out.print "]"
+                System.out.println()
+            }
         }
 
         if (checkAck(inStream) != 0) {
@@ -282,7 +316,7 @@ class DeployTask extends DefaultTask {
             throw new FileUploadException(sourceFilename);
         }
 
-        logger.lifecycle "Successfully uploaded"
+        log.lifecycle "Successfully uploaded"
 
         out.close()
         channel.disconnect()
@@ -299,8 +333,8 @@ class DeployTask extends DefaultTask {
 
         channel.connect()
 
-        logger.lifecycle "Creating directory: '${path}'"
-        logger.debug "Executing $command"
+        log.lifecycle "Creating directory: '${path}'"
+        log.debug "Executing $command"
 
         channel.close()
         out = null
@@ -308,17 +342,28 @@ class DeployTask extends DefaultTask {
     }
 
     private boolean deleteDir(File path) throws FileDeleteException {
+
         if (path.exists()) {
             if (path.isDirectory()) {
                 if (!path.deleteDir()) {
+                    log.failure("Could not delete directory ${path.path}")
                     new FileDeleteException(path)
                 }
-                logger.debug "Deleted directory '${path.path}'"
+                if (path.exists()) {
+                    log.failure("Could not delete directory ${path.path}")
+                } else {
+                    log.lifecycle "Successfully deleted directory '${path.path}'"
+                }
             } else {
                 if (!path.delete()) {
+                    log.failure("Could not delete ${path.path}")
                     new FileDeleteException(path)
                 }
-                logger.debug "Deleted '${path.path}'"
+                if (path.exists()) {
+                    log.failure("Could not delete directory ${path.path}")
+                } else {
+                    log.lifecycle "Successfully deleted '${path.path}'"
+                }
             }
         }
         return true
