@@ -12,7 +12,7 @@ import org.gradle.process.internal.JavaExecAction
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class GenerateGrammarSourceTask extends DefaultTask {
-    private TCLogger log = new TCLogger(project, logger)
+    private static final TCLogger log = new TCLogger(project, logger)
 
     @TaskAction
     def generateGrammarSource() {
@@ -22,12 +22,11 @@ class GenerateGrammarSourceTask extends DefaultTask {
         outputs.dir project.antlr3.destinationDir
 
         Map<String, FileTree> grammarMap = new HashMap<String, FileTree>()
-        println "generating from " + project.antlr3.grammarList.size() + " files"
+        log.lifecycle "Generating from " + project.antlr3.grammarList.size() + " files"
         for (String grammar in project.antlr3.grammarList) {
             def parts = grammar.split("->")
             if (parts.size() != 2) {
-                println "Could not run antlr for line '" + grammar + "'"
-                throw new Exception("Invalid Input for cat-antlr3!")
+                log.failure "Could not run antlr for line '" + grammar + "'", true
             }
             String grammarFile = parts[0]
             String grammarPackage = parts[1]
@@ -43,7 +42,7 @@ class GenerateGrammarSourceTask extends DefaultTask {
             String grammarPackage = m.getKey()
             FileTree tree = m.getValue()
 
-            println "   Generating from " + tree.files.size() + " grammar files  to '" + grammarPackage + "'"
+            log.lifecycle "Generating from " + tree.files.size() + " grammar files  to '" + grammarPackage + "'"
 
             grammarPackage = grammarPackage.replace('.', File.separator)
 
