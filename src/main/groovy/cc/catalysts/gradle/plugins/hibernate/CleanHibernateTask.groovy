@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.plugins.hibernate
 
+import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -7,13 +8,15 @@ import org.gradle.api.tasks.TaskAction
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class CleanHibernateTask extends DefaultTask {
+    private TCLogger log = new TCLogger(project, logger)
+
     @TaskAction
     def cleanHibernateTargetDir() {
-        File f = new File(project.projectDir.absolutePath + File.separatorChar + project.hibernate.destinationDir);
-        if (f.exists()){
-            println "     cat-hibernate: Deleting '" + f.getPath() + "'"
-            if (!f.deleteDir()){
-                println "          Error in deleting directory"
+        File f = new File(project.projectDir.absolutePath, project.hibernate.destinationDir as String);
+        if (f.exists()) {
+            log.lifecycle "Deleting '${f.getPath()}'"
+            if (!f.deleteDir()) {
+                log.failure "Could not delete directory '${f.getPath()}'", true
             }
         }
     }

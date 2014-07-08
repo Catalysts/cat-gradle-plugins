@@ -1,120 +1,122 @@
 package cc.catalysts.gradle.plugins.deploy
 
-import cc.catalysts.gradle.plugins.FileDeleteException
-import cc.catalysts.gradle.plugins.FileUploadException
+import cc.catalysts.gradle.utils.TCLogger
+import com.jcraft.jsch.Channel
+import com.jcraft.jsch.ChannelExec
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.Session
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import com.jcraft.jsch.Session
-import com.jcraft.jsch.JSch
-import com.jcraft.jsch.ChannelExec
-import com.jcraft.jsch.Channel
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class DeployTask extends DefaultTask {
+    private static String DEPLOY_BLOCK = "deploy"
+    private TCLogger log = new TCLogger(project, logger)
+
     @TaskAction
     def deploy() {
-        def usedConfig
-        if(project.hasProperty("depConfig")) {
-            if(project.deploy.findByName(project.depConfig) != null) {
+        log.openBlock(DEPLOY_BLOCK)
+        def usedConfig = null
+        if (project.hasProperty("depConfig")) {
+            if (project.deploy.findByName(project.depConfig) != null) {
                 usedConfig = project.deploy.findByName(project.depConfig)
             } else {
-                println "ERROR: Could not find Deploy-Configuration for '" + project.depConfig + "'!"
-                throw new Exception("Deploy-Configuration not defined")
+                log.failure("Could not find Deploy-Configuration for '${project.depConfig}'!", true)
             }
         } else {
-            if(project.deploy.size() == 0) {
-                println "ERROR: Could not find any Deploy-Configuration!"
-                throw new Exception("Deploy-Configuration not defined")
+            if (project.deploy.size() == 0) {
+                log.failure("Could not find any Deploy-Configuration!", true)
             } else if (project.deploy.size() == 1) {
                 usedConfig = project.deploy.iterator().next()
             } else {
-                println "ERROR: More than one Deploy-Configurations are defined, please choose one with 'gradle deploy -PdepConfig=confName' where confName is one of the following:"
+                def msg = "More than one Deploy-Configurations are defined, please choose one with 'gradle deploy -PdepConfig=confName' where confName is one of the following:"
                 for (target in project.deploy) {
-                    println "  " + target.name
+                    msg = msg + "\n  ${target.name}"
                 }
-                throw new Exception("Deploy-Configuration not defined")
+                log.failure(msg, true)
             }
         }
 
-        switch(usedConfig.type) {
+        switch (usedConfig?.type) {
             case 'lancopy':
+                File logDir = new File(usedConfig.webappDir as String, "logs")
+                File webappDir = new File(usedConfig.webappDir as String, "webapps")
+                File pluginDir = new File(usedConfig.webappDir as String, "plugins")
+                File workDir = new File(usedConfig.webappDir as String, "work")
 
-                File logDir = new File(usedConfig.webappDir, "logs")
-                File webappDir = new File(usedConfig.webappDir, "webapps")
-                File pluginDir = new File(usedConfig.webappDir, "plugins")
-                File workDir = new File(usedConfig.webappDir, "work")
+                log.lifecycle "Deploying ${usedConfig.webappWar} to ${usedConfig.tomcatHost}"
+                log.lifecycle "Stopping Tomcat Service.."
 
-                println "Deploying " + usedConfig.webappWar + " to " + usedConfig.tomcatHost
-
-
-                println "-- Stopping Tomcat Service.."
                 String state = executeServiceCommand(["sc", usedConfig.tomcatHost, "stop", usedConfig.tomcatService])
 
                 int i = 1;
                 int maxChecks = 5;
                 while (state.equals("STOP_PENDING")) {
-                    println "--    Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ..."
+                    log.warn("Tomcat didn't stop, check again in 5s ${i}/${maxChecks} ...")
                     i++
                     if (i > maxChecks) {
-                        throw new Exception("Couldn't stop tomcat service")
+                        log.failure("Couldn't stop tomcat service", true)
                     }
                     Thread.sleep(5000)
                     state = executeServiceCommand(["sc", usedConfig.tomcatHost, "query", usedConfig.tomcatService])
                 }
+                log.lifecycle "Waiting 5s for file handle release"
+                Thread.sleep(5000)
 
-                if (deleteDir(logDir)){
-                    println "   Successfully deleted " + logDir.getPath()
-                }
-                if (deleteDir(webappDir)){
-                    println "   Successfully deleted " + webappDir.getPath()
-                }
-                if (deleteDir(pluginDir)){
-                    println "   Successfully deleted " + pluginDir.getPath()
-                }
-                if (deleteDir(workDir)){
-                    println "   Successfully deleted " + workDir.getPath()
+                def folders = [logDir, webappDir, pluginDir, workDir]
+
+                for (def folder : folders) {
+                    deleteDir(folder)
                 }
 
-                logDir.mkdir()
+                if (logDir.mkdir()) {
+                    log.lifecycle "Created '${logDir.path}' folder"
+                }
 
-                println '-- Copying ' + usedConfig.webappWar + ' to ' + usedConfig.webappDir
+                log.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
+
                 project.copy {
                     from usedConfig.webappWar
                     into usedConfig.webappDir
                 }
 
-                println "-- Starting Tomcat Service.."
+                log.lifecycle "Starting Tomcat Service.."
                 executeServiceCommand(["sc", usedConfig.tomcatHost, "start", usedConfig.tomcatService])
 
                 break
             case 'upload':
                 def webappDir = usedConfig.webappDir
 
-                println 'Uploading ' + webappDir + ' to ' + usedConfig.uploadTarget
+                log.lifecycle "Uploading '${webappDir}' to '${usedConfig.uploadTarget}'"
 
-                sendFiles(usedConfig, webappDir)
+                sendFiles(usedConfig, webappDir as String)
 
                 break
             default:
-                println 'ERROR: invalid Type Property "' + usedConfig.type + '" in Configuration "' + usedConfig.name + '"!'
-                throw new Exception("Deploy-Configuration has no type")
+                log.failure("Deploy-Configuration: Invalid Type Property '${usedConfig.type}' in Configuration '${usedConfig.name}'!", true)
         }
+        log.closeBlock(DEPLOY_BLOCK)
     }
 
     private String executeServiceCommand(List<String> command) {
+        log.debug "Executing: ${command}"
         Process proc = command.execute()
         proc.waitFor()
 
         String stdout = proc.in.text
-        println "stderr: ${proc.err.text}"
-        println "stdout: ${stdout}"
-        println "return code: ${proc.exitValue()}"
+        if (proc.err.text) {
+            log.debug "stderr: ${proc.err.text}"
+        }
+        log.debug "stdout: ${stdout}"
+        log.debug "return code: ${proc.exitValue()}"
 
-        for(String line: stdout.split("\n")) {
+        for (String line : stdout.split("\n")) {
+            log.debug "process read: ${line}"
             if (line.contains("STATE")) {
                 String[] spl = line.split("\\s+")
+                log.info "Tomcat State: ${spl[4]}"
                 return spl[4]
             }
         }
@@ -122,65 +124,63 @@ class DeployTask extends DefaultTask {
         return ""
     }
 
-    private void sendFiles(usedConfig, webappDir) {
+    private void sendFiles(usedConfig, String webappDir) {
+        Session session
 
-        Session session = null
-
-        println '  -- Connecting to ' + usedConfig.uploadTarget
+        log.lifecycle "Connecting to '${usedConfig.uploadTarget}'"
         JSch jsch = new JSch()
-        println '    -- getting Session'
-        session = jsch.getSession(usedConfig.username, usedConfig.uploadTarget, 22)
+        log.lifecycle "getting session ..."
+        session = jsch.getSession(usedConfig.username as String, usedConfig.uploadTarget as String, 22)
         session.setConfig("StrictHostKeyChecking", "no")
-        println '    -- set password'
-        session.setPassword(usedConfig.password)
-        println '    -- connect'
+        log.lifecycle "setting password ..."
+        session.setPassword(usedConfig.password as String)
+        log.lifecycle "connecting"
         session.connect()
         session.sendKeepAliveMsg()
 
-        
+
         String baseUploadDir = usedConfig.uploadDir + '/' + project.version
 
         File sendDir = new File(webappDir)
         File[] dirList = sendDir.listFiles()
-        if ( dirList.size() == 0){
-            '    -- webApp directory is empty - no files to upload'
-        }else{
+        if (dirList.size() == 0) {
+            log.warn("webApp directory is empty - no files to upload")
+        } else {
             createRemoteDir(session, baseUploadDir)
-            
+
             uploadDir(session, usedConfig, dirList, baseUploadDir)
         }
-        println '    -- Finished'
+        log.lifecycle "Finished"
         session.disconnect()
-        session = null
     }
 
-    private static void uploadDir(Session session, def usedConfig,File[] dirList, String directory) {
-        if (dirList == null || session == null || directory == null || usedConfig == null){
+    private void uploadDir(Session session, def usedConfig, File[] dirList, String directory) {
+        if (dirList == null || session == null || directory == null || usedConfig == null) {
             return;
         }
-        for(int i=0; i < dirList.length; i++) {
+        for (int i = 0; i < dirList.length; i++) {
             File f = dirList[i]
-            if (f.isDirectory()){
-                String newDir = directory + '/' +f.getName()
+            if (f.isDirectory()) {
+                String newDir = directory + '/' + f.getName()
                 createRemoteDir(session, newDir)
                 uploadDir(session, usedConfig, f.listFiles(), newDir)
-            }else{
+            } else {
                 uploadSshFile(session, f, f.getPath(), directory + '/' + f.getName())
             }
         }
     }
 
-    private static void uploadSshFile(Session session, File f, String sourceFilename, String destFilename) {
-        String command = null
-        OutputStream out = null
-        InputStream inStream = null
-        Channel channel = null
-        
+    private void uploadSshFile(Session session, File f, String sourceFilename, String destFilename) {
+        String command
+        OutputStream out
+        InputStream inStream
+        Channel channel
+
         long fileSize = f.length()
 
-        println '    -- Sending ' + sourceFilename + ' to ' + destFilename + ' (~' + (long)(fileSize / 1024) + ' KB)'
+        log.lifecycle "Sending '${sourceFilename}' to '${destFilename}' (~ ${(long) (fileSize / 1024)} KB)"
 
-        FileInputStream fis = null
+        FileInputStream fis
 
         // SCP UPLOAD
         command = "scp -p -t '" + destFilename + "'"
@@ -192,12 +192,12 @@ class DeployTask extends DefaultTask {
 
         channel.connect()
 
-        println "         Command: " + command
+        log.debug "Executing $command"
 
-        if(checkAck(inStream) != 0 ){
-            throw new FileUploadException(sourceFilename);
-        }else{
-            println "           Acknowledge successful"
+        if (checkAck(inStream) != 0) {
+            log.failure("File \"${sourceFilename}\" could not be uploaded", true)
+        } else {
+            log.debug "Acknowledge successful"
         }
 
         // create File and upload
@@ -209,15 +209,15 @@ class DeployTask extends DefaultTask {
         }
         command += "\n"
 
-        print "         Command: " + command
+        log.debug "Executing $command"
 
         out.write(command.getBytes())
         out.flush()
 
-        if(checkAck(inStream) != 0 ){
-            throw new FileUploadException(sourceFilename);
-        }else{
-            println "           Acknowledge successful"
+        if (checkAck(inStream) != 0) {
+            log.failure("File \"${sourceFilename}\" could not be uploaded", true)
+        } else {
+            log.debug "Acknowledge successful"
         }
 
         fis = new FileInputStream(sourceFilename)
@@ -226,10 +226,14 @@ class DeployTask extends DefaultTask {
         int sendBuffer = 0
         long fivePercent = fileSize / 20
         int completed = 0
-        if (fileSize > 1024 * 50){
+        if (fileSize > 1024 * 50) {
             showProgress = true
-            System.out.print "           \"|\" = 5% ["
-            System.out.flush()
+            if (log.isTeamCityBuild) {
+                log.progressStart("Uploading ...")
+            } else {
+                System.out.print "           \"|\" = 5% ["
+                System.out.flush()
+            }
         }
         while (true) {
             int len = fis.read(buf, 0, buf.length)
@@ -238,22 +242,44 @@ class DeployTask extends DefaultTask {
             }
             out.write(buf, 0, len)
             sendBuffer += buf.size()
-            if(showProgress && sendBuffer > fivePercent){
+            if (showProgress && sendBuffer > fivePercent) {
                 // 5% sended
                 sendBuffer = sendBuffer - fivePercent
                 completed += 5
-                if(completed == 25){
-                    System.out.print '25%'
-                } else if(completed == 50){
-                    System.out.print '50%'
-                } else if(completed == 75){
-                    System.out.print '75%'
-                } else if(completed == 100){
-                    System.out.print '100%'
+                if (completed == 25) {
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('25%')
+                    } else {
+                        System.out.print '25%'
+                    }
+                } else if (completed == 50) {
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('50%')
+                    } else {
+                        System.out.print '50%'
+                    }
+                } else if (completed == 75) {
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('75%')
+                    } else {
+                        System.out.print '75%'
+                    }
+                } else if (completed == 100) {
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage('100%')
+                    } else {
+                        System.out.print '100%'
+                    }
                 } else {
-                    System.out.print '|'
+                    if (log.isTeamCityBuild) {
+                        log.progressMessage("$completed%")
+                    } else {
+                        System.out.print '|'
+                    }
                 }
-                System.out.flush()
+                if (!log.isTeamCityBuild) {
+                    System.out.flush()
+                }
             }
         }
         out.flush()
@@ -264,22 +290,29 @@ class DeployTask extends DefaultTask {
         buf[0] = 0
         out.write(buf, 0, 1)
         out.flush()
-        if (showProgress){
-            System.out.print "]"
-            System.out.println()
-        }
-        println '       Successfully uploaded'
+        if (showProgress) {
 
-        if(checkAck(inStream) != 0 ){
-            throw new FileUploadException(sourceFilename);
+            if (log.isTeamCityBuild) {
+                log.progressFinish("Upload complete")
+            } else {
+                System.out.print "]"
+                System.out.println()
+            }
         }
+
+        if (checkAck(inStream) != 0) {
+            out.close()
+            channel.disconnect()
+            log.failure("File \"${sourceFilename}\" could not be uploaded", true)
+        }
+
+        log.lifecycle "Successfully uploaded"
 
         out.close()
-
         channel.disconnect()
     }
 
-    private static void createRemoteDir(Session session, String path) {
+    private void createRemoteDir(Session session, String path) {
         String command = "mkdir '" + path + "'"
         Channel channel = session.openChannel("exec")
 
@@ -290,62 +323,65 @@ class DeployTask extends DefaultTask {
 
         channel.connect()
 
-        println "    -- Creating directory: '" + path + "'"
-        println "         Command: " + command
-        
+        log.lifecycle "Creating directory: '${path}'"
+        log.debug "Executing $command"
+
         channel.close()
         out = null
         inStream = null
     }
 
-    private static boolean deleteDir(File path) throws FileDeleteException {
-        if( path.exists() ) {
-            if (path.isDirectory()){
-                if (!path.deleteDir()){
-                    new FileDeleteException(path)
+    private boolean deleteDir(File path) {
+
+        if (path.exists()) {
+            if (path.isDirectory()) {
+                if (!path.deleteDir()) {
+                    log.failure("Could not delete directory ${path.path}", true)
                 }
-            }else{
-                if (!path.delete()){
-                    new FileDeleteException(path)
+                Thread.sleep(1000)
+                if (path.exists()) {
+                    log.failure("Could not delete directory ${path.path}", true)
+                } else {
+                    log.lifecycle "Successfully deleted directory '${path.path}'"
+                }
+            } else {
+                if (!path.delete()) {
+                    log.failure("Could not delete ${path.path}", true)
+                }
+                Thread.sleep(1000)
+                if (path.exists()) {
+                    log.failure("Could not delete ${path.path}", true)
+                } else {
+                    log.lifecycle "Successfully deleted '${path.path}'"
                 }
             }
         }
         return true
     }
 
-    public static int checkAck(InputStream stream) throws IOException {
+    public int checkAck(InputStream stream) throws IOException {
         int b = stream.read()
         // b may be 0 for success,
         // 1 for error,
         // 2 for fatal error,
         // -1
-        if(b == 0) return b
-        if(b == -1) return b
+        if (b == 0) return b
+        if (b == -1) return b
 
-        if(b == 1 || b == 2){
+        if (b == 1 || b == 2) {
             StringBuffer sb = new StringBuffer()
-            sb.append("           ")
-            int c
-            while(c != '\n' && c != -1){
+            int c = stream.read()
+            while (c != '\n' && c != -1) {
+                sb.append((char) c)
                 c = stream.read()
-                sb.append((char)c)
             }
-            if(b == 1 ){ // error
-                print sb.toString()
+            if (b == 1) { // error
+                log.error sb.toString()
             }
-            if(b == 2 ){ // fatal error
-                print sb.toString()
+            if (b == 2) { // fatal error
+                log.failure sb.toString()
             }
         }
         return b
-    }
-    
-    private static disconnect(Session session, Channel channel){
-        if (channel != null){
-            channel.disconnect()
-        }
-        if(session != null){
-            session.disconnect()
-        }
     }
 }

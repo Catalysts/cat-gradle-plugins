@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.plugins.codegen.groovy
 
+import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -9,6 +10,7 @@ import java.text.SimpleDateFormat
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class CodegenGroovyTask extends DefaultTask {
+    private TCLogger log = new TCLogger(project, logger)
 
     CodegenGroovyTask() {
         project.tasks.codegen.dependsOn(this)
@@ -32,13 +34,13 @@ class CodegenGroovyTask extends DefaultTask {
 
             new File(pathToPackage).mkdirs()
 
-            def f = new File(pathToPackage, 'Build.' + project.codegengroovy.fileExt)
+            def f = new File(pathToPackage, 'Build.' + (project.codegengroovy.fileExt as String))
             if (f.exists()) {
-                println "   deleting file [" + f.getAbsolutePath() + "]"
+                log.debug "Deleting file '${f.getAbsolutePath()}'"
                 f.delete()
             }
 
-            println "   writing new file [" + f.getAbsolutePath() + "]"
+            log.lifecycle "Writing new file '${f.getAbsolutePath()}'"
             def w = f.newWriter()
 
             w << 'package ' << pName << ';\r\n'
@@ -48,7 +50,6 @@ class CodegenGroovyTask extends DefaultTask {
             w << '}'
 
             w.close()
-
         }
     }
 }

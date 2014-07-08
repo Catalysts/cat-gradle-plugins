@@ -1,16 +1,16 @@
 description = 'collection of gradle plugins'
 group = 'cc.catalysts'
-version = '1.0'
+version = '2.0'
 if (hasProperty('teamcity')) {
     version += property('teamcity')['build.number']
-    println "##teamcity[buildNumber '" + version + "']"
+    logger.lifecycle "##teamcity[buildNumber '" + version + "']"
 }
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '2.0'
 }
 
 repositories {
@@ -47,6 +47,10 @@ dependencies {
 
     // cat-webdeploy
     runtime group: 'org.apache.ant', name: 'ant-jsch', version: '1.9.2'
+
+    // explicitly needed or it will download both each time the gwt plugin is executed
+    testCompile  'com.google.gwt:gwt-dev:2.4.0'
+    testCompile  'com.google.gwt:gwt-user:2.4.0'
 }
 
 uploadSnapshot {

@@ -1,6 +1,7 @@
 package cc.catalysts.gradle.plugins.i18n
 
 /**
+ * TODO: add TCLogger
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class I18nPropertyFileGroup {
@@ -47,7 +48,7 @@ class I18nPropertyFileGroup {
         return file.endsWith(".properties")
     }
 
-    public boolean verify(File rootDir, I18nExtension extension) {
+    def verify(File rootDir, I18nExtension extension) {
         for (String fName : files) {
             if (!fName.equals(template.getTemplateFileName())) {
                 template.compareWith(new File(rootDir, fName), extension)

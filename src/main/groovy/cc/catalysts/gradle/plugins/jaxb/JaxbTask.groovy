@@ -8,9 +8,9 @@ import org.gradle.api.tasks.TaskAction
  */
 public class JaxbTask extends DefaultTask {
 
-	@TaskAction
-	def GenerateAll() {
-		/* As this Task depends on all other JaxbGeneration Tasks, everything is done.*/
-	}
-	
+    @TaskAction
+    def GenerateAll() {
+        /* As this Task depends on all other JaxbGeneration Tasks, everything is done.*/
+    }
+
 }

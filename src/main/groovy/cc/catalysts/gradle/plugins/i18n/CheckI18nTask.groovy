@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.plugins.i18n
 
+import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -10,6 +11,8 @@ import static cc.catalysts.gradle.plugins.i18n.I18nPropertyFileGroup.isPropertyF
  * @author Catalysts GmbH, www.catalysts.cc
  */
 public class CheckI18nTask extends DefaultTask {
+    private TCLogger log = new TCLogger(project, logger)
+
     private I18nExtension e
 
     @TaskAction
@@ -20,7 +23,7 @@ public class CheckI18nTask extends DefaultTask {
         File root = new File(rootPath)
 
         if (root == null || !root.exists() || !root.isDirectory()) {
-            throw new FileNotFoundException("Could not find directory: " + rootPath);
+            log.failure("Could not find directory: ${rootPath}", true)
         }
 
         // create properties file list if empty
@@ -45,9 +48,7 @@ public class CheckI18nTask extends DefaultTask {
                 errorMsg.append(LF)
                 errorMsg.append(error)
             }
-            RuntimeException exception = new RuntimeException(errorMsg.toString())
-            exception.setStackTrace(new StackTraceElement[0])
-            throw exception
+            log.failure(errorMsg.toString(), true)
         }
     }
 
@@ -56,16 +57,16 @@ public class CheckI18nTask extends DefaultTask {
             if (isPropertyFile(f.getName())) {
                 String name = getPropertyFileName(f.getName());
                 if (e.groupsToIgnore.contains(name)) {
-                    println('Ignoring file "' + f.getName() + '"')
+                    log.lifecycle("Ignoring file '${f.getName()}'")
                     continue
                 }
                 I18nPropertyFileGroup curGroup = e.getProperties().hasGroup(name)
                 if (curGroup == null) {
-                    println('creating property file group "' + name + '" for file "' + f.getName() + '"')
+                    log.lifecycle("Creating property file group '${name}' for file '${f.getName()}'")
                     curGroup = new I18nPropertyFileGroup(f.getName())
                     e.getProperties().addGroup(curGroup)
                 } else {
-                    println('adding property file "' + f.getName() + '" to group "' + name + '"')
+                    log.lifecycle("Adding property file '${f.getName()}' to group '${name}'")
                     curGroup.addFile(f.getName())
                 }
             }

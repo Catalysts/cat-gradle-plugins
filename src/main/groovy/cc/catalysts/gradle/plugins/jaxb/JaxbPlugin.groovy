@@ -16,11 +16,10 @@ public class JaxbPlugin implements Plugin<Project> {
         project.plugins.apply(JavaPlugin)
 		project.task('codegen', type: CodegenTask)
 		
-        project.configurations.add('jaxb') {
-            visible = false
-            transitive = false
-            description = "The JAXB libraries to be used for this project."
-        }
+        def config = project.configurations.create('jaxb')
+        config.visible = false
+        config.transitive = false
+        config.description = "The JAXB libraries to be used for this project."
 		
         project.configurations.compile {
             extendsFrom project.configurations.jaxb
