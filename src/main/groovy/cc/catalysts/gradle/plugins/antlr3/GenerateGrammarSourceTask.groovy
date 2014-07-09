@@ -4,6 +4,8 @@ import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTree
 import org.gradle.api.internal.file.FileResolver
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.internal.DefaultJavaExecAction
 import org.gradle.process.internal.JavaExecAction
@@ -14,12 +16,17 @@ import org.gradle.process.internal.JavaExecAction
 class GenerateGrammarSourceTask extends DefaultTask {
     private TCLogger log = new TCLogger(project, logger)
 
+    @InputDirectory
+    def inputDir = new File(project.projectDir, project.antlr3.antlrSource as String)
+    @OutputDirectory
+    def outputDir = new File(project.projectDir, project.antlr3.destinationDir as String)
+
     @TaskAction
     def generateGrammarSource() {
-        FileResolver fileResolver = getServices().get(FileResolver.class)
+        log.info("input dir: $inputDir")
+        log.info("output dir: $outputDir")
 
-        inputs.dir project.antlr3.antlrSource
-        outputs.dir project.antlr3.destinationDir
+        FileResolver fileResolver = getServices().get(FileResolver.class)
 
         Map<String, FileTree> grammarMap = new HashMap<String, FileTree>()
         log.lifecycle "Generating from " + project.antlr3.grammarList.size() + " files"
