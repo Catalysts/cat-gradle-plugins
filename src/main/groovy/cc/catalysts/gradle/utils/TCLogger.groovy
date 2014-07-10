@@ -13,10 +13,49 @@ class TCLogger {
     private Logger logger
     public final boolean isTeamCityBuild
 
+    private String indent
+    private String increaseString
+
     TCLogger(Project project, Logger logger) {
         this.project = project
         this.logger = logger
         isTeamCityBuild = isTeamCityBuild(project)
+        setIncrease(5)
+    }
+
+    void setIndent(String indent) {
+        this.indent = indent
+    }
+
+    void increaseIndent() {
+        setIndent(indent + increaseString)
+    }
+
+    void decreaseIndent() {
+        if (indent.length() > increaseString.length()) {
+            indent = indent.substring(increaseString.length())
+        }
+    }
+
+    void setIncrease(int increase) {
+        resetIndent()
+        StringBuilder b = new StringBuilder()
+        for (int i = 0; i < increase; i++) {
+            b.append(' ')
+        }
+        increaseString = b.toString()
+    }
+
+    void resetIndent() {
+        indent = ''
+    }
+
+    boolean isInfoEnabled() {
+        return logger?.isInfoEnabled()
+    }
+
+    boolean isDebugEnabled() {
+        return logger?.isDebugEnabled()
     }
 
     static boolean isTeamCityBuild(Project project) {
@@ -25,40 +64,40 @@ class TCLogger {
 
     void error(String message) {
         if (isTeamCityBuild) {
-            println "##teamcity[message text='${escapeString(message)}' status='ERROR']"
+            println "##teamcity[message text='${indent + escapeString(message)}' status='ERROR']"
         } else {
-            logger.error(message)
+            logger.error(indent + message)
         }
     }
 
     void info(String message) {
         if (isTeamCityBuild) {
             if (logger.isInfoEnabled()) {
-                println "##teamcity[message text='${escapeString(message)}']"
+                println "##teamcity[message text='${indent + escapeString(message)}']"
             }
         } else {
-            logger.info(message)
+            logger.info(indent + message)
         }
     }
 
     void lifecycle(String message) {
         if (isTeamCityBuild) {
-            println "##teamcity[message text='${escapeString(message)}']"
+            println "##teamcity[message text='${indent + escapeString(message)}']"
         } else {
-            logger.lifecycle(message)
+            logger.lifecycle(indent + message)
         }
     }
 
     void warn(String message) {
         if (isTeamCityBuild) {
-            println "##teamcity[message text='${escapeString(message)}' status='WARNING']"
+            println "##teamcity[message text='${indent + escapeString(message)}' status='WARNING']"
         } else {
-            logger.warn(message)
+            logger.warn(indent + message)
         }
     }
 
     void debug(String message) {
-        logger.debug(message)
+        logger.debug(indent + message)
     }
 
     /**
@@ -66,12 +105,12 @@ class TCLogger {
      */
     void failure(String message, boolean stopBuild = false) {
         if (isTeamCityBuild) {
-            println "##teamcity[buildProblem description='${escapeString(message)}']"
+            println "##teamcity[buildProblem description='${indent + escapeString(message)}']"
             if (stopBuild) {
                 throw new RuntimeException(message)
             }
         } else {
-            logger.error(message)
+            logger.error(indent + message)
             if (stopBuild) {
                 throw new RuntimeException(message)
             }
@@ -105,6 +144,12 @@ class TCLogger {
     void progressMessage(String message) {
         if (isTeamCityBuild) {
             println "##teamcity[progressMessage '${escapeString(message)}']"
+        }
+    }
+
+    void buildNumber(String version) {
+        if (isTeamCityBuild) {
+            println "##teamcity[buildNumber '${version}']"
         }
     }
 

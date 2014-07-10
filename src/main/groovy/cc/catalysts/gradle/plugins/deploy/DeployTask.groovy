@@ -65,14 +65,18 @@ class DeployTask extends DefaultTask {
                 log.lifecycle "Waiting 5s for file handle release"
                 Thread.sleep(5000)
 
-                def folders = [logDir, webappDir, pluginDir, workDir]
+                def folders = [webappDir, pluginDir, workDir]
+
+                deleteDir(logDir, true)
 
                 for (def folder : folders) {
                     deleteDir(folder)
                 }
 
-                if (logDir.mkdir()) {
-                    log.lifecycle "Created '${logDir.path}' folder"
+                if (!logDir.exists()) {
+                    if (logDir.mkdir()) {
+                        log.lifecycle "Created '${logDir.path}' folder"
+                    }
                 }
 
                 log.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
@@ -331,18 +335,28 @@ class DeployTask extends DefaultTask {
         inStream = null
     }
 
-    private boolean deleteDir(File path) {
-
+    /**
+     * Deletes given directory or file
+     * @param path the file or directory to delete
+     * @param deleteOnlyContent if true only the content of the given directory is delete (does not cascade, subfolders will be deleted)
+     */
+    private void deleteDir(File path, boolean deleteOnlyContent = false) {
         if (path.exists()) {
             if (path.isDirectory()) {
-                if (!path.deleteDir()) {
-                    log.failure("Could not delete directory ${path.path}", true)
-                }
-                Thread.sleep(1000)
-                if (path.exists()) {
-                    log.failure("Could not delete directory ${path.path}", true)
+                if (deleteOnlyContent) {
+                    for (File f : path.listFiles()) {
+                        deleteDir(f)
+                    }
                 } else {
-                    log.lifecycle "Successfully deleted directory '${path.path}'"
+                    if (!path.deleteDir()) {
+                        log.failure("Could not delete directory ${path.path}", true)
+                    }
+                    Thread.sleep(1000)
+                    if (path.exists()) {
+                        log.failure("Could not delete directory ${path.path}", true)
+                    } else {
+                        log.lifecycle "Successfully deleted directory '${path.path}'"
+                    }
                 }
             } else {
                 if (!path.delete()) {
@@ -356,7 +370,6 @@ class DeployTask extends DefaultTask {
                 }
             }
         }
-        return true
     }
 
     public int checkAck(InputStream stream) throws IOException {
