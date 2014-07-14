@@ -18,7 +18,7 @@ class GrailsUtils {
         project.fileTree(dir: project.projectDir, include: '*GrailsPlugin.groovy').isEmpty()
     }
 
-    static ExecResult executeGrailsCommand(Project project, List<String> arguments, boolean interactive, ShowStacktrace stackTrace = ShowStacktrace.INTERNAL_EXCEPTIONS) {
+    static ExecResult executeGrailsCommand(Project project, List<String> arguments, boolean interactive) {
         TCLogger log = new TCLogger(project, Logging.getLogger(GrailsUtils.class))
 
         String grailsFolder = Path.join(SystemUtils.userHome.path, '.gradlegrails', 'grails', project.grails.version);
