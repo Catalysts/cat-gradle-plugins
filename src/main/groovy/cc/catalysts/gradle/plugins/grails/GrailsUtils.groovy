@@ -4,8 +4,8 @@ import cc.catalysts.gradle.utils.TCLogger
 import com.connorgarvey.gradlegrails.Path
 import org.apache.commons.lang3.SystemUtils
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.logging.Logging
+import org.gradle.logging.ShowStacktrace
 import org.gradle.process.ExecResult
 
 /**
@@ -18,8 +18,8 @@ class GrailsUtils {
         project.fileTree(dir: project.projectDir, include: '*GrailsPlugin.groovy').isEmpty()
     }
 
-    static ExecResult executeGrailsCommand(Project project, List<String> arguments, boolean interactive) {
-        TCLogger log = new TCLogger(project, Logging.getLogger(Task.class))
+    static ExecResult executeGrailsCommand(Project project, List<String> arguments, boolean interactive, ShowStacktrace stackTrace = ShowStacktrace.INTERNAL_EXCEPTIONS) {
+        TCLogger log = new TCLogger(project, Logging.getLogger(GrailsUtils.class))
 
         String grailsFolder = Path.join(SystemUtils.userHome.path, '.gradlegrails', 'grails', project.grails.version);
         String extension = SystemUtils.IS_OS_WINDOWS ? '.bat' : '';
@@ -33,10 +33,16 @@ class GrailsUtils {
         command.add(grailsExecutable);
         command.addAll(arguments);
 
-        if (!interactive)
-            command.add("--non-interactive");
+        if (!interactive) {
+            command.add("--non-interactive")
+        }
+        if(project.hasProperty('grailsVerbose') && project.grailsVerbose){
+            command.add("--verbose")
+        }else if (project?.gradle?.startParameter?.showStacktrace == ShowStacktrace.ALWAYS) {
+            command.add("--stacktrace")
+        }
 
-        log.debug("grails command: $command")
+        log.lifecycle("grails command: $command")
         log.debug("env: $env")
 
         return project.exec {

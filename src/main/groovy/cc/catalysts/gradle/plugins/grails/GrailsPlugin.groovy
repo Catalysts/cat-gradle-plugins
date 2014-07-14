@@ -1,10 +1,12 @@
 package cc.catalysts.gradle.plugins.grails
 
+import cc.catalysts.gradle.utils.TCLogger
 import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.internal.tasks.testing.DefaultTestTaskReports
+import org.gradle.api.logging.Logging
 import org.gradle.api.sonar.runner.SonarRunnerPlugin
 
 /**
@@ -12,6 +14,7 @@ import org.gradle.api.sonar.runner.SonarRunnerPlugin
  */
 class GrailsPlugin implements Plugin<Project> {
     Project project
+    TCLogger log
 
     private void applyGroovy() {
         project.apply plugin: 'groovy'
@@ -48,6 +51,7 @@ class GrailsPlugin implements Plugin<Project> {
                 description: 'Tests the project',
                 overwrite: true) << {
             if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
+                log.debug("grails: test task will create coverage report xml")
                 GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
             } else {
                 GrailsUtils.executeGrailsCommand(project, ["test-app"], false)
@@ -99,6 +103,7 @@ class GrailsPlugin implements Plugin<Project> {
 
     public void apply(Project project) {
         this.project = project
+        log = new TCLogger(project, Logging.getLogger(GrailsPlugin.class))
 
         applyGroovy()
         applyGrailsWrapper()
@@ -106,6 +111,7 @@ class GrailsPlugin implements Plugin<Project> {
 
         // in case there is no rootProject, rootProject simply points to the current project
         if (project.plugins.hasPlugin(SonarRunnerPlugin) || project.rootProject.plugins.hasPlugin(SonarRunnerPlugin)) {
+            log.debug("Adding standard grails groovy sonar-runner config")
             project.sonarRunner.sonarProperties {
                 property "sonar.language", "grvy"
                 property "sonar.sources", "src/groovy, grails-app"
