@@ -1,30 +1,34 @@
 package cc.catalysts.gradle.plugins.codegen.java
 
-import org.gradle.api.Project
-import org.gradle.api.Plugin
-import org.gradle.api.tasks.SourceSet
 import cc.catalysts.gradle.plugins.codegen.CodegenTask
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
 class CodegenJavaPlugin implements Plugin<Project> {
-	void apply(Project project) {
+    CodegenJavaExtension codegenJavaExtension
+
+    void apply(Project project) {
+        codegenJavaExtension = project.extensions.create("codegenjava", CodegenJavaExtension)
+
         project.apply plugin: 'java'
-		
-		if(project.tasks.findByPath('codegen') == null) {
-			project.task('codegen', type: CodegenTask)
-		}
-		
-		project.extensions.codegenjava = new CodegenJavaExtension()
-		project.task('codegenJavaBuild', type: CodegenJavaTask)
-		
-		project.convention.plugins.java.sourceSets.all { SourceSet sourceSet ->
-			if(!sourceSet.name.toLowerCase().contains("test")) {
-				def path = "${project.projectDir}/target/generated-sources/${sourceSet.name}/cp"
-				project.extensions.codegenjava.destDirs.add path
-				sourceSet.java { srcDir path }
-			}
-		}
-	}
+
+        if (project.tasks.findByPath('codegen') == null) {
+            project.task('codegen', type: CodegenTask)
+        }
+
+        project.task('codegenJavaBuild', type: CodegenJavaTask)
+
+        project.afterEvaluate {
+            project.sourceSets {
+                main {
+                    java {
+                        srcDir codegenJavaExtension.destDir
+                    }
+                }
+            }
+        }
+    }
 }

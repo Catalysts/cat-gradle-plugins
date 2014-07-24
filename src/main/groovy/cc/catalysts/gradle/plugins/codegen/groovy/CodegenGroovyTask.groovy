@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.plugins.codegen.groovy
 
+import cc.catalysts.gradle.plugins.codegen.java.CodegenJavaExtension
 import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat
  */
 class CodegenGroovyTask extends DefaultTask {
     private TCLogger log = new TCLogger(project, logger)
+    private CodegenGroovyExtension extension = project.codegengroovy
 
     CodegenGroovyTask() {
         project.tasks.codegen.dependsOn(this)
@@ -21,22 +23,28 @@ class CodegenGroovyTask extends DefaultTask {
 
     @TaskAction
     def build() {
-        def pName = project.codegengroovy.packageName
+        def pName = extension.packageName
         if (pName != null) {
             Calendar calendar = Calendar.getInstance()
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm")
             def date = dateFormat.format(calendar.getTime())
-            def version = project.version
+            String version = project.version as String
+            if (version.equals("unspecified")) {
+                version = project.parent.version
+                if (version.equals("unspecified")) {
+                    log.warn("project.version is \"unspecified\"")
+                }
+            }
 
-            File destDir = new File(project.projectDir, project.codegengroovy.destDir)
+            File destDir = new File(project.projectDir, extension.destDir)
 
             String pathToPackage = destDir.getAbsolutePath() + File.separator + pName.replace('.', File.separator)
 
             new File(pathToPackage).mkdirs()
 
-            def f = new File(pathToPackage, 'Build.' + (project.codegengroovy.fileExt as String))
+            def f = new File(pathToPackage, 'Build.' + extension.fileExt )
             if (f.exists()) {
-                log.debug "Deleting file '${f.getAbsolutePath()}'"
+                log.lifecycle "Deleting file '${f.getAbsolutePath()}'"
                 f.delete()
             }
 

@@ -6,7 +6,7 @@ package cc.catalysts.gradle.plugins.codegen.groovy
 public class CodegenGroovyExtension {
     String fileExt = "groovy"
     String packageName
-    String destDir
+    String destDir = "target/generated-sources/main/"
 
     public packageName(pack) {
         this.packageName = pack
