@@ -121,6 +121,7 @@ class GrailsPlugin implements Plugin<Project> {
                 property "sonar.surefire.reportsPath", "target/test-reports"
                 property "sonar.cobertura.reportPath", "target/test-reports/cobertura/coverage.xml"
                 property "sonar.groovy.cobertura.reportPath", "target/test-reports/cobertura/coverage.xml"
+                property "sonar.exclusions", "grails-app/migrations/**"
             }
         }
     }
