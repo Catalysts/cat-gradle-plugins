@@ -53,8 +53,7 @@ If you want to test your app before creating the archive, use the ```build``` ta
 
 You can customize the path of the produced war file(s) by setting the ```grails.project.war.file``` option in your ```BuildConfig.groovy```.
 
-In order to generate a code coverage report with the grails code-coverage plugin, you can use the ``testCoverage`` task or use -PgrailsCoverage=true
-
+In order to generate a code coverage report with the grails [code-coverage](http://grails.org/plugin/code-coverage) plugin, you can use the ``testCoverage`` task or use -PgrailsCoverage=true
 LESS
 ------
 
