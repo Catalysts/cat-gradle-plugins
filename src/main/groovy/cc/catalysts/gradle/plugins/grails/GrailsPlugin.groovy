@@ -117,7 +117,6 @@ class GrailsPlugin implements Plugin<Project> {
                 property "sonar.sources", "src/groovy, grails-app"
                 property "sonar.sourceEncoding", "UTF-8"
                 property "sonar.tests", "test/unit,test/integration"
-                property "sonar.dynamicAnalysis", "reuseReports"
                 property "sonar.surefire.reportsPath", "target/test-reports"
                 property "sonar.cobertura.reportPath", "target/test-reports/cobertura/coverage.xml"
                 property "sonar.groovy.cobertura.reportPath", "target/test-reports/cobertura/coverage.xml"
