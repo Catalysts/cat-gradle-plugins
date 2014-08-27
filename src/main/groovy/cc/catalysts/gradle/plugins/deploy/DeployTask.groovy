@@ -90,7 +90,7 @@ class DeployTask extends DefaultTask {
                 if (log.isDebugEnabled()) {
                     if (webappWar.isDirectory()) {
                         log.debug "\t Files in '${usedConfig.webappWar}'"
-                        debugLogFiles(webappWar)
+                        debugLogFiles("\t\t", webappWar)
                     }
                 }
 
@@ -117,13 +117,14 @@ class DeployTask extends DefaultTask {
         log.closeBlock(DEPLOY_BLOCK)
     }
 
-    def debugLogFiles(File directory) {
+    def debugLogFiles(String s, File directory) {
         for (File f : directory.listFiles()) {
             if (f.isDirectory()) {
-                debugLogFiles(f)
+                log.debug(s + "[DIR] " + f.name)
+                debugLogFiles("\t" + s, f)
                 continue
             }
-            log.debug "\t\t" + f.name
+            log.debug s + f.name
         }
     }
 
