@@ -82,9 +82,9 @@ class DeployTask extends DefaultTask {
                 log.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
 
                 File webappWar = new File(usedConfig.webappWar);
+
                 if (!webappWar.exists()) {
-                    log.failure("'${usedConfig.webappWar}' does not exist!")
-                    throw new RuntimeException("'${usedConfig.webappWar}' does not exist!")
+                    log.failure("'${webappWar.absolutePath}' does not exist!")
                 }
 
                 if (log.isDebugEnabled()) {
