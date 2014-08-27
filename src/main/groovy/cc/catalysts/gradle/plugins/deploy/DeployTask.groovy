@@ -18,7 +18,7 @@ class DeployTask extends DefaultTask {
     @TaskAction
     def deploy() {
         log.openBlock(DEPLOY_BLOCK)
-        def usedConfig = null
+        DeployTarget usedConfig = null
         if (project.hasProperty("depConfig")) {
             if (project.deploy.findByName(project.depConfig) != null) {
                 usedConfig = project.deploy.findByName(project.depConfig)
@@ -29,7 +29,7 @@ class DeployTask extends DefaultTask {
             if (project.deploy.size() == 0) {
                 log.failure("Could not find any Deploy-Configuration!", true)
             } else if (project.deploy.size() == 1) {
-                usedConfig = project.deploy.iterator().next()
+                usedConfig = (DeployTarget) project.deploy.iterator().next()
             } else {
                 def msg = "More than one Deploy-Configurations are defined, please choose one with 'gradle deploy -PdepConfig=confName' where confName is one of the following:"
                 for (target in project.deploy) {
@@ -81,6 +81,19 @@ class DeployTask extends DefaultTask {
 
                 log.lifecycle "Copying '${usedConfig.webappWar}' to '${usedConfig.webappDir}'"
 
+                File webappWar = new File(usedConfig.webappWar);
+                if (!webappWar.exists()) {
+                    log.failure("'${usedConfig.webappWar}' does not exist!")
+                    throw new RuntimeException("'${usedConfig.webappWar}' does not exist!")
+                }
+
+                if (log.isDebugEnabled()) {
+                    if (webappWar.isDirectory()) {
+                        log.debug "\t Files in '${usedConfig.webappWar}'"
+                        debugLogFiles(webappWar)
+                    }
+                }
+
                 project.copy {
                     from usedConfig.webappWar
                     into usedConfig.webappDir
@@ -102,6 +115,16 @@ class DeployTask extends DefaultTask {
                 log.failure("Deploy-Configuration: Invalid Type Property '${usedConfig.type}' in Configuration '${usedConfig.name}'!", true)
         }
         log.closeBlock(DEPLOY_BLOCK)
+    }
+
+    def debugLogFiles(File directory) {
+        for (File f : directory.listFiles()) {
+            if (f.isDirectory()) {
+                debugLogFiles(f)
+                continue
+            }
+            log.debug "\t\t" + f.name
+        }
     }
 
     private String executeServiceCommand(List<String> command) {
