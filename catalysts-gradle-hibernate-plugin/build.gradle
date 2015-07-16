@@ -1,0 +1,35 @@
+group = 'cc.catalysts.gradle'
+version = '1.0.0'
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    snapshot.extendsFrom(archives)
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+uploadSnapshot {
+    repositories {
+        ivy {
+            credentials {
+                username = System.getenv('IVY_USERNAME')
+                password = System.getenv('IVY_PASSWORD')
+            }
+            url System.getenv('IVY_HOST')
+            layout 'maven'
+        }
+    }
+}

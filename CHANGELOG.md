@@ -1,11 +1,3 @@
 # catalysts-gradle-plugins 1.0 (unreleased)
-* added **cat-grails** plugin
-* added **cat-less** plugin
-* added **cat-teamcity** plugin
-* added **cat-gwt** plugin
-* added **cat-gwtp** plugin
-* added **cat-deploy** plugin
-* added **cat-jaxb** plugin
-* added **cat-codgen-java** plugin
-* added **cat-querydsl** plugin
-* added **cat-sass** plugin
+* created a subproject for catalysts-gradle-hibernate-plugin
+* changed the project structure to a gradle multi-project
