@@ -1,29 +1,3 @@
 task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
-
-subprojects.each {
-    apply plugin: 'groovy'
-    apply plugin: 'idea'
-
-    repositories {
-        mavenCentral()
-    }
-
-    configurations {
-        snapshot.extendsFrom(archives)
-    }
-
-    uploadSnapshot {
-        repositories {
-            ivy {
-                credentials {
-                    username = System.getenv('IVY_USERNAME')
-                    password = System.getenv('IVY_PASSWORD')
-                }
-                url System.getenv('IVY_HOST')
-                layout 'maven'
-            }
-        }
-    }
-}
