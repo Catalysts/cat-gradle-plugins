@@ -1,11 +1,12 @@
+description = 'hibernate gradle plugin'
 group = 'cc.catalysts.gradle'
-version = '1.0.0'
+version = '2.0.0'
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.0'
 }
 
 repositories {

@@ -1,18 +1,8 @@
-description = 'collection of gradle plugins'
-group = 'cc.catalysts.gradle'
-version = '3.0'
-
-if (hasProperty('teamcity')) {
-    version += property('teamcity')['build.number']
-    logger.lifecycle "##teamcity[buildNumber '" + version + "']"
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
 
 subprojects.each {
-
     apply plugin: 'groovy'
     apply plugin: 'idea'
 
