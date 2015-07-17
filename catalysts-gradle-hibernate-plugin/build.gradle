@@ -1,6 +1,12 @@
 description = 'hibernate gradle plugin'
 group = 'cc.catalysts.gradle'
-version = '2.0.0'
+version = '2.0'
+
+if (hasProperty('teamcity')) {
+    version += property('teamcity')['build.number']
+    logger.lifecycle "##teamcity[buildNumber '" + version + "']"
+}
+
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
