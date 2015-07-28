@@ -7,7 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.internal.tasks.testing.DefaultTestTaskReports
 import org.gradle.api.logging.Logging
-import org.gradle.api.sonar.runner.SonarRunnerPlugin
+import org.gradle.sonar.runner.plugins.SonarRunnerPlugin
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
