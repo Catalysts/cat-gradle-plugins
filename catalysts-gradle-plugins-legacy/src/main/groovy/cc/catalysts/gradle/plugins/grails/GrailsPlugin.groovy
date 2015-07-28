@@ -46,10 +46,11 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     private Task addTestTask() {
-        Task testTask = project.task('test',
-                group: 'cat-grails',
-                description: 'Tests the project',
-                overwrite: true) << {
+        // Overwrite existing behaviour without creating a new task if possible, to stay compatible with SonarRunnerPlugin
+        Task testTask = project.tasks.findByName('test') ?:
+                project.task('test', group: 'cat-grails', description: 'Tests the project')
+        testTask.actions = []
+        testTask.doFirst {
             if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
                 log.debug("grails: test task will create coverage report xml")
                 GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
@@ -61,7 +62,7 @@ class GrailsPlugin implements Plugin<Project> {
         testTask.convention.reports = new DefaultTestTaskReports(testTask)
         testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
 
-        Task testCoverageTask = project.task('testCoverage',
+        project.task('testCoverage',
                 group: 'cat-grails',
                 description: 'Tests the project and generates a coverage report',
                 type: GrailsTestCoverageTask)
