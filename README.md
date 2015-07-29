@@ -54,6 +54,8 @@ If you want to test your app before creating the archive, use the ```build``` ta
 You can customize the path of the produced war file(s) by setting the ```grails.project.war.file``` option in your ```BuildConfig.groovy```.
 
 In order to generate a code coverage report with the grails [code-coverage](http://grails.org/plugin/code-coverage) plugin, you can use the ``testCoverage`` task or use -PgrailsCoverage=true
+
+*Note: Version 2.1 of 'cat-grails' is no longer compatible with gradle version 2.0 or lower, due to ```org.gradle.api.sonar.runner.SonarRunnerPlugin``` moving to the package ```org.gradle.sonar.runner.plugins``` !*
 LESS
 ------
 

@@ -7,7 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.internal.tasks.testing.DefaultTestTaskReports
 import org.gradle.api.logging.Logging
-import org.gradle.api.sonar.runner.SonarRunnerPlugin
+import org.gradle.sonar.runner.plugins.SonarRunnerPlugin
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
@@ -46,10 +46,14 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     private Task addTestTask() {
-        Task testTask = project.task('test',
-                group: 'cat-grails',
-                description: 'Tests the project',
-                overwrite: true) << {
+        // Overwrite existing behaviour without creating a new task if possible
+        Task testTask = project.tasks.findByName('test') ?: project.task('test')
+        testTask.with {
+            group = 'cat-grails'
+            description = 'Tests the project'
+            actions = []
+        }
+        testTask.doFirst {
             if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
                 log.debug("grails: test task will create coverage report xml")
                 GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
@@ -61,7 +65,7 @@ class GrailsPlugin implements Plugin<Project> {
         testTask.convention.reports = new DefaultTestTaskReports(testTask)
         testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
 
-        Task testCoverageTask = project.task('testCoverage',
+        project.task('testCoverage',
                 group: 'cat-grails',
                 description: 'Tests the project and generates a coverage report',
                 type: GrailsTestCoverageTask)
@@ -70,11 +74,13 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     private Task addBuildTask() {
-        // empty build task, depends on test (and if it's a grails app) on war
-        Task buildTask = project.task('build',
-                group: 'cat-grails',
-                description: 'Tests the project and (if it is an application) builds the war archive',
-                overwrite: true)
+        // Overwrite existing behaviour without creating a new task if possible
+        Task buildTask = project.tasks.findByName('build') ?: project.task('build')
+        buildTask.with {
+            group = 'cat-grails'
+            description = 'Tests the project and (if it is an application) builds the war archive'
+        }
+
         return buildTask
     }
 

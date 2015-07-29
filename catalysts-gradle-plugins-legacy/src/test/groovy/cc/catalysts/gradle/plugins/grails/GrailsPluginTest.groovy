@@ -1,14 +1,11 @@
 package cc.catalysts.gradle.plugins.grails
 
 import org.gradle.api.Project
-import org.gradle.api.plugins.sonar.SonarPlugin
-import org.gradle.api.sonar.runner.SonarRunnerExtension
-import org.gradle.api.sonar.runner.SonarRunnerPlugin
+import org.gradle.sonar.runner.plugins.SonarRunnerPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
