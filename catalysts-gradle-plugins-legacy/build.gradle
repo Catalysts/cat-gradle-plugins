@@ -31,7 +31,7 @@ dependencies {
     compile 'com.jcraft:jsch:0.1.49'
 
     // cat-grails
-    compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0'
+    compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0.1'
 
 	// cat-jdeps
 	runtime 'commons-lang:commons-lang:2.3'

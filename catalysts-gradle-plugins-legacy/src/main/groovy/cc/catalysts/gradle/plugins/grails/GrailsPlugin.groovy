@@ -46,10 +46,13 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     private Task addTestTask() {
-        // Overwrite existing behaviour without creating a new task if possible, to stay compatible with SonarRunnerPlugin
-        Task testTask = project.tasks.findByName('test') ?:
-                project.task('test', group: 'cat-grails', description: 'Tests the project')
-        testTask.actions = []
+        // Overwrite existing behaviour without creating a new task if possible
+        Task testTask = project.tasks.findByName('test') ?: project.task('test')
+        testTask.with {
+            group = 'cat-grails'
+            description = 'Tests the project'
+            actions = []
+        }
         testTask.doFirst {
             if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
                 log.debug("grails: test task will create coverage report xml")
@@ -71,11 +74,13 @@ class GrailsPlugin implements Plugin<Project> {
     }
 
     private Task addBuildTask() {
-        // empty build task, depends on test (and if it's a grails app) on war
-        Task buildTask = project.task('build',
-                group: 'cat-grails',
-                description: 'Tests the project and (if it is an application) builds the war archive',
-                overwrite: true)
+        // Overwrite existing behaviour without creating a new task if possible
+        Task buildTask = project.tasks.findByName('build') ?: project.task('build')
+        buildTask.with {
+            group = 'cat-grails'
+            description = 'Tests the project and (if it is an application) builds the war archive'
+        }
+
         return buildTask
     }
 
