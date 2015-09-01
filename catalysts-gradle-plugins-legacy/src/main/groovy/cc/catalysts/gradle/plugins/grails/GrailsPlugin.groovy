@@ -1,6 +1,7 @@
 package cc.catalysts.gradle.plugins.grails
 
 import cc.catalysts.gradle.utils.TCLogger
+import com.connorgarvey.gradlegrails.Grails
 import com.connorgarvey.gradlegrails.GrailsPlugin as GradleGrailsWrapperPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -23,19 +24,18 @@ class GrailsPlugin implements Plugin<Project> {
         project.sourceSets {
             main {
                 groovy {
-                    srcDir 'grails-app'
-                    srcDir 'src/groovy'
-                    srcDir 'scripts'
+                    srcDirs 'grails-app', 'src/groovy', 'scripts'
+                }
+                java {
+                    srcDir 'src/java'
                 }
                 resources {
-                    srcDir 'web-app'
-                    srcDir 'conf'
+                    srcDirs 'web-app', 'conf'
                 }
             }
             test {
                 groovy {
-                    srcDir 'test/unit'
-                    srcDir 'test/integration'
+                    srcDirs 'test/unit', 'test/integration'
                 }
             }
         }
@@ -43,6 +43,11 @@ class GrailsPlugin implements Plugin<Project> {
 
     private void applyGrailsWrapper() {
         project.apply plugin: GradleGrailsWrapperPlugin
+        // Add additional configuration extensions
+        Grails.metaClass.allowBuildCompile = false
+        Grails.metaClass.allowBuildCompile {
+            delegate.allowBuildCompile = it
+        }
     }
 
     private Task addTestTask() {
@@ -79,6 +84,7 @@ class GrailsPlugin implements Plugin<Project> {
         buildTask.with {
             group = 'cat-grails'
             description = 'Tests the project and (if it is an application) builds the war archive'
+            actions = []
         }
 
         return buildTask
@@ -114,6 +120,15 @@ class GrailsPlugin implements Plugin<Project> {
         applyGroovy()
         applyGrailsWrapper()
         addTasks()
+
+        // Prevent compilation of source files outside of grails scope, as BuildConfig dependencies are not yet resolved
+        project.afterEvaluate {
+            if(!project.grails.allowBuildCompile) {
+                ['compileJava', 'compileTestJava', 'compileGroovy', 'compileTestGroovy'].each { task ->
+                    project.tasks.getByName(task).actions = []
+                }
+            }
+        }
 
         // in case there is no rootProject, rootProject simply points to the current project
         if (project.plugins.hasPlugin(SonarRunnerPlugin) || project.rootProject.plugins.hasPlugin(SonarRunnerPlugin)) {
