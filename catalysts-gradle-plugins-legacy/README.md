@@ -45,11 +45,15 @@ download of the specified grails version.
 apply plugin: 'cat-grails'
 grails {
     version '2.3.7'
+    allowBuildCompile false
 }
 ```
 
 Now the ```war``` task on every grails application (usually one) builds the war file with the specified grails version.
-If you want to test your app before creating the archive, use the ```build``` task.  
+If you want to test your app before creating the archive, use the ```build``` task.
+  
+```compileJava, compileTestJava, compileGroovy, compileTestGroovy``` tasks will be disabled to prevent failed compilation outside of grails, due to dependencies being defined in ```BuildConfig.groovy```. 
+To run those tasks anyway, set ```allowBuildCompile``` to true.
 
 You can customize the path of the produced war file(s) by setting the ```grails.project.war.file``` option in your ```BuildConfig.groovy```.
 
