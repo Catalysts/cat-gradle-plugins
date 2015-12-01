@@ -58,7 +58,13 @@ class GrailsPlugin implements Plugin<Project> {
             description = 'Tests the project'
             actions = []
         }
-        testTask.doFirst {
+        testTask.convention.testResultsDir = project.file('target/test-reports')
+        testTask.convention.reports = new DefaultTestTaskReports(testTask)
+        testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
+
+        Task grailsTest = project.task('grailsTest', group: 'cat-grails',
+            description: 'Run grails-test-app and generate coverage reports, if indicated by grailsCoverage property.')
+        grailsTest.doFirst {
             if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
                 log.debug("grails: test task will create coverage report xml")
                 GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
@@ -66,9 +72,7 @@ class GrailsPlugin implements Plugin<Project> {
                 GrailsUtils.executeGrailsCommand(project, ["test-app"], false)
             }
         }
-        testTask.convention.testResultsDir = project.file('target/test-reports')
-        testTask.convention.reports = new DefaultTestTaskReports(testTask)
-        testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
+        testTask.dependsOn(grailsTest)
 
         project.task('testCoverage',
                 group: 'cat-grails',
