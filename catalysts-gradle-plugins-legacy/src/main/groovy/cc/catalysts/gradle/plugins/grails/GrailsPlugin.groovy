@@ -8,7 +8,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.internal.tasks.testing.DefaultTestTaskReports
 import org.gradle.api.logging.Logging
-import org.gradle.sonar.runner.plugins.SonarRunnerPlugin
+import org.sonarqube.gradle.SonarQubePlugin
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
@@ -58,7 +58,13 @@ class GrailsPlugin implements Plugin<Project> {
             description = 'Tests the project'
             actions = []
         }
-        testTask.doFirst {
+        testTask.convention.testResultsDir = project.file('target/test-reports')
+        testTask.convention.reports = new DefaultTestTaskReports(testTask)
+        testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
+
+        Task grailsTest = project.task('grailsTest', group: 'cat-grails',
+            description: 'Run grails-test-app and generate coverage reports, if indicated by grailsCoverage property.')
+        grailsTest.doFirst {
             if (project.hasProperty('grailsCoverage') && project.grailsCoverage) {
                 log.debug("grails: test task will create coverage report xml")
                 GrailsUtils.executeGrailsCommand(project, ["test-app", "-coverage", "-xml"], false)
@@ -66,9 +72,7 @@ class GrailsPlugin implements Plugin<Project> {
                 GrailsUtils.executeGrailsCommand(project, ["test-app"], false)
             }
         }
-        testTask.convention.testResultsDir = project.file('target/test-reports')
-        testTask.convention.reports = new DefaultTestTaskReports(testTask)
-        testTask.convention.reports.junitXml.destination = project.file('target/test-reports')
+        testTask.dependsOn(grailsTest)
 
         project.task('testCoverage',
                 group: 'cat-grails',
@@ -131,9 +135,9 @@ class GrailsPlugin implements Plugin<Project> {
         }
 
         // in case there is no rootProject, rootProject simply points to the current project
-        if (project.plugins.hasPlugin(SonarRunnerPlugin) || project.rootProject.plugins.hasPlugin(SonarRunnerPlugin)) {
+        if (project.plugins.hasPlugin(SonarQubePlugin) || project.rootProject.plugins.hasPlugin(SonarQubePlugin)) {
             log.debug("Adding standard grails groovy sonar-runner config")
-            project.sonarRunner.sonarProperties {
+            project.sonarqube.properties {
                 property "sonar.language", "grvy"
                 property "sonar.sources", "src/groovy, grails-app"
                 property "sonar.sourceEncoding", "UTF-8"
