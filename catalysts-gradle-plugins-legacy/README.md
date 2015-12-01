@@ -59,7 +59,7 @@ You can customize the path of the produced war file(s) by setting the ```grails.
 
 In order to generate a code coverage report with the grails [code-coverage](http://grails.org/plugin/code-coverage) plugin, you can use the ``testCoverage`` task or use -PgrailsCoverage=true
 
-*Note: Version 2.1 of 'cat-grails' is no longer compatible with gradle version 2.0 or lower, due to ```org.gradle.api.sonar.runner.SonarRunnerPlugin``` moving to the package ```org.gradle.sonar.runner.plugins``` !*
+*Note: Version 2.2 of 'cat-grails' is no longer compatible with gradle version 2.1 or lower, due to ```org.gradle.api.sonar.runner.SonarRunnerPlugin``` being replaced by ```org.sonarqube.gradle.SonarQubePlugin``` !*
 LESS
 ------
 

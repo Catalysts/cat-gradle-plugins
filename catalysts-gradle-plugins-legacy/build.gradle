@@ -1,6 +1,6 @@
 description = 'collection of gradle plugins'
 group = 'cc.catalysts.gradle'
-version = '2.3'
+version = '2.2'
 
 if (hasProperty('teamcity')) {
     version += property('teamcity')['build.number']
