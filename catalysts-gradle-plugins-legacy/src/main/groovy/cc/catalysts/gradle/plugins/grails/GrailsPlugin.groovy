@@ -8,7 +8,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.internal.tasks.testing.DefaultTestTaskReports
 import org.gradle.api.logging.Logging
-import org.gradle.sonar.runner.plugins.SonarRunnerPlugin
+import org.sonarqube.gradle.SonarQubePlugin
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
@@ -135,9 +135,9 @@ class GrailsPlugin implements Plugin<Project> {
         }
 
         // in case there is no rootProject, rootProject simply points to the current project
-        if (project.plugins.hasPlugin(SonarRunnerPlugin) || project.rootProject.plugins.hasPlugin(SonarRunnerPlugin)) {
+        if (project.plugins.hasPlugin(SonarQubePlugin) || project.rootProject.plugins.hasPlugin(SonarQubePlugin)) {
             log.debug("Adding standard grails groovy sonar-runner config")
-            project.sonarRunner.sonarProperties {
+            project.sonarqube.properties {
                 property "sonar.language", "grvy"
                 property "sonar.sources", "src/groovy, grails-app"
                 property "sonar.sourceEncoding", "UTF-8"
