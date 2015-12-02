@@ -1,9 +1,9 @@
 package cc.catalysts.gradle.plugins.grails
 
 import org.gradle.api.Project
-import org.gradle.sonar.runner.plugins.SonarRunnerPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
+import org.sonarqube.gradle.SonarQubePlugin
 
 import static org.junit.Assert.assertEquals
 
@@ -28,9 +28,9 @@ class GrailsPluginTest {
     public void sonarLanguageSetting() {
         Project project = ProjectBuilder.builder().build()
 
-        project.apply plugin: SonarRunnerPlugin
+        project.apply plugin: SonarQubePlugin
         project.apply plugin: 'cat-grails'
-        def properties = project.tasks.findByName("sonarRunner").sonarProperties
+        def properties = project.tasks.findByName("sonarqube").properties
         assertEquals('grvy', properties."sonar.language")
     }
 
