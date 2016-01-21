@@ -1,6 +1,6 @@
-package cc.catalysts.boot.gradle.systemjs.task
+package cc.catalysts.gradle.systemjs.task
 
-import cc.catalysts.boot.gradle.systemjs.SystemjsExtension
+import cc.catalysts.gradle.systemjs.SystemjsExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 

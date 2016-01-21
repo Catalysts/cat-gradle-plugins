@@ -1,6 +1,6 @@
-package cc.catalysts.boot.gradle.systemjs.task
+package cc.catalysts.gradle.systemjs.task
 
-import cc.catalysts.boot.gradle.systemjs.SystemjsExtension
+import cc.catalysts.gradle.systemjs.SystemjsExtension
 import com.moowork.gradle.node.task.NodeTask
 /**
  * @author Thomas Scheinecker, Catalysts GmbH

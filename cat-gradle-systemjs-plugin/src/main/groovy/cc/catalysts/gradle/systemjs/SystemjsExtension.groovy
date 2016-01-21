@@ -1,4 +1,4 @@
-package cc.catalysts.boot.gradle.systemjs
+package cc.catalysts.gradle.systemjs
 
 import org.gradle.api.Project
 

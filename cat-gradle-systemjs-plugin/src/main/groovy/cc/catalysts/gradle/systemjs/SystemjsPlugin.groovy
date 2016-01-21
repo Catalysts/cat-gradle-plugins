@@ -1,8 +1,8 @@
-package cc.catalysts.boot.gradle.systemjs
+package cc.catalysts.gradle.systemjs
 
-import cc.catalysts.boot.gradle.systemjs.task.CleanSystemjsBundle
-import cc.catalysts.boot.gradle.systemjs.task.CreateSystemjsBundle
-import cc.catalysts.boot.gradle.systemjs.task.CreateSystemjsWebjarConfig
+import cc.catalysts.gradle.systemjs.task.CleanSystemjsBundle
+import cc.catalysts.gradle.systemjs.task.CreateSystemjsBundle
+import cc.catalysts.gradle.systemjs.task.CreateSystemjsWebjarConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task

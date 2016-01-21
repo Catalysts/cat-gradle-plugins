@@ -2,4 +2,4 @@ rootProject.name = 'catalysts-gradle-plugins'
 
 include 'catalysts-gradle-plugins-legacy'
 include 'catalysts-gradle-hibernate-plugin'
-include 'catalysts-gradle-systemjs-plugin'
+include 'cat-gradle-systemjs-plugin'
