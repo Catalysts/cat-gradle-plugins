@@ -1,4 +1,5 @@
 group = 'cc.catalysts.gradle'
+version '0.0.1-SNAPSHOT'
 description = 'collection of gradle plugins'
 
 task wrapper(type: Wrapper) {
@@ -25,10 +26,31 @@ subprojects {
         maven { url "https://plugins.gradle.org/m2/" }
     }
 
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+    }
+
     publishing {
         publications {
-            mavenJava( MavenPublication ) {
+            mavenJava(MavenPublication) {
+                // TODO why aren't these settings taken from the root project?
+                groupId 'cc.catalysts.gradle'
+                version '0.0.1-SNAPSHOT'
+
                 from components.java
+
+                artifact sourceJar {
+                    classifier "sources"
+                }
+            }
+        }
+        repositories {
+            maven {
+                credentials {
+                    username System.getProperty('mavenUser')
+                    password System.getProperty('mavenPassword')
+                }
+                url System.getProperty('mavenRepo')
             }
         }
     }
