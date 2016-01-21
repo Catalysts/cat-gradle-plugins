@@ -1,3 +1,35 @@
+group = 'cc.catalysts.gradle'
+description = 'collection of gradle plugins'
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.5'
+    gradleVersion = '2.10'
+}
+
+subprojects {
+    apply plugin: 'groovy'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
+    def compatibilityVersion = 1.8
+    sourceCompatibility = compatibilityVersion
+    targetCompatibility = compatibilityVersion
+
+    dependencies {
+        compile gradleApi()
+        compile localGroovy()
+    }
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    publishing {
+        publications {
+            mavenJava( MavenPublication ) {
+                from components.java
+            }
+        }
+    }
 }
