@@ -2,7 +2,6 @@ package cc.catalysts.gradle.systemjs
 
 import cc.catalysts.gradle.systemjs.task.CleanSystemjsBundle
 import cc.catalysts.gradle.systemjs.task.CreateSystemjsBundle
-import cc.catalysts.gradle.systemjs.task.CreateSystemjsWebjarConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -21,23 +20,11 @@ class SystemjsPlugin implements Plugin<Project> {
 
         project.convention.plugins.java.sourceSets.forEach({ SourceSet sourceSet ->
             SystemjsExtension config = project.systemjs;
-            sourceSet.resources {srcDir config.destinationDir };
+            sourceSet.resources { srcDir config.destinationDir };
         })
 
-        Task prepareNode = project.task('prepareNode',
+        Task bundle = project.task('systemJsBundle',
                 dependsOn: 'npmInstall',
-                type: CreateSystemjsBundle,
-                description: 'Creates a systemjs bunlde of all specified js files',
-                group: 'cat-boot')
-
-        Task webjarConfig = project.task('webjarConfig',
-                dependsOn: 'npmInstall',
-                type: CreateSystemjsWebjarConfig,
-                description: 'Creates a systemjs configuration for all webjars dependencies',
-                group: 'cat-boot')
-
-        Task bundle = project.task('systemjsBundle',
-                dependsOn: webjarConfig,
                 type: CreateSystemjsBundle,
                 description: 'Creates a systemjs bunlde of all specified js files',
                 group: 'cat-boot')
