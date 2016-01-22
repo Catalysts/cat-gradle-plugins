@@ -27,6 +27,13 @@ To activate the generation for a project, just apply the plugin in the build.gra
 
 Example:
 ```
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-hibernate-plugin:' + catGradleVersion
+  }
+}
+
+
 apply plugin: 'cat-hibernate'
 ```
 
@@ -49,6 +56,12 @@ Generates a class BuildInfo.java that holds information about the current build 
 
 Example:
 ```
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-buildinfo-plugin:' + catGradleVersion
+  }
+}
+
 apply plugin: 'cat-buildinfo'
 
 buildinfo {
