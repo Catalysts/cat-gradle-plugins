@@ -3,6 +3,7 @@ configurations {
 }
 
 dependencies {
+    compile project(':cat-gradle-utils')
 
     compile "org.sonarqube.gradle:gradle-sonarqube-plugin:1.1"
 
@@ -13,8 +14,8 @@ dependencies {
     // cat-grails
     compile 'com.connorgarvey.gradle:gradle-grails-wrapper:1.0.1'
 
-	// cat-jdeps
-	runtime 'commons-lang:commons-lang:2.3'
+    // cat-jdeps
+    runtime 'commons-lang:commons-lang:2.3'
 
     // cat-less
     compile 'org.lesscss:lesscss:1.3.1'
@@ -30,6 +31,6 @@ dependencies {
     runtime group: 'org.apache.ant', name: 'ant-jsch', version: '1.9.2'
 
     // explicitly needed or it will download both each time the gwt plugin is executed
-    testCompile  'com.google.gwt:gwt-dev:2.4.0'
-    testCompile  'com.google.gwt:gwt-user:2.4.0'
+    testCompile 'com.google.gwt:gwt-dev:2.4.0'
+    testCompile 'com.google.gwt:gwt-user:2.4.0'
 }

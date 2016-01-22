@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.plugins.hibernate
+package cc.catalysts.gradle.hibernate
 
 import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask

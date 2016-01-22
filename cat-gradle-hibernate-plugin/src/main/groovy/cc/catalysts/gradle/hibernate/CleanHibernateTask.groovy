@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.plugins.hibernate
+package cc.catalysts.gradle.hibernate
 
 import cc.catalysts.gradle.utils.TCLogger
 import org.gradle.api.DefaultTask
@@ -7,16 +7,16 @@ import org.gradle.api.tasks.TaskAction
 /**
  * @author Catalysts GmbH, www.catalysts.cc
  */
-class HibernateOutputDirTask extends DefaultTask {
+class CleanHibernateTask extends DefaultTask {
     private TCLogger log = new TCLogger(project, logger)
 
     @TaskAction
-    def createHibernateOutputDir() {
+    def cleanHibernateTargetDir() {
         File f = new File(project.projectDir.absolutePath, project.hibernate.destinationDir as String);
-        if (!f.exists()) {
-            log.lifecycle "Creating '${f.getPath()}'"
-            if (!f.mkdirs()) {
-                log.failure "Could not create directory '${f.getPath()}'", true
+        if (f.exists()) {
+            log.lifecycle "Deleting '${f.getPath()}'"
+            if (!f.deleteDir()) {
+                log.failure "Could not delete directory '${f.getPath()}'", true
             }
         }
     }

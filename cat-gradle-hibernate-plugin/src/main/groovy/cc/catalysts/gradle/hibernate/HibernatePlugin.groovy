@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.plugins.hibernate
+package cc.catalysts.gradle.hibernate
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.plugins.hibernate
+package cc.catalysts.gradle.hibernate
 
 /**
  * @author Catalysts GmbH, www.catalysts.cc
