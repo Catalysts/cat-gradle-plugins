@@ -13,7 +13,6 @@ class SystemjsExtension {
 
     SystemjsExtension(Project project) {
         srcDir = new File(project.projectDir, 'src/main/resources')
-//        destinationDir = new File(project.buildDir, 'generated-resources/systemjs-bundle')
         bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
         destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
     }

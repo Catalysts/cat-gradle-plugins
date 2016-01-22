@@ -23,11 +23,6 @@ class SystemjsPlugin implements Plugin<Project> {
             SystemjsExtension config = project.systemjs;
             sourceSet.resources {srcDir config.destinationDir };
         })
-//        project.convention.plugins.java.sourceSets.all { SourceSet sourceSet ->
-//            if (!sourceSet.name.toLowerCase().contains("test")) {
-//                sourceSet.java { srcDir project.hibernate.destinationDir }
-//            }
-//        }
 
         Task prepareNode = project.task('prepareNode',
                 dependsOn: 'npmInstall',
