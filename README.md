@@ -16,6 +16,7 @@ List of plugins
 
 * [HIBERNATE](#hibernate)
 * [BUILDINFO](#buildinfo)
+* [SYSTEMJS](#systemjs)
 * [LEGACY] (https://github.com/Catalysts/catalysts-gradle-plugins/tree/master/catalysts-gradle-plugins-legacy)
 
 HIBERNATE
@@ -66,5 +67,30 @@ apply plugin: 'cat-buildinfo'
 
 buildinfo {
     packageName = 'cc.catalysts.mproject'
+}
+```
+
+SYSTEMJS
+------
+
+Takes all configured files of a configured source folder and creates a systemjs bundle for it.
+Currently the `package.json` and `gulpfile.js` files which perform the actual task need to be part of the module where the plugin is applied.
+This will change in a future version.
+
+```groovy
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-buildinfo-plugin:' + catGradleVersion
+  }
+}
+
+apply plugin: 'cat-systemjs'
+
+buildinfo {
+    srcDir = new File(project.projectDir, 'src/main/resources')
+    destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
+    includePath = "**${File.separator}*.js"
+    bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
+
 }
 ```
