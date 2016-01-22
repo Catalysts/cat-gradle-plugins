@@ -14,11 +14,11 @@ class BuildInfoPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.add('buildinfo', new BuildInfoExtension(project))
 
-        project.convention.plugins.java.sourceSets.all { SourceSet sourceSet ->
-            if (!sourceSet.name.toLowerCase().contains("test")) {
-                sourceSet.java { srcDir project.buildinfo.destinationDir }
-            }
-        }
+        project.convention.plugins.java.sourceSets.forEach({ SourceSet sourceSet ->
+            BuildInfoExtension config = project.buildinfo;
+            sourceSet.java {srcDir config.destinationDir };
+        })
+
         Task buildInfo = project.task('buildinfo',
                 type: BuildInfoTask,
                 description: 'Generates a class that holds information about the build such as the build number',

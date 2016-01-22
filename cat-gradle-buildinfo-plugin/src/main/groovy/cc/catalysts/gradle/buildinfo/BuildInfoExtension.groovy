@@ -11,7 +11,7 @@ class BuildInfoExtension {
     File destinationDir
 
     public BuildInfoExtension(Project project) {
-        destinationDir = new File(project.projectDir, "build/generated-sources/buildinfo")
+        destinationDir = new File(project.projectDir, "target/generated-sources/buildinfo")
     }
 
 
