@@ -1,5 +1,5 @@
 group = 'cc.catalysts.gradle'
-version '0.0.3-SNAPSHOT'
+version '0.0.3'
 description = 'collection of gradle plugins'
 
 task wrapper(type: Wrapper) {
