@@ -1,12 +1,14 @@
 group = 'cc.catalysts.gradle'
-version '0.0.2-SNAPSHOT'
+version '0.0.2'
 description = 'collection of gradle plugins'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.10'
 }
 
-subprojects {
+subprojects { proj->
+    proj.version = parent.version
+
     apply plugin: 'groovy'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
@@ -35,7 +37,6 @@ subprojects {
             mavenJava(MavenPublication) {
                 // TODO why aren't these settings taken from the root project?
                 groupId 'cc.catalysts.gradle'
-                version '0.0.2-SNAPSHOT'
 
                 from components.java
 
