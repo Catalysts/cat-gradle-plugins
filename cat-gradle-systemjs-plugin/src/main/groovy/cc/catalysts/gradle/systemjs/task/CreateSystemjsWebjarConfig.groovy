@@ -38,7 +38,7 @@ System.config({
 });
 """
 
-        File webjarConfig = new File(config.destinationDir, 'webjar-config.js')
+        File webjarConfig = new File(config.getBundleLocation(), 'webjar-config.js')
         webjarConfig.parentFile.mkdirs()
         webjarConfig.write webjarConfigContent
     }

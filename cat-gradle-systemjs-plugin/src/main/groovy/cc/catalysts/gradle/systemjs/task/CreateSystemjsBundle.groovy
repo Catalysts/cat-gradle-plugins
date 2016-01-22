@@ -12,23 +12,10 @@ class CreateSystemjsBundle extends NodeTask {
         SystemjsExtension config = project.systemjs
         setArgs([
                 "--project.version=${project.rootProject.version}",
-                "--destination.dir=${config.destinationDir}",
+                "--destination.dir=${config.getBundleLocation()}",
                 "--bundle.name=${project.name}-bundle.js",
                 "--source.dir=${config.srcDir}",
                 "--include.path=${config.includePath}"
         ])
     }
-
-    //    @TaskAction
-//    void createSystemjsBundle() {
-//        SystemjsExtension config = project.catBootSystemjs;
-//
-//        File srcDir = config.srcDir
-//        String include = "${srcDir}${File.separator}${config.includePath}"
-//        File destinationDir = config.destinationDir
-//
-//
-//
-//        println "${include}->${destinationDir}"
-//    }
 }
