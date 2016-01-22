@@ -46,7 +46,7 @@ class SystemjsPlugin implements Plugin<Project> {
                 type: CreateSystemjsBundle,
                 description: 'Creates a systemjs bunlde of all specified js files',
                 group: 'cat-boot')
-        project.tasks.getByName('assemble').dependsOn(bundle)
+        project.tasks.getByName('processResources').dependsOn(bundle)
 
         Task clean = project.task('cleanSystemjsBundle',
                 type: CleanSystemjsBundle,
