@@ -10,13 +10,8 @@ import org.gradle.api.tasks.SourceSet
 class SystemjsPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-
-        project.plugins.apply('com.moowork.node')
+        applyNodePluginAndDefaults(project)
         project.extensions.add('systemjs', new SystemjsExtension(project))
-
-        project.node.version = '5.4.1'
-        project.node.npmVersion = '3.5.3'
-        project.node.download = true
 
         project.convention.plugins.java.sourceSets.forEach({ SourceSet sourceSet ->
             SystemjsExtension config = project.systemjs;
@@ -35,7 +30,14 @@ class SystemjsPlugin implements Plugin<Project> {
                 description: 'Cleans output directory of systemjs bundle',
                 group: 'cat-boot')
         project.tasks.getByName('clean').dependsOn(clean)
+    }
 
+    private void applyNodePluginAndDefaults(Project project) {
+        project.plugins.apply('com.moowork.node')
+
+        project.node.version = '5.4.1'
+        project.node.npmVersion = '3.5.3'
+        project.node.download = true
     }
 }
 
