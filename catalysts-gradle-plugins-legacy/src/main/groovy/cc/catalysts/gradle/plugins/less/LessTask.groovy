@@ -1,6 +1,6 @@
-package cc.catalysts.gradle.less
+package cc.catalysts.gradle.plugins.less
 
-import cc.catalysts.gradle.utils.PreprocessorTask
+import cc.catalysts.gradle.plugins.css.PreprocessorTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction

@@ -1,4 +1,4 @@
-package cc.catalysts.gradle.utils
+package cc.catalysts.gradle.plugins.css
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileTree
