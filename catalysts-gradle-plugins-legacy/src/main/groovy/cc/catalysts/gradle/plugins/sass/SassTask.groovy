@@ -1,6 +1,6 @@
 package cc.catalysts.gradle.plugins.sass
 
-import cc.catalysts.gradle.plugins.css.PreprocessorTask
+import cc.catalysts.gradle.utils.PreprocessorTask
 import org.gradle.api.tasks.TaskAction
 
 import javax.script.ScriptEngine

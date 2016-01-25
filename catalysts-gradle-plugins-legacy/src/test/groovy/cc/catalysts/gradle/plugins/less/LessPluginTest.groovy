@@ -1,9 +1,8 @@
 package cc.catalysts.gradle.plugins.less
 
 import cc.catalysts.gradle.plugins.TestUtils
-import cc.catalysts.gradle.plugins.less.LessTask
+import LessTask
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
