@@ -26,7 +26,7 @@ class SystemjsPlugin implements Plugin<Project> {
         Task bundle = project.task('systemJsBundle',
                 dependsOn: 'npmInstall',
                 type: CreateSystemjsBundle,
-                description: 'Creates a systemjs bunlde of all specified js files',
+                description: 'Creates a systemjs bundle of all specified js files',
                 group: 'cat-boot')
         project.tasks.getByName('processResources').dependsOn(bundle)
 
