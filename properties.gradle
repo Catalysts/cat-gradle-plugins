@@ -1,0 +1,7 @@
+ext.cgGroup       = 'cc.catalysts.gradle'
+ext.cgVersion     = '0.0.9-SNAPSHOT'
+ext.cgWebsite     = 'https://github.com/Catalysts/cat-gradle-plugins'
+ext.cgTracker     = 'https://github.com/Catalysts/cat-gradle-plugins/issues'
+ext.cgGit         = 'https://github.com/Catalysts/cat-gradle-plugins.git'
+ext.cgDescription = 'Catalysts Gradle extentions'
+ext.cgRootId      = 'cat-gradle'

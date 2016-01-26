@@ -1,0 +1,18 @@
+language: java
+sudo: false
+jdk:
+- oraclejdk8
+before_cache:
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+after_success:
+- if [ "$TRAVIS_BRANCH" == "master" ]; then ./gradlew artifactoryPublish bintrayUpload; fi
+env:
+  global:
+  - secure: cnKaG0xKfJ9Y7oesBOm/RZR7VriCImD7jkPF4y9bpyQSYbRC9F8vS9yGo4ewwh7YD3dUJqz5U/AOMDj2eAJf2fkTOQRYjwepG9tYvDpydwQyVPkDTr+i1iOIaU7WtTbFHbBXDfD2/SLMnK+NqPh49ueo5Uz34qfFCw3x7JJHPkY=
+  - secure: hU9FpdYwDxiMhQ+s+eRepo2WREqiokGl4hufiR85SBQrtOzO32N9vTZF67ugw7axeR8lvACdJPg87mcfTtvS+gg5Rv+GhlH9zTs/2TubYj9s61vNNiW0ZQRc/M7R0ODgsrv0CYvUBERDV0uzhfZ08IMz12ZNYi3TEAD2c4ewibg=
+  - secure: VeXDwhZqCwsFDs6YUfmfIi8igMZ7Ga8+b6QvzVEO221qk1HMAD9CaTFnkESf6NfZz8T2SoVwhN2Bf8yakv8IC4hE+m9c8mZacWeVZ3IpHYdm7ZaeVkvi3/115heY2jkrmoswUpPl5hWKAUb1hqBUl2GJMQl0UHcDdYid1YkRL94=
+  - secure: f8b6ysRUBBv6NUOqlTSTovJBe0HViyBBgztZgwtPt5YpnYjZVv7HDgyxVvk68+GZlTr5lwtu0+Qz3mgPOB9IrgUwHysoNzJrTZtqLLwoL+UUF+c9XNPRk9Z5p/AIE9JgacuNu9NyNInXuxNcawiTHSh6cWIT9wehiCCd2EUeDIU=
