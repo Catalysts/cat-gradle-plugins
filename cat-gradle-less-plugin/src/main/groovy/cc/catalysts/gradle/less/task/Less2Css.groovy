@@ -34,7 +34,7 @@ class Less2Css extends NodeTask {
                 '--strict-units=on',
                 '--autoprefix',
                 '--clean-css',
-                "--include-path=\"${new File(project.getBuildDir(), 'cat-gradle/less/extracted/META-INF/resources')}\""
+                "--include-path=${new File(project.getBuildDir(), 'cat-gradle/less/extracted/META-INF/resources')}"
         ]
 
         project.configurations.forEach({ configuration ->
