@@ -1,4 +1,4 @@
-catalysts-gradle-plugins
+cat-gradle-plugins
 ========================
 
 A collection of reusable gradle plugins.
@@ -6,7 +6,7 @@ A collection of reusable gradle plugins.
 
 Usage
 =====
-**catalysts-gradle-plugins** is *work-in-progress* and not yet published on maven central.  
+**cat-gradle-plugins** is *work-in-progress* and not yet published on maven central.  
 If you 're curious, you can try it out by downloading the source and placing it into the ```buildSrc``` directory
 of your gradle project.
 
@@ -17,7 +17,7 @@ List of plugins
 * [HIBERNATE](#hibernate)
 * [BUILDINFO](#buildinfo)
 * [SYSTEMJS](#systemjs)
-* [LEGACY] (https://github.com/Catalysts/catalysts-gradle-plugins/tree/master/catalysts-gradle-plugins-legacy)
+* [LEGACY] (https://github.com/Catalysts/cat-gradle-plugins/tree/master/catalysts-gradle-plugins-legacy)
 
 HIBERNATE
 ------
