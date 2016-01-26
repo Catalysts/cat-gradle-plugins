@@ -80,7 +80,7 @@ This will change in a future version.
 ```groovy
 buildscript {
   dependencies {
-    classpath 'cc.catalysts.gradle:cat-gradle-buildinfo-plugin:' + catGradleVersion
+    classpath 'cc.catalysts.gradle:cat-gradle-systemjs-plugin:' + catGradleVersion
   }
 }
 
@@ -91,6 +91,46 @@ buildinfo {
     destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
     includePath = "**${File.separator}*.js"
     bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
+
+}
+```
+
+LESS
+------
+
+Takes a set of less files and compiles them to css.
+
+Wejbars are supported by extracting all `css` and `less` files from them and by providing special global variables:
+
+`webjars-<artifactId>` contains the base path of the given webjar (`webjars/<artifactId>/<artifactVersion>`)
+
+*Note: As less doesn't support the '.' character in variable names these will be replaced with a '-'.'*
+*For example `org.webjars.npm:imagenary.lib:1.4.9` will produce the variables `webjars-imagenary-lib`*
+
+These variables can be used anywhere in your `less` files to import other less or css files from any webjar.
+
+For example you can include the twitter bootstrap styles by adding the following line:
+
+```less
+@import "@{webjars-bootstrap}/less/bootstrap";
+```
+
+Configuration:
+
+```groovy
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-less-plugin:' + catGradleVersion
+  }
+}
+
+apply plugin: 'cat-less'
+
+less {
+    srcDir = new File(project.projectDir, 'src/main/resources/less')
+    srcFiles = ["${project.name}.less"]
+    destinationDir = new File(project.buildDir, "generated-resources/cat-less")
+    cssPath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
 
 }
 ```

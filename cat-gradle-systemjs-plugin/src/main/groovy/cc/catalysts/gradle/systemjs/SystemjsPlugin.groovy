@@ -35,8 +35,7 @@ class SystemjsPlugin implements Plugin<Project> {
     private void applyNodePluginAndDefaults(Project project) {
         project.plugins.apply('com.moowork.node')
 
-        project.node.version = '5.4.1'
-        project.node.npmVersion = '3.5.3'
+        project.node.version = '5.5.0'
         project.node.download = true
     }
 }
