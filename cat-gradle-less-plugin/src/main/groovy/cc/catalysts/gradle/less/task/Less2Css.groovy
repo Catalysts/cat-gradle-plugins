@@ -40,7 +40,7 @@ class Less2Css extends NodeTask {
         project.configurations.forEach({ configuration ->
             configuration.dependencies.findAll { it.group.startsWith('org.webjars') } forEach {
                 String artifactId = "${it.name.replace('.', '-')}"
-                commonArgs.add("--global-var=\"webjars-" + artifactId + "\"='webjars/${it.name}/${it.version}'")
+                commonArgs.add("--global-var=webjars-${artifactId}='webjars/${it.name}/${it.version}'")
             }
 
         });
