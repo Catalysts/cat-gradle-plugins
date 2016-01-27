@@ -8,13 +8,15 @@ import org.gradle.api.Project
 class LessExtension {
     File srcDir
     String[] srcFiles
+    File nodeModulesDir
     File destinationDir
     String cssPath
 
     LessExtension(Project project) {
         srcDir = new File(project.projectDir, 'src/main/resources/less')
         srcFiles = ["${project.name}.less"]
-        destinationDir = new File(project.buildDir, "generated-resources/cat-less")
+        nodeModulesDir = new File(project.buildDir, 'cat-gradle/less')
+        destinationDir = new File(project.buildDir, 'generated-resources/cat-less')
         cssPath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
     }
 

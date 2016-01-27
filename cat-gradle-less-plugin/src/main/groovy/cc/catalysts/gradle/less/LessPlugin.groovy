@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.less
 
+import cc.catalysts.gradle.less.task.CleanLess
 import cc.catalysts.gradle.less.task.ExtractWebjars
 import cc.catalysts.gradle.less.task.InstallLess
 import cc.catalysts.gradle.less.task.Less2Css
@@ -19,13 +20,16 @@ class LessPlugin implements Plugin<Project> {
     }
 
     private void registerTasks(Project project) {
-        Task installLess = project.task('installLess', type: InstallLess)
-        Task extractWebjars = project.task('extract-webjars', type: ExtractWebjars)
+        Task clean = project.task('less-clean', type: CleanLess)
+        project.tasks.getByName('clean').dependsOn(clean)
+
+        Task installLess = project.task('less-install', type: InstallLess)
+        Task extractWebjars = project.task('less-extract-webjars', type: ExtractWebjars)
         Task less = project.task('less',
                 type: Less2Css,
                 dependsOn: [installLess, extractWebjars],
                 description: 'Prepares the less compiler and compiles your less to css')
-        project.task('less2css', type: Less2Css)
+        project.task('less-compile', type: Less2Css)
         project.tasks.getByName('processResources').dependsOn(less)
     }
 

@@ -3,7 +3,6 @@ package cc.catalysts.gradle.less.task
 import cc.catalysts.gradle.less.LessExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
-
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -14,12 +13,12 @@ class Less2Css extends NodeTask {
 
         project.afterEvaluate({
             LessExtension config = LessExtension.get(project)
-            File lessc = new File(NodeExtension.get(project).nodeModulesDir, 'node_modules/less/bin/lessc')
+            File lessc = new File(config.nodeModulesDir, 'node_modules/less/bin/lessc')
             setScript(lessc)
 
             getInputs().dir(config.srcDir)
             getOutputs().dir(config.cssFiles)
-            setWorkingDir(this.project.node.nodeModulesDir)
+            setWorkingDir(NodeExtension.get(project).nodeModulesDir)
         })
 
     }

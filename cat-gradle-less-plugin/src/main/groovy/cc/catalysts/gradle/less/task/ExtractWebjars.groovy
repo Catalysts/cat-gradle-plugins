@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.less.task
 
+import cc.catalysts.gradle.less.LessExtension
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.util.PatternSet
 /**
@@ -14,7 +15,6 @@ class ExtractWebjars extends Copy {
         patternSet.include('**/*.less', '**/*.css')
 
         project.afterEvaluate({
-
             from project.configurations.collect({ configuration ->
                 return configuration.files({
                     return it.group.startsWith('org.webjars')
@@ -23,7 +23,7 @@ class ExtractWebjars extends Copy {
                 return project.zipTree(it).matching(patternSet)
             });
 
-            into(new File(project.getBuildDir(), 'cat-gradle/less/extracted'))
+            into(new File(LessExtension.get(project).nodeModulesDir, 'extracted'))
         })
     }
 
