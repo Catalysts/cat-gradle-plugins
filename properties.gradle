@@ -5,3 +5,4 @@ ext.cgTracker     = 'https://github.com/Catalysts/cat-gradle-plugins/issues'
 ext.cgGit         = 'https://github.com/Catalysts/cat-gradle-plugins.git'
 ext.cgDescription = 'Catalysts Gradle extentions'
 ext.cgRootId      = 'cat-gradle'
+
