@@ -1,7 +1,9 @@
 package cc.catalysts.gradle.systemjs.task
 
 import cc.catalysts.gradle.systemjs.SystemjsExtension
+import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
+import org.gradle.api.artifacts.Dependency
 
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
@@ -9,13 +11,19 @@ import com.moowork.gradle.node.task.NodeTask
 class CreateSystemjsBundle extends NodeTask {
     CreateSystemjsBundle() {
         project.afterEvaluate({
-            setScript(new File(project.node.nodeModulesDir, 'node_modules/gulp/bin/gulp.js'))
+            setScript(new File(NodeExtension.get(project).nodeModulesDir, 'node_modules/gulp/bin/gulp.js'))
 
-            SystemjsExtension config = project.systemjs
+            SystemjsExtension config = SystemjsExtension.get(project)
+
+            inputs.dir(config.srcDir)
+            inputs.file(new File(project.projectDir, 'gulpfile.js'))
+            inputs.file(new File(project.projectDir, 'package.json'))
+            outputs.dir(config.getBundleLocation())
+
             setArgs([
-                    "--project.version=${project.rootProject.version}",
+                    "--project.version=${project.version}",
                     "--destination.dir=${config.getBundleLocation()}",
-                    "--bundle.name=${project.name}-bundle.js",
+                    "--bundle.name=${project.name}-bundle",
                     "--source.dir=${config.srcDir}",
                     "--include.path=${config.includePath}"
             ])
@@ -24,16 +32,25 @@ class CreateSystemjsBundle extends NodeTask {
         })
     }
 
+    boolean isWebjar(Dependency dependency) {
+        return dependency.group.startsWith('org.webjars') ||
+                (dependency.group == 'cc.catalysts.boot' &&
+                        dependency.name == 'cat-boot-i18n-angular')
+    }
+
     void createSystemjsWebjarConfig() {
 
         Map<String, String> webjarPaths = [:];
 
         project.configurations.forEach({ configuration ->
-            configuration.dependencies.findAll { it.group.startsWith('org.webjars') } forEach {
+            configuration.dependencies.findAll { isWebjar(it) } forEach {
                 webjarPaths.put(it.name, "webjars/${it.name}/${it.version}")
             }
-
         });
+
+        if (webjarPaths.isEmpty()) {
+            return;
+        }
 
         StringBuilder sb = new StringBuilder()
 

@@ -10,10 +10,6 @@ import org.gradle.api.tasks.TaskAction
 class CleanSystemjsBundle extends DefaultTask {
     @TaskAction
     void cleanSystemjsBundle() {
-        project.afterEvaluate({
-            SystemjsExtension config = project.systemjs;
-
-            project.delete(config.destinationDir)
-        })
+        project.delete(SystemjsExtension.get(project).destinationDir)
     }
 }
