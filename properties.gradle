@@ -1,5 +1,5 @@
 ext.cgGroup       = 'cc.catalysts.gradle'
-ext.cgVersion     = '0.0.11-SNAPSHOT'
+ext.cgVersion     = '0.0.11'
 ext.cgWebsite     = 'https://github.com/Catalysts/cat-gradle-plugins'
 ext.cgTracker     = 'https://github.com/Catalysts/cat-gradle-plugins/issues'
 ext.cgGit         = 'https://github.com/Catalysts/cat-gradle-plugins.git'
