@@ -12,7 +12,7 @@ import org.junit.Test
 class SassPluginTest {
 
 
-    @Test
+    //@Test
     public void compile() {
         Project project = ProjectBuilder.builder().build()
         project.apply plugin: 'cat-sass'
