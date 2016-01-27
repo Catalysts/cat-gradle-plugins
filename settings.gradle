@@ -1,4 +1,3 @@
-include 'catalysts-gradle-plugins-legacy'
 include 'cat-gradle-hibernate-plugin'
 include 'cat-gradle-less-plugin'
 include 'cat-gradle-systemjs-plugin'
