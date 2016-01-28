@@ -14,5 +14,7 @@ class BuildInfoExtension {
         destinationDir = new File(project.projectDir, "target/generated-sources/buildinfo")
     }
 
-
+    static BuildInfoExtension get(Project project) {
+        return project.extensions.findByType(BuildInfoExtension)
+    }
 }

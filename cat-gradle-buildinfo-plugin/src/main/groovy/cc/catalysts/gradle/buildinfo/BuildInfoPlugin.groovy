@@ -15,10 +15,9 @@ class BuildInfoPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.add('buildinfo', new BuildInfoExtension(project))
 
-        project.convention.plugins.java.sourceSets.forEach({ SourceSet sourceSet ->
-            BuildInfoExtension config = project.buildinfo;
-            sourceSet.java {srcDir config.destinationDir };
-        })
+        BuildInfoExtension config = BuildInfoExtension.get(project);
+        SourceSet sourceSetMain = project.convention.plugins.java.sourceSets.main
+        sourceSetMain.java.srcDir config.destinationDir
 
         Task buildInfo = project.task('buildinfo',
                 type: BuildInfoTask,
