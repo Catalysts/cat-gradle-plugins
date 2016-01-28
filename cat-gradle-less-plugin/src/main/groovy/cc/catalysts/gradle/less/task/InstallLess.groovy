@@ -36,8 +36,11 @@ class InstallLess extends NpmTask {
             if (!projectPackageJson.exists()) {
                 // first run
                 outputs.upToDateWhen { false }
+                logger.lifecycle("No previous ${projectPackageJson} file available - writing new one")
             } else if (!projectPackageJson.delete()) {
                 throw new TaskConfigurationException(path, "Couldn't delete ${projectPackageJson}!", null)
+            } else {
+                logger.lifecycle("Successfully deleted ${projectPackageJson}")
             }
 
             projectPackageJson.text = PACKAGE_JSON
@@ -45,6 +48,8 @@ class InstallLess extends NpmTask {
             if (!projectPackageJson.exists()) {
                 throw new TaskConfigurationException(path, "Couldn't create ${projectPackageJson}!", null)
             }
+
+            logger.lifecycle("Successfully created ${projectPackageJson}")
 
             setWorkingDir(nodeModulesDir)
             setNpmCommand('install')
