@@ -1,14 +1,38 @@
 cat-gradle-plugins
 ========================
 
-A collection of reusable gradle plugins.
+A collection of reusable gradle plugins. All the plugins are available on MavenCentral and JCenter, so it's easy to embed
+them in your projects. 
 
 
 Usage
 =====
-**cat-gradle-plugins** is *work-in-progress* and not yet published on maven central.  
-If you 're curious, you can try it out by downloading the source and placing it into the ```buildSrc``` directory
-of your gradle project.
+You can utilize every plugin seperately but we recommend to use the same version of every plugin that you are embedding.
+
+So your build.gradle might look like that:
+
+```
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    String catGradleVersion = '0.0.11'
+
+    dependencies {
+        classpath "cc.catalysts.gradle:cat-gradle-systemjs-plugin:${catGradleVersion}"
+        classpath "cc.catalysts.gradle:cat-gradle-less-plugin:0.0.10"
+        classpath "cc.catalysts.gradle:cat-gradle-buildinfo-plugin:${catGradleVersion}"
+    }
+}
+```
+
+Changelog
+=====
+TBD
+
+The latest stable version is 0.0.11
 
 
 List of plugins
