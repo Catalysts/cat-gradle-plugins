@@ -34,10 +34,9 @@ class LessPlugin implements Plugin<Project> {
     }
 
     private void addDestinationDirToSourceSets(Project project) {
-        project.convention.plugins.java.sourceSets.forEach({ SourceSet sourceSet ->
-            LessExtension config = LessExtension.get(project)
-            sourceSet.resources { srcDir config.destinationDir };
-        })
+        LessExtension config = LessExtension.get(project)
+        SourceSet sourceSetMain = project.convention.plugins.java.sourceSets.main
+        sourceSetMain.output.dir config.destinationDir, builtBy: 'less';
     }
 
     private void initConfiguration(Project project) {

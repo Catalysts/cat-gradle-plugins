@@ -13,10 +13,9 @@ class SystemjsPlugin implements Plugin<Project> {
         applyNodePluginAndDefaults(project)
         project.extensions.add('systemjs', new SystemjsExtension(project))
 
-        project.convention.plugins.java.sourceSets.forEach({ SourceSet sourceSet ->
-            SystemjsExtension config = project.systemjs;
-            sourceSet.resources { srcDir config.destinationDir };
-        })
+        SystemjsExtension config = SystemjsExtension.get(project)
+        SourceSet sourceSetMain = project.convention.plugins.java.sourceSets.main
+        sourceSetMain.output.dir config.destinationDir, builtBy: 'systemJsBundle';
 
         Task bundle = project.task('systemJsBundle',
                 dependsOn: 'npmInstall',
