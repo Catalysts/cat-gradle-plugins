@@ -1,7 +1,9 @@
 package cc.catalysts.gradle.less.task
 
 import cc.catalysts.gradle.less.LessExtension
+import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NpmTask
+import org.gradle.execution.commandline.TaskConfigurationException
 
 import java.nio.file.Files
 
@@ -17,8 +19,8 @@ class InstallLess extends NpmTask {
         project.afterEvaluate({
             File nodeModulesDir = LessExtension.get(project).nodeModulesDir
 
-            if (!nodeModulesDir.exists()) {
-                nodeModulesDir.mkdirs();
+            if (!nodeModulesDir.exists() && !nodeModulesDir.mkdirs()) {
+                throw new TaskConfigurationException(path, "Couldn't create ${nodeModulesDir}", null)
             }
 
             File projectPackageJson = new File(nodeModulesDir, 'package.json')
@@ -33,5 +35,13 @@ class InstallLess extends NpmTask {
             inputs.file(projectPackageJson)
             outputs.dir(new File(nodeModulesDir, 'node_modules'))
         })
+    }
+
+    @Override
+    void exec() {
+        println "node.download ${NodeExtension.get( this.project ).download}"
+        println "node.nodeModulesDir ${NodeExtension.get( this.project ).nodeModulesDir}"
+        println "runner.workdir ${runner.workingDir}"
+        super.exec()
     }
 }
