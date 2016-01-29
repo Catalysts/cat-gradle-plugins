@@ -4,7 +4,7 @@ import cc.catalysts.gradle.systemjs.SystemjsExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.artifacts.Dependency
-
+import org.gradle.execution.commandline.TaskConfigurationException
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -18,7 +18,7 @@ class CreateSystemjsBundle extends NodeTask {
             inputs.dir(config.srcDir)
             inputs.file(new File(project.projectDir, 'gulpfile.js'))
             inputs.file(new File(project.projectDir, 'package.json'))
-            outputs.dir(config.getBundleLocation())
+            outputs.dir(config.destinationDir)
 
             setArgs([
                     "--project.version=${project.version}",
@@ -28,8 +28,13 @@ class CreateSystemjsBundle extends NodeTask {
                     "--include.path=${config.includePath}"
             ])
 
-            createSystemjsWebjarConfig()
         })
+    }
+
+    @Override
+    void exec() {
+        createSystemjsWebjarConfig()
+        super.exec()
     }
 
     boolean isWebjar(Dependency dependency) {
@@ -49,8 +54,10 @@ class CreateSystemjsBundle extends NodeTask {
         });
 
         if (webjarPaths.isEmpty()) {
+            logger.lifecycle('No webjars available - no webjar-config.js will be generated');
             return;
         }
+        logger.lifecycle("webjar-config.js for ${webjarPaths.size()} webjars will be created");
 
         StringBuilder sb = new StringBuilder()
 
@@ -71,7 +78,15 @@ System.config({
         SystemjsExtension config = project.systemjs;
 
         File webjarConfig = new File(config.getBundleLocation(), 'webjar-config.js')
-        webjarConfig.parentFile.mkdirs()
-        webjarConfig.write webjarConfigContent
+
+        File webjarConfigFolder = webjarConfig.parentFile
+        if (!webjarConfigFolder.exists() && !webjarConfigFolder.mkdirs()) {
+            throw new TaskConfigurationException(path, "Directory ${webjarConfigFolder} couldn't be created!", null)
+        }
+        webjarConfig.text = webjarConfigContent
+
+        if (!webjarConfig.exists()) {
+            throw new TaskConfigurationException(path, "${webjarConfig} couldn't be created!", null)
+        }
     }
 }
