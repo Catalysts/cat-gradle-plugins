@@ -27,7 +27,7 @@ class LessPluginTest extends Specification  {
         pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
     }
 
-    def "less-install task creates package.json"() {
+    def "less-install installs less + plugins"() {
         given:
         buildFile << """
             plugins {
@@ -38,16 +38,11 @@ class LessPluginTest extends Specification  {
         when:
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('install-less')
+                .withArguments('less-install')
                 .withPluginClasspath(pluginClasspath)
                 .build()
 
         then:
-        File packageJsonFile = new File(testProjectDir.root, 'build/cat-gradle-less/package.json')
-        String packageJsonPath = "${packageJsonFile}"
-
-        result.output.contains("No previous ${packageJsonPath} - writing new one")
-        result.output.contains("No Sucessfully created ${packageJsonPath}")
         result.output.contains("less@2.5.3")
         result.output.contains("less-plugin-autoprefix@1.5.1")
         result.output.contains("less-plugin-clean-css@1.5.1")
