@@ -3,6 +3,7 @@ package cc.catalysts.gradle.less.task
 import cc.catalysts.gradle.less.LessExtension
 import com.moowork.gradle.node.task.NpmTask
 import org.gradle.execution.commandline.TaskConfigurationException
+
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -26,9 +27,23 @@ class InstallLess extends NpmTask {
 
             File projectPackageJson = new File(nodeModulesDir, 'package.json')
 
+            outputs.upToDateWhen {
+                if (!projectPackageJson.exists()) {
+                    // first run
+                    return false
+                }
+
+                String current = projectPackageJson.readLines().join('\n')
+                boolean equals = current.replaceAll(/\r/, '').equals(InstallLess.PACKAGE_JSON)
+                if (equals) {
+                    logger.debug('less-install package.json wasn\'t modified')
+                } else {
+                    logger.debug('less-install package.json was modified')
+                }
+                return equals
+            }
             if (!projectPackageJson.exists()) {
                 // first run
-                outputs.upToDateWhen { false }
             } else {
                 outputs.upToDateWhen {
                     def current = projectPackageJson.readLines().join('\n')
@@ -45,7 +60,6 @@ class InstallLess extends NpmTask {
             setWorkingDir(nodeModulesDir)
             setNpmCommand('install')
 
-            inputs.file(projectPackageJson)
             outputs.dir(new File(nodeModulesDir, 'node_modules'))
         })
     }

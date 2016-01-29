@@ -56,6 +56,8 @@ class LessPluginTest extends Specification  {
                 id 'cc.catalysts.less'
             }
         """
+        testProjectDir.newFolder('build', 'cat-gradle', 'less')
+        testProjectDir.newFile('build/cat-gradle/less/package.json') << '{"private":true}'
 
         when:
         BuildResult result = GradleRunner.create()
