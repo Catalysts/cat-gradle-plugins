@@ -7,6 +7,7 @@ import cc.catalysts.gradle.less.task.Less2Css
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
 
 class LessPlugin implements Plugin<Project> {
@@ -20,8 +21,9 @@ class LessPlugin implements Plugin<Project> {
     }
 
     private void registerTasks(Project project) {
-        Task clean = project.task('less-clean', type: CleanLess)
-        project.tasks.getByName('clean').dependsOn(clean)
+        Task lessClean = project.task('less-clean', type: CleanLess)
+
+        dependsOnIfExists(project, 'clean', lessClean)
 
         Task installLess = project.task('less-install', type: InstallLess)
         Task extractWebjars = project.task('less-extract-webjars', type: ExtractWebjars)
@@ -30,13 +32,25 @@ class LessPlugin implements Plugin<Project> {
                 dependsOn: [installLess, extractWebjars],
                 description: 'Prepares the less compiler and compiles your less to css')
         project.task('less-compile', type: Less2Css)
-        project.tasks.getByName('processResources').dependsOn(less)
+        dependsOnIfExists(project, JavaPlugin.PROCESS_RESOURCES_TASK_NAME, less)
+    }
+
+    private void dependsOnIfExists(Project project, String taskName, Task dependsOn) {
+        Task task = project.tasks.findByName(taskName)
+        if (task) {
+            task.dependsOn(dependsOn)
+        }
     }
 
     private void addDestinationDirToSourceSets(Project project) {
-        LessExtension config = LessExtension.get(project)
-        SourceSet sourceSetMain = project.convention.plugins.java.sourceSets.main
-        sourceSetMain.output.dir config.destinationDir, builtBy: 'less';
+        JavaPlugin javaPlugin = project.convention.plugins.java
+
+        if (javaPlugin) {
+            LessExtension config = LessExtension.get(project)
+            project.logger.lifecycle("Injecting ${config.destinationDir} as output directory into main source set")
+            SourceSet sourceSetMain = javaPlugin.sourceSets.main
+            sourceSetMain.output.dir config.destinationDir, builtBy: 'less';
+        }
     }
 
     private void initConfiguration(Project project) {
