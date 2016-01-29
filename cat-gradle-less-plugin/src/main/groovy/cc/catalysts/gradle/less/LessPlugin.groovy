@@ -8,6 +8,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 
 class LessPlugin implements Plugin<Project> {
@@ -43,7 +44,7 @@ class LessPlugin implements Plugin<Project> {
     }
 
     private void addDestinationDirToSourceSets(Project project) {
-        JavaPlugin javaPlugin = project.convention.plugins.java
+        JavaPluginConvention javaPlugin = project.convention.plugins.java
 
         if (javaPlugin) {
             LessExtension config = LessExtension.get(project)
