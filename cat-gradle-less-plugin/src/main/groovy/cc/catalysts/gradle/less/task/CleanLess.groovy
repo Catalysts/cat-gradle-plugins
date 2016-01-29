@@ -1,9 +1,8 @@
 package cc.catalysts.gradle.less.task
 
-import cc.catalysts.gradle.less.LessExtension
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.tasks.TaskAction
-
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -15,8 +14,7 @@ class CleanLess extends DefaultTask {
 
     @TaskAction
     void clean() {
-        LessExtension config = LessExtension.get(project)
-        project.delete(config.destinationDir)
-        project.delete(config.nodeModulesDir)
+        Task lessTask = project.tasks.less;
+        project.delete(lessTask.outputs.files)
     }
 }

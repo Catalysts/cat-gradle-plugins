@@ -62,7 +62,7 @@ class LessPluginTest extends Specification  {
         when:
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('less-clean', 'less-install')
+                .withArguments('cleanLess', 'less-install')
                 .withPluginClasspath(pluginClasspath)
                 .build()
 

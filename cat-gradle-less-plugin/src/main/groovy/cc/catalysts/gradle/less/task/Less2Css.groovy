@@ -17,7 +17,8 @@ class Less2Css extends NodeTask {
             setScript(lessc)
 
             getInputs().dir(config.srcDir)
-            getOutputs().dir(config.cssFiles)
+            getOutputs().dir(config.nodeModulesDir)
+            getOutputs().dir(config.destinationDir)
             setWorkingDir(NodeExtension.get(project).nodeModulesDir)
         })
 

@@ -22,9 +22,9 @@ class LessPlugin implements Plugin<Project> {
     }
 
     private void registerTasks(Project project) {
-        Task lessClean = project.task('less-clean', type: CleanLess)
-
-        dependsOnIfExists(project, 'clean', lessClean)
+        if (!project.tasks.findByName('clean')) {
+            project.task('cleanLess', type: CleanLess)
+        }
 
         Task installLess = project.task('less-install', type: InstallLess)
         Task extractWebjars = project.task('less-extract-webjars', type: ExtractWebjars)
