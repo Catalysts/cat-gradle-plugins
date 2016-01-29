@@ -3,7 +3,6 @@ package cc.catalysts.gradle.less.task
 import cc.catalysts.gradle.less.LessExtension
 import com.moowork.gradle.node.task.NpmTask
 import org.gradle.execution.commandline.TaskConfigurationException
-
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -15,9 +14,7 @@ class InstallLess extends NpmTask {
     "less-plugin-autoprefix": "1.5.1",
     "less-plugin-clean-css": "1.5.1"
   }
-}
-""";
-
+}""";
 
     public InstallLess() {
         this.group = 'Cat-Boot LESS'
@@ -27,29 +24,23 @@ class InstallLess extends NpmTask {
         project.afterEvaluate({
             File nodeModulesDir = LessExtension.get(project).nodeModulesDir
 
-            if (!nodeModulesDir.exists() && !nodeModulesDir.mkdirs()) {
-                throw new TaskConfigurationException(path, "Couldn't create ${nodeModulesDir}!", null)
-            }
-
             File projectPackageJson = new File(nodeModulesDir, 'package.json')
 
             if (!projectPackageJson.exists()) {
                 // first run
                 outputs.upToDateWhen { false }
-                logger.lifecycle("No previous ${projectPackageJson} file available - writing new one")
-            } else if (!projectPackageJson.delete()) {
-                throw new TaskConfigurationException(path, "Couldn't delete ${projectPackageJson}!", null)
             } else {
-                logger.lifecycle("Successfully deleted ${projectPackageJson}")
+                outputs.upToDateWhen {
+                    def current = projectPackageJson.readLines().join('\n')
+                    boolean equals = current.replaceAll(/\r/, '').equals(InstallLess.PACKAGE_JSON)
+                    if (equals) {
+                        logger.debug('less-install package.json wasn\'t modified')
+                    } else {
+                        logger.debug('less-install package.json was modified')
+                    }
+                    return equals
+                }
             }
-
-            projectPackageJson.text = PACKAGE_JSON
-
-            if (!projectPackageJson.exists()) {
-                throw new TaskConfigurationException(path, "Couldn't create ${projectPackageJson}!", null)
-            }
-
-            logger.lifecycle("Successfully created ${projectPackageJson}")
 
             setWorkingDir(nodeModulesDir)
             setNpmCommand('install')
@@ -57,5 +48,37 @@ class InstallLess extends NpmTask {
             inputs.file(projectPackageJson)
             outputs.dir(new File(nodeModulesDir, 'node_modules'))
         })
+    }
+
+    private void writePackageJson() {
+        File nodeModulesDir = LessExtension.get(project).nodeModulesDir
+
+        if (!nodeModulesDir.exists() && !nodeModulesDir.mkdirs()) {
+            throw new TaskConfigurationException(path, "Couldn't create ${nodeModulesDir}!", null)
+        }
+
+        File projectPackageJson = new File(nodeModulesDir, 'package.json')
+        if (!projectPackageJson.exists()) {
+            // first run
+            logger.lifecycle("No previous ${projectPackageJson} file available - writing new one")
+        } else if (!projectPackageJson.delete()) {
+            throw new TaskConfigurationException(path, "Couldn't delete ${projectPackageJson}!", null)
+        } else {
+            logger.lifecycle("Successfully deleted ${projectPackageJson}")
+        }
+
+        projectPackageJson.text = PACKAGE_JSON
+
+        if (!projectPackageJson.exists()) {
+            throw new TaskConfigurationException(path, "Couldn't create ${projectPackageJson}!", null)
+        }
+
+        logger.lifecycle("Successfully created ${projectPackageJson}")
+    }
+
+    @Override
+    void exec() {
+        writePackageJson();
+        super.exec()
     }
 }
