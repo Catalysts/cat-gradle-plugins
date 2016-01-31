@@ -41,7 +41,7 @@ List of plugins
 * [HIBERNATE](#hibernate)
 * [BUILDINFO](#buildinfo)
 * [SYSTEMJS](#systemjs)
-* [LEGACY] (https://github.com/Catalysts/cat-gradle-plugins/tree/master/catalysts-gradle-plugins-legacy)
+* [LESS] (#less)
 
 HIBERNATE
 ------
@@ -124,12 +124,12 @@ LESS
 
 Takes a set of less files and compiles them to css.
 
-Wejbars are supported by extracting all `css` and `less` files from them and by providing special global variables:
+Webjars are supported by extracting all `css` and `less` files from them and by providing special global variables:
 
 `webjars-<artifactId>` contains the base path of the given webjar (`webjars/<artifactId>/<artifactVersion>`)
 
-*Note: As less doesn't support the '.' character in variable names these will be replaced with a '-'.'*
-*For example `org.webjars.npm:imagenary.lib:1.4.9` will produce the variables `webjars-imagenary-lib`*
+*Note:* As less doesn't support the '.' character in variable names these will be replaced with a '-'.
+For example `org.webjars.npm:imaginary.lib:1.4.9` will produce the variable `webjars-imaginary-lib`.
 
 These variables can be used anywhere in your `less` files to import other less or css files from any webjar.
 
