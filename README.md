@@ -41,7 +41,7 @@ List of plugins
 * [HIBERNATE](#hibernate)
 * [BUILDINFO](#buildinfo)
 * [SYSTEMJS](#systemjs)
-* [LEGACY] (https://github.com/Catalysts/cat-gradle-plugins/tree/master/catalysts-gradle-plugins-legacy)
+* [LESS] (#less)
 
 HIBERNATE
 ------
