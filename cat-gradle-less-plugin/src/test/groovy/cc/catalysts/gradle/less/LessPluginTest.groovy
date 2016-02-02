@@ -7,17 +7,17 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
-class LessPluginTest extends Specification  {
-    @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
+class LessPluginTest extends Specification {
+    @Rule
+    final TemporaryFolder testProjectDir = new TemporaryFolder()
     File buildFile
 
     def setup() {
         buildFile = testProjectDir.newFile('build.gradle')
-
-
 
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
         if (pluginClasspathResource == null) {
