@@ -16,6 +16,11 @@ class LessExtension extends AbstractNpmAwareExtension {
             'less-plugin-autoprefix': '1.5.1',
             'less-plugin-clean-css' : '1.5.1'
     ]
+    List<String> plugins;
+    Map<String, String> pluginOptions = [:]
+    List<String> additionalArguments = [
+            '--strict-units=on'
+    ]
 
     LessExtension(Project project) {
         super(project, 'less')
@@ -48,5 +53,17 @@ class LessExtension extends AbstractNpmAwareExtension {
 
     File getPackageJsonFile() {
         new File(nodeModulesDir, 'package.json')
+    }
+
+    List<String> getPlugins() {
+        if (plugins == null) {
+            return npmDependencies.findAll { it.key.startsWith('less-plugin-') }.collect { it.key.substring(12) }
+        }
+
+        return plugins
+    }
+
+    Map<String, String> getPluginOptions() {
+        return pluginOptions.clone() as Map<String, String>
     }
 }

@@ -3,6 +3,7 @@ package cc.catalysts.gradle.less.task
 import cc.catalysts.gradle.less.LessExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
+
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -28,14 +29,21 @@ class Less2Css extends NodeTask {
     void exec() {
         LessExtension config = LessExtension.get(project)
 
-
         List<String> commonArgs = [
-                '--source-map-less-inline',
-                '--strict-units=on',
-                '--autoprefix',
-                '--clean-css',
                 "--include-path=${new File(project.getBuildDir(), 'cat-gradle/less/extracted/META-INF/resources')}"
         ]
+
+        commonArgs.addAll(config.additionalArguments)
+
+        def pluginOptions = config.pluginOptions
+        for (String plugin : config.plugins) {
+            String pluginArgs = pluginOptions.remove(plugin)
+            commonArgs.add("--${plugin}=${pluginArgs ?: ''}")
+        }
+
+        if (!pluginOptions.isEmpty()) {
+            logger.warn("Unused plugin options ${pluginOptions.keySet()} are configured! Please make sure you have no typos in your configuration.")
+        }
 
         project.configurations.forEach({ configuration ->
             configuration.dependencies.findAll { it.group.startsWith('org.webjars') } forEach {
@@ -51,6 +59,7 @@ class Less2Css extends NodeTask {
                     "${new File(config.cssLocation, srcFile.replace('.less', '.css'))}"
             ]
             argumentList.addAll(commonArgs)
+            logger.lifecycle("Executing lessc: ${argumentList}")
             setArgs(argumentList)
             super.exec()
             getResult().assertNormalExitValue()

@@ -41,7 +41,7 @@ List of plugins
 * [HIBERNATE](#hibernate)
 * [BUILDINFO](#buildinfo)
 * [SYSTEMJS](#systemjs)
-* [LEGACY] (https://github.com/Catalysts/cat-gradle-plugins/tree/master/catalysts-gradle-plugins-legacy)
+* [LESS](#less)
 
 HIBERNATE
 ------
@@ -115,7 +115,6 @@ buildinfo {
     destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
     includePath = "**${File.separator}*.js"
     bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
-
 }
 ```
 
@@ -128,8 +127,8 @@ Wejbars are supported by extracting all `css` and `less` files from them and by 
 
 `webjars-<artifactId>` contains the base path of the given webjar (`webjars/<artifactId>/<artifactVersion>`)
 
-*Note: As less doesn't support the '.' character in variable names these will be replaced with a '-'.'*
-*For example `org.webjars.npm:imagenary.lib:1.4.9` will produce the variables `webjars-imagenary-lib`*
+*Note: As less doesn't support the '.' character in variable names these will be replaced with a '-'.*
+*For example `org.webjars.npm:imaginary.lib:1.4.9` will produce the variable `webjars-imaginary-lib`*
 
 These variables can be used anywhere in your `less` files to import other less or css files from any webjar.
 
@@ -151,10 +150,27 @@ buildscript {
 apply plugin: 'cat-less'
 
 less {
+    // The source directory of your less files
     srcDir = new File(project.projectDir, 'src/main/resources/less')
+    // The actual less source files, relative to your srcDir
     srcFiles = ["${project.name}.less"]
+    // The destination directory which will be treated as a 'resource' folder when the java plugin is present
     destinationDir = new File(project.buildDir, "generated-resources/cat-less")
+    // The base path for all generated css files (default path matches webjar convention)
     cssPath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
-
+    // A map of npm dependencies to use - can be used to change versions and add or remove plugins
+    npmDependencies = [
+        'less'                  : '2.5.3',
+        'less-plugin-autoprefix': '1.5.1',
+        'less-plugin-clean-css' : '1.5.1'
+    ]
+    // A list of less plugins to apply - when null then all npmDependencies starting with 'less-plugin-' will be used
+    plugins = null
+    // A map where the key corresponds to a less plugin name (eg 'clean-css') and the value are the cli arguments to pass to it (eg. '--s0')
+    pluginOptions = [:]
+    // A list of additional command line arguments to pass to the lessc
+    additionalArguments = [
+        '--strict-units=on'
+    ]
 }
 ```
