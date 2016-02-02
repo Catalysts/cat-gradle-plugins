@@ -18,11 +18,11 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
 
-    String catGradleVersion = '0.0.11'
+    String catGradleVersion = '0.0.16'
 
     dependencies {
         classpath "cc.catalysts.gradle:cat-gradle-systemjs-plugin:${catGradleVersion}"
-        classpath "cc.catalysts.gradle:cat-gradle-less-plugin:0.0.10"
+        classpath "cc.catalysts.gradle:cat-gradle-less-plugin:${catGradleVersion}"
         classpath "cc.catalysts.gradle:cat-gradle-buildinfo-plugin:${catGradleVersion}"
     }
 }
@@ -30,9 +30,10 @@ buildscript {
 
 Changelog
 =====
-TBD
 
-The latest stable version is 0.0.11
+The latest stable version is 0.0.16
+
+see [CHANGELOG.md](CHANGELOG.md) for details
 
 
 List of plugins
