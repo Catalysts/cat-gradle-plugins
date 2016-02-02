@@ -1,22 +1,26 @@
 package cc.catalysts.gradle.less
 
+import cc.catalysts.gradle.npm.AbstractNpmAwareExtension
+import cc.catalysts.gradle.npm.PackageJson
 import org.gradle.api.Project
 
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
-class LessExtension {
+class LessExtension extends AbstractNpmAwareExtension {
     File srcDir
     String[] srcFiles
-    File nodeModulesDir
-    File destinationDir
     String cssPath
+    Map<String, String> npmDependencies = [
+            'less'                  : '2.5.3',
+            'less-plugin-autoprefix': '1.5.1',
+            'less-plugin-clean-css' : '1.5.1'
+    ]
 
     LessExtension(Project project) {
+        super(project, 'less')
         srcDir = new File(project.projectDir, 'src/main/resources/less')
         srcFiles = ["${project.name}.less"]
-        nodeModulesDir = new File(project.buildDir, 'cat-gradle/less')
-        destinationDir = new File(project.buildDir, 'generated-resources/cat-less')
         cssPath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
     }
 
@@ -34,5 +38,15 @@ class LessExtension {
 
     File[] getLessFiles() {
         return srcFiles.collect { new File(srcDir, it) }
+    }
+
+    PackageJson getPackageJson() {
+        return PackageJson
+                .initPrivate()
+                .addDependencies(npmDependencies)
+    }
+
+    File getPackageJsonFile() {
+        new File(nodeModulesDir, 'package.json')
     }
 }
