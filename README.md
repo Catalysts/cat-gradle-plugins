@@ -75,7 +75,7 @@ Analyses your project and reports dependency information to a configured server.
 ```groovy
 buildscript {
   dependencies {
-    classpath 'cc.catalysts.gradle:cat-gradle-systemjs-plugin:' + catGradleVersion
+    classpath 'cc.catalysts.gradle:cat-gradle-dmuncle-plugin:' + catGradleVersion
   }
 }
 
