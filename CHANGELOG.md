@@ -1,4 +1,32 @@
 # Changelog
+## v0.0.18 (2016-02-03)
+
+Webjar versions for `less` and `systemjs` plugins are now resolved correctly
+
+### less
+* The webjar versions for the global less variables now represent the resolved values.
+This enables us to use arbitrary version formats in our gradle files.
+```groovy
+dependencies {
+    compile 'org.webjars.bower:angular:[1.4.6,1.5)'
+}
+```
+Value of generated variable `webjars-angular`
+Before: `webjars/angular/[1.4.6,1.5)`
+After: `webjars/angular/1.4.9`
+
+### systemjs
+* The webjar versions for the systemjs config paths now represent the resolved values.
+This enables us to use arbitrary version formats in our gradle files.
+```groovy
+dependencies {
+    compile 'org.webjars.bower:angular:[1.4.6,1.5)'
+}
+```
+Value of generated path `webjars/angular/*`
+Before: `webjars/angular/[1.4.6,1.5)/*`
+After: `webjars/angular/1.4.9/*`
+
 ## v0.0.17 (2016-02-02)
 
 Let us introduce a new plugin `dmuncle`
