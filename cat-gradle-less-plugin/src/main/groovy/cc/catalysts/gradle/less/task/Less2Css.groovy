@@ -3,6 +3,8 @@ package cc.catalysts.gradle.less.task
 import cc.catalysts.gradle.less.LessExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolvedArtifact
 
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
@@ -45,13 +47,22 @@ class Less2Css extends NodeTask {
             logger.warn("Unused plugin options ${pluginOptions.keySet()} are configured! Please make sure you have no typos in your configuration.")
         }
 
-        project.configurations.forEach({ configuration ->
-            configuration.dependencies.findAll { it.group.startsWith('org.webjars') } forEach {
-                String artifactId = "${it.name.replace('.', '-')}"
-                commonArgs.add("--global-var=webjars-${artifactId}='webjars/${it.name}/${it.version}'")
-            }
+        Map<String, String> globalVars = [:]
 
+        project.configurations.forEach({ Configuration configuration ->
+            configuration
+                    .resolvedConfiguration
+                    .resolvedArtifacts
+                    .findAll({ it.moduleVersion.id.group.startsWith('org.webjars') })
+                    .forEach({ ResolvedArtifact it ->
+                String artifactId = "${it.name.replace('.', '-')}"
+                globalVars.put("webjars-${artifactId}", "webjars/${it.name}/${it.moduleVersion.id.version}")
+            })
         });
+
+        for (Map.Entry<String, String> globalVar : globalVars) {
+            commonArgs.add("--global-var=${globalVar.key}='${globalVar.value}'")
+        }
 
         for (String srcFile : config.srcFiles) {
             List<String> argumentList = [
