@@ -18,12 +18,14 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
 
-    String catGradleVersion = '0.0.16'
+    String catGradleVersion = '0.0.17'
 
     dependencies {
-        classpath "cc.catalysts.gradle:cat-gradle-systemjs-plugin:${catGradleVersion}"
-        classpath "cc.catalysts.gradle:cat-gradle-less-plugin:${catGradleVersion}"
         classpath "cc.catalysts.gradle:cat-gradle-buildinfo-plugin:${catGradleVersion}"
+        classpath "cc.catalysts.gradle:cat-gradle-dmuncle-plugin:${catGradleVersion}"
+        classpath "cc.catalysts.gradle:cat-gradle-hibernate-plugin:${catGradleVersion}"
+        classpath "cc.catalysts.gradle:cat-gradle-less-plugin:${catGradleVersion}"
+        classpath "cc.catalysts.gradle:cat-gradle-systemjs-plugin:${catGradleVersion}"
     }
 }
 ```
@@ -31,49 +33,19 @@ buildscript {
 Changelog
 =====
 
-The latest stable version is 0.0.16
+The latest stable version is 0.0.17
 
-see [CHANGELOG.md](CHANGELOG.md) for details
+see [CHANGELOG](CHANGELOG.md) for details
 
 
 List of plugins
 ===============
 
-* [HIBERNATE](#hibernate)
 * [BUILDINFO](#buildinfo)
-* [SYSTEMJS](#systemjs)
+* [DMUNCLE](#dmuncle)
+* [HIBERNATE](#hibernate)
 * [LESS](#less)
-
-HIBERNATE
-------
-Generates static metamodel classes for Hibernate JPA. The sources will be generated to (default) 'target/generated-sources/hibernate' (extends compileJava task).  
-This folder will be added to the SourceSet.  
-The 'target/generated-sources/hibernate' directory will be deleted when running 'gradle clean'.  
-To activate the generation for a project, just apply the plugin in the build.gradle file. Additionally you can choose the used hibernate version by defining the hibernateVersion variable on the project (or any parent project).
-
-Example:
-```
-buildscript {
-  dependencies {
-    classpath 'cc.catalysts.gradle:cat-gradle-hibernate-plugin:' + catGradleVersion
-  }
-}
-
-
-apply plugin: 'cat-hibernate'
-```
-
-Example: Change destination directory to something else then the default value and use a specific hibernate Version
-```
-ext.hibernateVersion = '4.3.1.Final'
-
-apply plugin: 'cat-hibernate'
-
-hibernate {
-    destinationDir 'PATH'
-}
-```
-
+* [SYSTEMJS](#systemjs)
 
 BUILDINFO
 ------
@@ -88,19 +60,17 @@ buildscript {
   }
 }
 
-apply plugin: 'cat-buildinfo'
+apply plugin: 'cc.catalysts.buildinfo'
 
 buildinfo {
     packageName = 'cc.catalysts.mproject'
 }
 ```
 
-SYSTEMJS
+DMUNCLE
 ------
+Analyses your project and reports dependency information to a configured server.
 
-Takes all configured files of a configured source folder and creates a systemjs bundle for it.
-Currently the `package.json` and `gulpfile.js` files which perform the actual task need to be part of the module where the plugin is applied.
-This will change in a future version.
 
 ```groovy
 buildscript {
@@ -109,13 +79,42 @@ buildscript {
   }
 }
 
-apply plugin: 'cat-systemjs'
+apply plugin: 'cc.catalysts.dmuncle'
 
-buildinfo {
-    srcDir = new File(project.projectDir, 'src/main/resources')
-    destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
-    includePath = "**${File.separator}*.js"
-    bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
+dmuncle {
+    server = null
+    requestTimeout = 100000
+}
+
+```
+
+
+HIBERNATE
+------
+Generates static metamodel classes for Hibernate JPA. The sources will be generated to (default) 'target/generated-sources/hibernate' (extends compileJava task).
+This folder will be added to the SourceSet.
+The 'target/generated-sources/hibernate' directory will be deleted when running 'gradle clean'.
+To activate the generation for a project, just apply the plugin in the build.gradle file. Additionally you can choose the used hibernate version by defining the hibernateVersion variable on the project (or any parent project).
+
+Example:
+```
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-hibernate-plugin:' + catGradleVersion
+  }
+}
+
+apply plugin: 'cc.catalysts.hibernate'
+```
+
+Example: Change destination directory to something else then the default value and use a specific hibernate Version
+```
+ext.hibernateVersion = '4.3.1.Final'
+
+apply plugin: 'cat-hibernate'
+
+hibernate {
+    destinationDir 'PATH'
 }
 ```
 
@@ -148,7 +147,7 @@ buildscript {
   }
 }
 
-apply plugin: 'cat-less'
+apply plugin: 'cc.catalysts.less'
 
 less {
     // The source directory of your less files
@@ -173,5 +172,29 @@ less {
     additionalArguments = [
         '--strict-units=on'
     ]
+}
+```
+
+SYSTEMJS
+------
+
+Takes all configured files of a configured source folder and creates a systemjs bundle for it.
+Currently the `package.json` and `gulpfile.js` files which perform the actual task need to be part of the module where the plugin is applied.
+This will change in a future version.
+
+```groovy
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-systemjs-plugin:' + catGradleVersion
+  }
+}
+
+apply plugin: 'cc.catalysts.systemjs'
+
+buildinfo {
+    srcDir = new File(project.projectDir, 'src/main/resources')
+    destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
+    includePath = "**${File.separator}*.js"
+    bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
 }
 ```

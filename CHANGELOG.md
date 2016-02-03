@@ -1,9 +1,14 @@
 # Changelog
+## v0.0.17 (2016-02-02)
 
-## 0.0.17 (2016-02-02)
+Let us introduce a new plugin `dmuncle`
 
-### buildinfo
-_no changes_
+### dmuncle
+A new plugin featuring detection and reporting of outdated dependencies within your gradle project.
+
+## v0.0.16 (2016-02-02)
+
+This version brings you more configration options for the less plugin.
 
 ### less
 * Introduced new configuration options:
@@ -11,6 +16,3 @@ _no changes_
   - plugins: specify which less-plugins will be applied
   - pluginOptions: allow specification of plugin arguments
   - additionalArguments: any number of additional command line arguments to pass to the less compiler
-
-### systemjs
-_no changes_
