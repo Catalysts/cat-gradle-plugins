@@ -3,7 +3,9 @@ package cc.catalysts.gradle.systemjs.task
 import cc.catalysts.gradle.systemjs.SystemjsExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
-import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ModuleVersionIdentifier
+import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.execution.commandline.TaskConfigurationException
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
@@ -37,20 +39,25 @@ class CreateSystemjsBundle extends NodeTask {
         super.exec()
     }
 
-    boolean isWebjar(Dependency dependency) {
-        return dependency.group.startsWith('org.webjars') ||
-                (dependency.group == 'cc.catalysts.boot' &&
-                        dependency.name == 'cat-boot-i18n-angular')
+    boolean isWebjar(ResolvedArtifact resolvedArtifact) {
+        ModuleVersionIdentifier id = resolvedArtifact.moduleVersion.id
+        return id.group.startsWith('org.webjars') ||
+                (id.group == 'cc.catalysts.boot' &&
+                        id.name == 'cat-boot-i18n-angular')
     }
 
     void createSystemjsWebjarConfig() {
 
         Map<String, String> webjarPaths = [:];
 
-        project.configurations.forEach({ configuration ->
-            configuration.dependencies.findAll { isWebjar(it) } forEach {
-                webjarPaths.put(it.name, "webjars/${it.name}/${it.version}")
-            }
+        project.configurations.forEach({ Configuration configuration ->
+            configuration
+                    .resolvedConfiguration
+                    .resolvedArtifacts
+                    .findAll({ isWebjar(it) })
+                    .forEach({ ResolvedArtifact it ->
+                webjarPaths.put(it.name, "webjars/${it.name}/${it.moduleVersion.id.version}")
+            })
         });
 
         if (webjarPaths.isEmpty()) {
