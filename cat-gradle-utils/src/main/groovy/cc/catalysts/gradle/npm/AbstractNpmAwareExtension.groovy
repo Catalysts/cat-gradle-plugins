@@ -6,7 +6,8 @@ import org.gradle.api.Project
  * @author Thomas Scheinecker, Catalysts GmbH
  */
 abstract class AbstractNpmAwareExtension {
-    Map<String, String> npmDependencies = [:]
+    abstract Map<String, String> getNpmDependencies()
+    abstract void setNpmDependencies(Map<String, String> npmDependencies)
     File destinationDir
     File nodeModulesDir
 

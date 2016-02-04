@@ -1,7 +1,6 @@
 package cc.catalysts.gradle.systemjs.task
 
 import cc.catalysts.gradle.systemjs.SystemjsExtension
-import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleVersionIdentifier
@@ -12,10 +11,13 @@ import org.gradle.execution.commandline.TaskConfigurationException
  */
 class CreateSystemjsBundle extends NodeTask {
     CreateSystemjsBundle() {
+        description = 'Creates a systemjs bundle of all specified js files'
+        group = 'cat-boot'
+
         project.afterEvaluate({
-            setScript(new File(NodeExtension.get(project).nodeModulesDir, 'node_modules/gulp/bin/gulp.js'))
 
             SystemjsExtension config = SystemjsExtension.get(project)
+            setScript(new File(config.nodeModulesDir, 'systemjs-bundle.es6'))
 
             inputs.dir(config.srcDir)
             inputs.file(new File(project.projectDir, 'gulpfile.js'))

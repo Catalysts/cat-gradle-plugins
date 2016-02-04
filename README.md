@@ -193,10 +193,8 @@ SYSTEMJS
 ------
 
 Takes all configured files of a configured source folder and creates a systemjs bundle for it.
-Currently the `package.json` and `gulpfile.js` files which perform the actual task need to be part of the module where the plugin is applied.
-This will change in a future version.
 
-```groovy
+```
 buildscript {
   dependencies {
     classpath 'cc.catalysts.gradle:cat-gradle-systemjs-plugin:' + catGradleVersion
@@ -206,9 +204,18 @@ buildscript {
 apply plugin: 'cc.catalysts.systemjs'
 
 buildinfo {
+    // The source directory of your js files
     srcDir = new File(project.projectDir, 'src/main/resources')
-    destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
+    // A glob pattern to specify which js files to include
     includePath = "**${File.separator}*.js"
+    // The destination directory which will be treated as a 'resource' folder when the java plugin is present
+    destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
+    // The path to where the bundle file will be located
     bundlePath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
+    // A map of npm dependencies to use - can be used to change versions
+    npmDependencies = [
+        'command-line-args': '2.1.4',
+        'systemjs-builder' : '0.15.3'
+    ]
 }
 ```

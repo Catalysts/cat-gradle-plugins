@@ -2,6 +2,7 @@ package cc.catalysts.gradle.systemjs
 
 import cc.catalysts.gradle.systemjs.task.CleanSystemjsBundle
 import cc.catalysts.gradle.systemjs.task.CreateSystemjsBundle
+import cc.catalysts.gradle.systemjs.task.InstallSystemjsBuilder
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -13,15 +14,15 @@ class SystemjsPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         applyNodePluginAndDefaults(project)
-        project.extensions.add('systemjs', new SystemjsExtension(project))
+        project.extensions.create('systemjs', SystemjsExtension, project)
 
         addDestinationDirToSourceSets(project)
 
+        InstallSystemjsBuilder installSystemjsBuilder = project.tasks.create('systemjs-builder-install', InstallSystemjsBuilder)
+
         Task bundle = project.task('systemJsBundle',
-                dependsOn: 'npmInstall',
-                type: CreateSystemjsBundle,
-                description: 'Creates a systemjs bundle of all specified js files',
-                group: 'cat-boot')
+                dependsOn: installSystemjsBuilder,
+                type: CreateSystemjsBundle)
         project.tasks.getByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME).dependsOn(bundle)
 
         if (!project.tasks.findByName('clean')) {
