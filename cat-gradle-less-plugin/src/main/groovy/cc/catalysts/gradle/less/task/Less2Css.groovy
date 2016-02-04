@@ -5,11 +5,21 @@ import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputFiles
 
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
 class Less2Css extends NodeTask {
+    File srcDir
+    String[] srcFiles
+    String cssPath
+    List<String> plugins;
+    Map<String, String> pluginOptions
+    List<String> additionalArguments
+    Closure<String> cssFileName
+
     public Less2Css() {
         this.group = 'Cat-Boot LESS'
         this.description = 'Compiles your less to css'
@@ -19,26 +29,63 @@ class Less2Css extends NodeTask {
             File lessc = new File(config.nodeModulesDir, 'node_modules/less/bin/lessc')
             setScript(lessc)
 
-            getInputs().dir(config.srcDir)
             getOutputs().dir(config.nodeModulesDir)
             getOutputs().dir(config.destinationDir)
             setWorkingDir(NodeExtension.get(project).nodeModulesDir)
         })
+    }
 
+    LessExtension getConfig() {
+        return LessExtension.get(project)
+    }
+
+    @InputDirectory
+    File getSrcDir() {
+        return srcDir ?: config.srcDir
+    }
+
+    String[] getSrcFiles() {
+        return srcFiles ?: config.srcFiles
+    }
+
+    File getCssLocation() {
+        return cssPath ? new File(config.destinationDir, cssPath) : config.cssLocation;
+    }
+
+    List<String> getPlugins() {
+        return plugins ?: config.plugins
+    }
+
+    Map<String, String> getPluginOptions() {
+        return pluginOptions ?: config.pluginOptions
+    }
+
+    List<String> getAdditionalArguments() {
+        return additionalArguments ?: config.additionalArguments
+    }
+
+    String getCssFileName(String lessFileName) {
+        return cssFileName ? cssFileName(lessFileName) : config.cssFileName(lessFileName)
+    }
+
+    @OutputFiles
+    List<File> getCssFiles() {
+        return getSrcFiles()
+                .collect({
+            return new File(getSrcDir(), getCssFileName(it))
+        })
     }
 
     @Override
     void exec() {
-        LessExtension config = LessExtension.get(project)
-
         List<String> commonArgs = [
                 "--include-path=${new File(project.getBuildDir(), 'cat-gradle/less/extracted/META-INF/resources')}"
         ]
 
-        commonArgs.addAll(config.additionalArguments)
+        commonArgs.addAll(getAdditionalArguments())
 
-        def pluginOptions = config.pluginOptions
-        for (String plugin : config.plugins) {
+        def pluginOptions = getPluginOptions()
+        for (String plugin : getPlugins()) {
             String pluginArgs = pluginOptions.remove(plugin)
             commonArgs.add("--${plugin}=${pluginArgs ?: ''}")
         }
@@ -64,10 +111,10 @@ class Less2Css extends NodeTask {
             commonArgs.add("--global-var=${globalVar.key}='${globalVar.value}'")
         }
 
-        for (String srcFile : config.srcFiles) {
+        for (String srcFile : getSrcFiles()) {
             List<String> argumentList = [
-                    "${new File(config.srcDir, srcFile)}",
-                    "${new File(config.cssLocation, srcFile.replace('.less', '.css'))}"
+                    "${new File(getSrcDir(), srcFile)}",
+                    "${new File(cssLocation, getCssFileName(srcFile))}"
             ]
             argumentList.addAll(commonArgs)
             logger.lifecycle("Executing lessc: ${argumentList}")

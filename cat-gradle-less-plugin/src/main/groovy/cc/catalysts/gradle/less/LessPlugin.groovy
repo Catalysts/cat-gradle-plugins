@@ -26,13 +26,17 @@ class LessPlugin implements Plugin<Project> {
             project.task('cleanLess', type: CleanLess)
         }
 
-        Task installLess = project.task('less-install', type: InstallLess)
-        Task extractWebjars = project.task('less-extract-webjars', type: ExtractWebjars)
-        Task less = project.task('less',
-                type: Less2Css,
-                dependsOn: [installLess, extractWebjars],
-                description: 'Prepares the less compiler and compiles your less to css')
-        project.task('less-compile', type: Less2Css)
+        InstallLess installLess = project.tasks.create('less-install', InstallLess)
+        ExtractWebjars extractWebjars = project.tasks.create('less-extract-webjars', ExtractWebjars)
+        Less2Css less = project.tasks.create('less', Less2Css, {
+                it.dependsOn = [installLess, extractWebjars]
+                it.description = 'Prepares the less compiler and compiles your less to css'
+        })
+
+        // add the Less task type as property to the project to be able to use it within custom tasks
+        project.extensions.extraProperties.Less = Less2Css
+
+        Less2Css lessCompile = project.tasks.create('less-compile', Less2Css)
         dependsOnIfExists(project, JavaPlugin.PROCESS_RESOURCES_TASK_NAME, less)
     }
 
@@ -55,7 +59,7 @@ class LessPlugin implements Plugin<Project> {
     }
 
     private void initConfiguration(Project project) {
-        project.extensions.add('less', new LessExtension(project))
+        project.extensions.create('less', LessExtension, project)
     }
 
     private void applyNodePluginAndDefaults(Project project) {

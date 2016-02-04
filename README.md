@@ -172,7 +172,21 @@ less {
     additionalArguments = [
         '--strict-units=on'
     ]
+    // A Closure<String> to transform input file names to output file names
+    cssFileName = {return it.replace('.less', '.min.css')}
 }
+```
+
+Custom `Less` tasks can also be configured and have access to the same configuration options. If a option is not used the default value will be assumed.
+
+Example for generating an unminified version into the `static/css` folder:
+```groovy
+task unminifiedLess(type: Less) {
+    cssPath = 'static/css'
+    plugins = ['autoprefix']
+}
+
+tasks.less.dependsOn('unminifiedLess')
 ```
 
 SYSTEMJS

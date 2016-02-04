@@ -3,7 +3,6 @@ package cc.catalysts.gradle.less
 import cc.catalysts.gradle.npm.AbstractNpmAwareExtension
 import cc.catalysts.gradle.npm.PackageJson
 import org.gradle.api.Project
-
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -21,6 +20,9 @@ class LessExtension extends AbstractNpmAwareExtension {
     List<String> additionalArguments = [
             '--strict-units=on'
     ]
+    Closure<String> cssFileName = {
+        return it.replace('.less', '.css')
+    }
 
     LessExtension(Project project) {
         super(project, 'less')
