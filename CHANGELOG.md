@@ -1,4 +1,22 @@
 # Changelog
+## v0.0.19 (2015-02-04)
+
+### less
+* A new config property `cssFileName` has been introduced which accepts a `Closure<String>` to transform the input file names to output file names
+* It is now possible to define your own tasks of type `Less` to execute multiple independent configurations
+```groovy
+less {
+    cssFileName = {return it.replace('.less', '.min.css')}
+}
+
+task unminifiedLess(type: Less) {
+    plugins = ['autoprefix']
+    cssFileName = {return it.replace('.less', '.css')}
+}
+
+tasks.less.dependsOn('unminifiedLess')
+```
+
 ## v0.0.18 (2016-02-03)
 
 Webjar versions for `less` and `systemjs` plugins are now resolved correctly
