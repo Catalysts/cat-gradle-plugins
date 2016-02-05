@@ -14,7 +14,7 @@ So your build.gradle might look like that:
 ```
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter() // or mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
     }
 
