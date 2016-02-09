@@ -208,7 +208,7 @@ buildinfo {
     // The source directory of your js files
     srcDir = new File(project.projectDir, 'src/main/resources')
     // A glob pattern to specify which js files to include
-    includePath = "**${File.separator}*.js"
+    includePath = "**/*.js"
     // The destination directory which will be treated as a 'resource' folder when the java plugin is present
     destinationDir = new File(project.buildDir, "generated-resources/cat-systemjs")
     // The path to where the bundle file will be located
