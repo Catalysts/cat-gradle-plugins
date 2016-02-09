@@ -1,4 +1,8 @@
 # Changelog
+## v0.0.22 (2015-02-09)
+
+The plugin tasks now correctly declare there own configuration as input properties, therefor configuration changes now will clear the `UP-TO-DATE` status and the tasks will correctly be rerun.
+
 ## v0.0.21 (2015-02-08)
 
 A new (incubating) plugin `cc.catalysts.webjars` which creates a helper Java class containing information about all resolved webjar dependencies.
