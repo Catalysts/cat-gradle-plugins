@@ -46,6 +46,7 @@ List of plugins
 * [HIBERNATE](#hibernate)
 * [LESS](#less)
 * [SYSTEMJS](#systemjs)
+* [WEBJARS](#webjars)
 
 BUILDINFO
 ------
@@ -194,7 +195,7 @@ SYSTEMJS
 
 Takes all configured files of a configured source folder and creates a systemjs bundle for it.
 
-```
+```groovy
 buildscript {
   dependencies {
     classpath 'cc.catalysts.gradle:cat-gradle-systemjs-plugin:' + catGradleVersion
@@ -217,5 +218,33 @@ buildinfo {
         'command-line-args': '2.1.4',
         'systemjs-builder' : '0.15.3'
     ]
+}
+```
+
+WEBJARS __*(INCUBATING)*__
+------
+
+_This feature is considered incubating and may change completely in a future version_
+
+This plugin creates a helper class `Webjars` containing a map which maps from webjar names to artifact information (group, name, version, webjar path).
+
+```groovy
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-webjars-plugin:' + catGradleVersion
+  }
+}
+
+apply plugin: 'cc.catalysts.webjars'
+
+webjars {
+    // The package to use for the generated 'Webjars' class
+    packageName = 'cc.catalysts.gradle'
+    // The destination directory which will be treated as a source folder
+    destinationDir = new File(project.buildDir, "generated-resources/cat-webjars")
+    // a filter closure to customize which resolved artifacts should qualify as webjars
+    webjarFilter = { ResolvedArtifact it ->
+        return it.moduleVersion.id.group.startsWith('org.webjars')
+    }
 }
 ```

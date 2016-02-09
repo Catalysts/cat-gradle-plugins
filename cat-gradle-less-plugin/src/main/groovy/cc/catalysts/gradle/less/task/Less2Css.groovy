@@ -5,9 +5,10 @@ import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFiles
-
+import org.gradle.api.tasks.SkipWhenEmpty
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -44,6 +45,7 @@ class Less2Css extends NodeTask {
         return srcDir ?: config.srcDir
     }
 
+    @SkipWhenEmpty
     String[] getSrcFiles() {
         return srcFiles ?: config.srcFiles
     }
@@ -52,14 +54,17 @@ class Less2Css extends NodeTask {
         return cssPath ? new File(config.destinationDir, cssPath) : config.cssLocation;
     }
 
+    @Input
     List<String> getPlugins() {
         return plugins ?: config.plugins
     }
 
+    @Input
     Map<String, String> getPluginOptions() {
         return pluginOptions ?: config.pluginOptions
     }
 
+    @Input
     List<String> getAdditionalArguments() {
         return additionalArguments ?: config.additionalArguments
     }
@@ -72,7 +77,7 @@ class Less2Css extends NodeTask {
     List<File> getCssFiles() {
         return getSrcFiles()
                 .collect({
-            return new File(getSrcDir(), getCssFileName(it))
+            return new File(getCssLocation(), getCssFileName(it))
         })
     }
 

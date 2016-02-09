@@ -4,6 +4,8 @@ import cc.catalysts.gradle.webjars.WebjarsExtension
 import org.gradle.api.Incubating
 import org.gradle.api.artifacts.ModuleVersionIdentifier
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.execution.commandline.TaskConfigurationException
 
@@ -24,15 +26,25 @@ class WebjarsClass extends AbstractWebjarAware {
         description = 'Creates a \'Webjars.java\' file which holds a Map with information about you webjars'
     }
 
+    @Input
     String getPackageName() {
         return packageName ?: config.packageName
+    }
+
+    File getWebjarsClassDir() {
+        return new File(config.destinationDir, "${getPackageName().replace('.', '/')}")
+    }
+
+    @OutputFile
+    File getWebjarClassFile() {
+        return new File(webjarsClassDir, 'Webjars.java')
     }
 
     @TaskAction
     void generateWebjarsClass() {
         WebjarsExtension config = project.webjars;
 
-        File webjarsClassDir = new File(config.destinationDir, "${getPackageName().replace('.', '/')}")
+        File webjarsClassDir = getWebjarsClassDir()
         Files.createDirectories(webjarsClassDir.toPath());
 
         StringBuilder webjarClassBuilder = new StringBuilder("""package ${getPackageName()};
@@ -74,7 +86,7 @@ public class Webjars {
         webjarClassBuilder.append("}");
 
 
-        File webjarClassJavaFile = new File(webjarsClassDir, 'Webjars.java')
+        File webjarClassJavaFile = getWebjarClassFile()
         webjarClassJavaFile.text = webjarClassBuilder.toString()
 
         if (!webjarClassJavaFile.exists()) {

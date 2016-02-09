@@ -1,4 +1,8 @@
 # Changelog
+## v0.0.21 (2015-02-08)
+
+A new (incubating) plugin `cc.catalysts.webjars` which creates a helper Java class containing information about all resolved webjar dependencies.
+
 ## v0.0.20 (2015-02-04)
 
 The systemjs plugin is now completely self-contained and doesn't requrie additional setup within the project anymore.

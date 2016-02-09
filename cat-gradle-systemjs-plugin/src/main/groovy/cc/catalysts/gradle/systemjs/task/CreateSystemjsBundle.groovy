@@ -5,7 +5,11 @@ import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleVersionIdentifier
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.tasks.*
 import org.gradle.execution.commandline.TaskConfigurationException
+
+import java.nio.file.*
+import java.nio.file.attribute.BasicFileAttributes
 /**
  * @author Thomas Scheinecker, Catalysts GmbH
  */
@@ -17,11 +21,8 @@ class CreateSystemjsBundle extends NodeTask {
         project.afterEvaluate({
 
             SystemjsExtension config = SystemjsExtension.get(project)
-            setScript(new File(config.nodeModulesDir, 'systemjs-bundle.es6'))
+            setScript(scriptFile)
 
-            inputs.dir(config.srcDir)
-            inputs.file(new File(project.projectDir, 'gulpfile.js'))
-            inputs.file(new File(project.projectDir, 'package.json'))
             outputs.dir(config.destinationDir)
 
             setArgs([
@@ -33,6 +34,37 @@ class CreateSystemjsBundle extends NodeTask {
             ])
 
         })
+    }
+
+    File getSrcDir() {
+        return config.srcDir
+    }
+
+    String getIncludePath() {
+        return config.includePath
+    }
+
+    @InputFiles
+    @SkipWhenEmpty
+    List<File> getInputFiles() {
+        List<File> inputFiles = []
+        PathMatcher matcher = FileSystems.default.getPathMatcher("glob:${getIncludePath()}")
+        Files.walkFileTree(getSrcDir().toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (matcher.matches(file)) {
+                    inputFiles.add(file.toFile())
+                }
+                return super.visitFile(file, attrs)
+            }
+        })
+
+        return inputFiles
+    }
+
+    @InputFile
+    File getScriptFile() {
+        return new File(config.nodeModulesDir, 'systemjs-bundle.es6')
     }
 
     @Override
@@ -48,9 +80,9 @@ class CreateSystemjsBundle extends NodeTask {
                         id.name == 'cat-boot-i18n-angular')
     }
 
-    void createSystemjsWebjarConfig() {
-
-        Map<String, String> webjarPaths = [:];
+    @Input
+    Map<String, String> getWebjarPaths() {
+        Map<String, String> webjarPaths = [:]
 
         project.configurations.forEach({ Configuration configuration ->
             configuration
@@ -61,6 +93,21 @@ class CreateSystemjsBundle extends NodeTask {
                 webjarPaths.put(it.name, "webjars/${it.name}/${it.moduleVersion.id.version}")
             })
         });
+
+        return webjarPaths
+    }
+
+    SystemjsExtension getConfig() {
+        return SystemjsExtension.get(project)
+    }
+
+    @OutputDirectory
+    File getBundleLocation() {
+        return config.bundleLocation
+    }
+
+    void createSystemjsWebjarConfig() {
+        Map<String, String> webjarPaths = getWebjarPaths()
 
         if (webjarPaths.isEmpty()) {
             logger.lifecycle('No webjars available - no webjar-config.js will be generated');
@@ -84,9 +131,7 @@ System.config({
     }
 });
 """
-        SystemjsExtension config = project.systemjs;
-
-        File webjarConfig = new File(config.getBundleLocation(), 'webjar-config.js')
+        File webjarConfig = new File(bundleLocation, 'webjar-config.js')
 
         File webjarConfigFolder = webjarConfig.parentFile
         if (!webjarConfigFolder.exists() && !webjarConfigFolder.mkdirs()) {

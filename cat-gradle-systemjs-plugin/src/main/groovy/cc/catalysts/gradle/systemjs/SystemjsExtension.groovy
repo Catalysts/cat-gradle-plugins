@@ -8,7 +8,10 @@ import org.gradle.api.Project
  */
 class SystemjsExtension extends AbstractNpmAwareExtension {
     File srcDir
-    String includePath = "**${File.separator}*.js"
+    /**
+     * glob pattern
+     */
+    String includePath = "**/*.js"
     String bundlePath
     Map<String, String> npmDependencies = [
             'command-line-args': '2.1.4',
