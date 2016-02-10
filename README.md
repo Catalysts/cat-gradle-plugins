@@ -221,7 +221,7 @@ buildinfo {
 }
 ```
 
-WEBJARS __*(INCUBATING)*__
+WEBJARS
 ------
 
 _This feature is considered incubating and may change completely in a future version_
