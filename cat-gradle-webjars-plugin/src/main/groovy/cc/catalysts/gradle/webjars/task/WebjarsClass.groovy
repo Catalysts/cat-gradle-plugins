@@ -60,7 +60,7 @@ public class Webjars {
         public final String version;
         public final String path;
 
-        private Webjar(String group, String name, String version) {
+        public Webjar(String group, String name, String version) {
             this.group = group;
             this.name = name;
             this.version = version;
