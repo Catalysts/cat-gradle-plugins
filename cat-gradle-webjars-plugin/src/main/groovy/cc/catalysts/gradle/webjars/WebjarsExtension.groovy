@@ -13,7 +13,7 @@ class WebjarsExtension {
     File destinationDir
 
     Closure webjarFilter = { ResolvedArtifact it ->
-        return it.moduleVersion.id.group.startsWith('org.webjars')
+        return it.moduleVersion.id.group?.startsWith('org.webjars')
     }
 
     WebjarsExtension(Project project) {

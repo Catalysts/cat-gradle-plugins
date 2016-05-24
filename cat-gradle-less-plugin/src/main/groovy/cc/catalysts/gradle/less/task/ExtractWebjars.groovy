@@ -17,7 +17,7 @@ class ExtractWebjars extends Copy {
         project.afterEvaluate({
             from project.configurations.collect({ configuration ->
                 return configuration.files({
-                    return it.group.startsWith('org.webjars')
+                    return it.group?.startsWith('org.webjars')
                 })
             }).flatten().collect({
                 return project.zipTree(it).matching(patternSet)
