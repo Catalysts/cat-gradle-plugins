@@ -79,7 +79,3 @@ subprojects { proj->
     }
 }
 
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
-}

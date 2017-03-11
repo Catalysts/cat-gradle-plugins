@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.less.task
 
+import cc.catalysts.gradle.GradleHelper
 import cc.catalysts.gradle.less.LessExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
@@ -101,10 +102,12 @@ class Less2Css extends NodeTask {
 
         Map<String, String> globalVars = [:]
 
-        project.configurations.forEach({ Configuration configuration ->
+        project.getConfigurations().findAll {
+            GradleHelper.canBeResolved(it)
+        }.each({ Configuration configuration ->
             configuration
-                    .resolvedConfiguration
-                    .resolvedArtifacts
+                    .getResolvedConfiguration()
+                    .getResolvedArtifacts()
                     .findAll({ it.moduleVersion.id.group.startsWith('org.webjars') })
                     .forEach({ ResolvedArtifact it ->
                 String artifactId = "${it.name.replace('.', '-')}"

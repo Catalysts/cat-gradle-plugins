@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.webjars.task
 
+import cc.catalysts.gradle.GradleHelper
 import cc.catalysts.gradle.webjars.WebjarsExtension
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleVersionIdentifier
@@ -33,7 +34,9 @@ abstract class AbstractWebjarAware extends AbstractTask {
 
     Set<ResolvedArtifact> getWebjars() {
         Set<ResolvedArtifact> webjars = []
-        project.configurations.forEach({ Configuration configuration ->
+        project.getConfigurations().findAll {
+            GradleHelper.canBeResolved(it)
+        }.forEach({ Configuration configuration ->
             webjars.addAll(configuration
                     .resolvedConfiguration
                     .resolvedArtifacts
