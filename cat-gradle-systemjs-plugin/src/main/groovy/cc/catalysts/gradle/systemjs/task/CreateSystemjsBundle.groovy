@@ -1,5 +1,6 @@
 package cc.catalysts.gradle.systemjs.task
 
+import cc.catalysts.gradle.GradleHelper
 import cc.catalysts.gradle.systemjs.SystemjsExtension
 import com.moowork.gradle.node.task.NodeTask
 import org.gradle.api.artifacts.Configuration
@@ -84,7 +85,9 @@ class CreateSystemjsBundle extends NodeTask {
     Map<String, String> getWebjarPaths() {
         Map<String, String> webjarPaths = [:]
 
-        project.configurations.forEach({ Configuration configuration ->
+        project.getConfigurations().findAll {
+                GradleHelper.canBeResolved(it)
+            }.forEach({ Configuration configuration ->
             configuration
                     .resolvedConfiguration
                     .resolvedArtifacts
