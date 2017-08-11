@@ -11,7 +11,7 @@ class LessExtension extends AbstractNpmAwareExtension {
     String[] srcFiles
     String cssPath
     Map<String, String> npmDependencies = [
-            'less'                  : '2.5.3',
+            'less'                  : '2.7.2',
             'less-plugin-autoprefix': '1.5.1',
             'less-plugin-clean-css' : '1.5.1'
     ]
