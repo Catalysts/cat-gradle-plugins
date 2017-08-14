@@ -43,7 +43,7 @@ class LessPluginTest extends Specification {
                 .build()
 
         then:
-        result.output.contains("less@2.5.3")
+        result.output.contains("less@2.7.2")
         result.output.contains("less-plugin-autoprefix@1.5.1")
         result.output.contains("less-plugin-clean-css@1.5.1")
         result.task(":less-install").outcome == SUCCESS
@@ -67,9 +67,10 @@ class LessPluginTest extends Specification {
                 .build()
 
         then:
-        result.output.contains("less@2.5.3")
+        result.output.contains("less@2.7.2")
         result.output.contains("less-plugin-autoprefix@1.5.1")
         result.output.contains("less-plugin-clean-css@1.5.1")
+        result.task(":cleanLess").outcome == SUCCESS
         result.task(":less-install").outcome == SUCCESS
     }
 
