@@ -12,11 +12,9 @@ class SassExtension extends AbstractNpmAwareExtension {
     Map<String, String> npmDependencies = [
         'node-sass'     : '4.5.3',
     ]
-    List<String> plugins;
-    Map<String, String> pluginOptions = [:]
 
     Closure<String> cssFileName = {
-        return it.replace('.sass', '.css').replace('.scss', '.css')
+        return it.replaceAll('\\.s[ac]ss$', '.css')
     }
 
     SassExtension(Project project) {
@@ -44,7 +42,7 @@ class SassExtension extends AbstractNpmAwareExtension {
     }
 
     File[] getCssFiles() {
-        return srcFiles.collect { new File(cssLocation, it.replace('.sass', '.css').replace('.scss', '.css')) }
+        return srcFiles.collect { new File(cssLocation, it.replaceAll('\\.s[ac]ss$', '.css')) }
     }
 
     File[] getSassFiles() {
@@ -59,17 +57,5 @@ class SassExtension extends AbstractNpmAwareExtension {
 
     File getPackageJsonFile() {
         new File(nodeModulesDir, 'package.json')
-    }
-
-    List<String> getPlugins() {
-        if (plugins == null) {
-            return npmDependencies.findAll { it.key.startsWith('sass-plugin-') }.collect { it.key.substring(12) }
-        }
-
-        return plugins
-    }
-
-    Map<String, String> getPluginOptions() {
-        return pluginOptions.clone() as Map<String, String>
     }
 }

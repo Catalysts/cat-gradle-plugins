@@ -15,8 +15,6 @@ class Sass2Css extends NodeTask {
     File srcDir
     String[] srcFiles
     String cssPath
-    List<String> plugins;
-    Map<String, String> pluginOptions
     List<String> additionalArguments
     Closure<String> cssFileName
 
@@ -54,16 +52,6 @@ class Sass2Css extends NodeTask {
     }
 
     @Input
-    List<String> getPlugins() {
-        return plugins ?: config.plugins
-    }
-
-    @Input
-    Map<String, String> getPluginOptions() {
-        return pluginOptions ?: config.pluginOptions
-    }
-
-    @Input
     List<String> getAdditionalArguments() {
         return additionalArguments ?: config.additionalArguments
     }
@@ -86,18 +74,6 @@ class Sass2Css extends NodeTask {
 
         commonArgs.addAll(getAdditionalArguments())
 
-        def pluginOptions = getPluginOptions()
-        for (String plugin : getPlugins()) {
-            String pluginArgs = pluginOptions.remove(plugin)
-            commonArgs.add("--${plugin}=${pluginArgs ?: ''}")
-        }
-
-        if (!pluginOptions.isEmpty()) {
-            logger.warn("Unused plugin options ${pluginOptions.keySet()} are configured! Please make sure you have no typos in your configuration.")
-        }
-
-        Map<String, String> globalVars = [:]
-
         project.getConfigurations().findAll {
             GradleHelper.canBeResolved(it)
         }.each({ Configuration configuration ->
@@ -107,13 +83,8 @@ class Sass2Css extends NodeTask {
                     .findAll({ it.moduleVersion.id.group.startsWith('org.webjars') })
                     .forEach({ ResolvedArtifact it ->
                 String artifactId = "${it.name.replace('.', '-')}"
-                globalVars.put("webjars-${artifactId}", "webjars/${it.name}/${it.moduleVersion.id.version}")
             })
         });
-
-        for (Map.Entry<String, String> globalVar : globalVars) {
-            commonArgs.add("--global-var=${globalVar.key}='${globalVar.value}'")
-        }
 
         for (String srcFile : getSrcFiles()) {
             List<String> argumentList = [
