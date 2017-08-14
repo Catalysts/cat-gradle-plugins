@@ -4,6 +4,7 @@ import cc.catalysts.gradle.GradleHelper
 import cc.catalysts.gradle.sass.SassExtension
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
+import groovy.json.JsonOutput
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.tasks.Input
@@ -74,6 +75,8 @@ class Sass2Css extends NodeTask {
 
         commonArgs.addAll(getAdditionalArguments())
 
+        Map<String, String> globalVars = [:]
+
         project.getConfigurations().findAll {
             GradleHelper.canBeResolved(it)
         }.each({ Configuration configuration ->
@@ -83,13 +86,20 @@ class Sass2Css extends NodeTask {
                     .findAll({ it.moduleVersion.id.group.startsWith('org.webjars') })
                     .forEach({ ResolvedArtifact it ->
                 String artifactId = "${it.name.replace('.', '-')}"
+                globalVars.put("webjars-${artifactId}", "webjars/${it.name}/${it.moduleVersion.id.version}")
+
             })
         });
+
+        new File("mapping.json").newWriter().withWriter { w ->
+            w << JsonOutput.toJson(globalVars)
+        }
 
         for (String srcFile : getSrcFiles()) {
             List<String> argumentList = [
                     "${new File(getSrcDir(), srcFile)}",
-                    "${new File(cssLocation, getCssFileName(srcFile))}"
+                    "${new File(cssLocation, getCssFileName(srcFile))}",
+                    "--importer node-sass-webjar-importer.js"
             ]
             argumentList.addAll(commonArgs)
             logger.lifecycle("Executing sassc: ${argumentList}")
