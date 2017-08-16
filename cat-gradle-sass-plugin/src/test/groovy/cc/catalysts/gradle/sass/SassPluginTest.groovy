@@ -129,7 +129,8 @@ body
 @import "colors"
 body 
     color: $color
-        '''.
+        '''
+
         testProjectDir.newFile("src/main/resources/sass/colors.sass") << '''
             $color: green
         '''
@@ -154,54 +155,6 @@ body
         Scanner scanner = new Scanner(css)
         scanner.nextLine() == "body {"
         scanner.nextLine().trim() == "color: green; }"
-        !scanner.hasNextLine()
-    }
-
-    def "sass imports bootstrap jar"() {
-        given:
-        buildFile << """
-            plugins {
-                id 'cc.catalysts.sass'
-            }
-        """
-        testProjectDir.newFolder('build', 'cat-gradle', 'sass')
-        testProjectDir.newFile('build/cat-gradle/sass/package.json') << '{"private":true}'
-
-        testProjectDir.newFolder('src', 'main', 'resources', 'sass')
-        testProjectDir.newFile("src/main/resources/sass/${testProjectDir.getRoot().getName()}.sass") << '''
-@import "webjar-bootstrap"
-body 
-    color: $gray-base
-        '''
-
-        testProjectDir.newFile("src/main/resources/sass/bootstrap.sass") << '''
-$gray-base: blue
-        '''
-
-        testProjectDir.newFile("src/main/resources/sass/webjar-bootstrap.sass") << '''
-$gray-base: yellow
-        '''
-
-        when:
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.root)
-                .withArguments('cleanSass', 'sass')
-                .withPluginClasspath(pluginClasspath)
-                .build()
-
-        then:
-        result.output.contains("node-sass@4.5.3")
-        result.task(":cleanSass").outcome == SUCCESS
-        File css = new File(testProjectDir.getRoot(),
-                "/build/generated-resources/cat-sass/META-INF/resources/webjars/${testProjectDir.getRoot().getName()}/unspecified/${testProjectDir.getRoot().getName()}.css"
-        )
-        css.exists()
-        css.isFile()
-        css.canRead()
-
-        Scanner scanner = new Scanner(css)
-        scanner.nextLine() == "body {"
-        scanner.nextLine().trim() == "color: #000 !default; }"
         !scanner.hasNextLine()
     }
 
