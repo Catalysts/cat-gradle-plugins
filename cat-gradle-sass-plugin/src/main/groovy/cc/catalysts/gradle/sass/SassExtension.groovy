@@ -8,14 +8,10 @@ class SassExtension extends AbstractNpmAwareExtension {
     File srcDir
     String[] srcFiles
     String cssPath
-    List<String> additionalArguments = [ ]
+    List<String> additionalArguments = []
     Map<String, String> npmDependencies = [
-        'node-sass'     : '4.5.3',
+            'node-sass': '4.5.3',
     ]
-
-    Closure<String> cssFileName = {
-        return it.replaceAll('\\.s[ac]ss$', '.css')
-    }
 
     SassExtension(Project project) {
         super(project, 'sass')
@@ -23,10 +19,10 @@ class SassExtension extends AbstractNpmAwareExtension {
         java.io.File sassDir = new File(project.projectDir, 'src/main/resources/sass')
         java.io.File scssDir = new File(project.projectDir, 'src/main/resources/scss')
 
-        if(sassDir.exists() && sassDir.isDirectory()) {
+        if (sassDir.exists() && sassDir.isDirectory()) {
             srcDir = sassDir
             srcFiles = ["${project.name}.sass"]
-        } else if(scssDir.exists() && scssDir.isDirectory()) {
+        } else if (scssDir.exists() && scssDir.isDirectory()) {
             srcDir = scssDir
             srcFiles = ["${project.name}.scss"]
         }
@@ -39,14 +35,6 @@ class SassExtension extends AbstractNpmAwareExtension {
 
     File getCssLocation() {
         return new File(destinationDir, cssPath)
-    }
-
-    File[] getCssFiles() {
-        return srcFiles.collect { new File(cssLocation, it.replaceAll('\\.s[ac]ss$', '.css')) }
-    }
-
-    File[] getSassFiles() {
-        return srcFiles.collect { new File(srcDir, it) }
     }
 
     PackageJson getPackageJson() {

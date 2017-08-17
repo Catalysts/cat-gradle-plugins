@@ -9,7 +9,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.SkipWhenEmpty
 
 class Sass2Css extends NodeTask {
@@ -17,7 +16,6 @@ class Sass2Css extends NodeTask {
     String[] srcFiles
     String cssPath
     List<String> additionalArguments
-    Closure<String> cssFileName
 
     public Sass2Css() {
         this.group = 'Cat-Boot SASS'
@@ -55,18 +53,6 @@ class Sass2Css extends NodeTask {
     @Input
     List<String> getAdditionalArguments() {
         return additionalArguments ?: config.additionalArguments
-    }
-
-    String getCssFileName(String sassFileName) {
-        return cssFileName ? cssFileName(sassFileName) : config.cssFileName(sassFileName)
-    }
-
-    @OutputFiles
-    List<File> getCssFiles() {
-        return getSrcFiles()
-                .collect({
-            return new File(getCssLocation(), getCssFileName(it))
-        })
     }
 
     @Override
@@ -118,6 +104,7 @@ class Sass2Css extends NodeTask {
             setArgs(argumentList)
             super.exec()
             getResult().assertNormalExitValue()
+
         }
     }
 }
