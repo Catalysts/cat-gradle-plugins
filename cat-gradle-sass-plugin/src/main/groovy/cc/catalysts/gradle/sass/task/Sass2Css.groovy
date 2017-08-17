@@ -71,7 +71,7 @@ class Sass2Css extends NodeTask {
 
     @Override
     void exec() {
-        List<String> commonArgs = [ ]
+        List<String> commonArgs = []
 
         commonArgs.addAll(getAdditionalArguments())
 
@@ -86,20 +86,32 @@ class Sass2Css extends NodeTask {
                     .findAll({ it.moduleVersion.id.group.startsWith('org.webjars') })
                     .forEach({ ResolvedArtifact it ->
                 String artifactId = "${it.name.replace('.', '-')}"
-                globalVars.put("webjars-${artifactId}", "webjars/${it.name}/${it.moduleVersion.id.version}")
+
+                File f = new File(SassExtension.get(project).nodeModulesDir, 'extracted')
+
+                globalVars.put(artifactId, "${f.getAbsolutePath()}/META-INF/resources/webjars/${it.name}/${it.moduleVersion.id.version}")
 
             })
         });
 
-        new File("mapping.json").newWriter().withWriter { w ->
+
+        SassExtension config = SassExtension.get(project)
+
+        File mappingFile = new File(config.getNodeModulesDir(), "mapping.json")
+        mappingFile.newWriter().withWriter { w ->
             w << JsonOutput.toJson(globalVars)
+        }
+
+        File importerJS = new File(config.getNodeModulesDir(), "node-sass-webjar-importer.js")
+        importerJS.newWriter().withWriter { w ->
+            w << getClass().getClassLoader().getResource("node-sass-webjar-importer.js").getContent()
         }
 
         for (String srcFile : getSrcFiles()) {
             List<String> argumentList = [
+                    "--importer", "${importerJS.getAbsolutePath()}",
+                    "-o", "${cssLocation}",
                     "${new File(getSrcDir(), srcFile)}",
-                    "${new File(cssLocation, getCssFileName(srcFile))}",
-                    "--importer node-sass-webjar-importer.js"
             ]
             argumentList.addAll(commonArgs)
             logger.lifecycle("Executing sassc: ${argumentList}")
