@@ -101,7 +101,7 @@ body
         result.output.contains("node-sass@4.5.3")
         result.task(":cleanSass").outcome == SUCCESS
         File css = new File(testProjectDir.getRoot(),
-            "/build/generated-resources/cat-sass/META-INF/resources/webjars/${testProjectDir.getRoot().getName()}/unspecified/${testProjectDir.getRoot().getName()}.css"
+                "/build/generated-resources/cat-sass/META-INF/resources/webjars/${testProjectDir.getRoot().getName()}/unspecified/${testProjectDir.getRoot().getName()}.css"
         )
         css.exists()
         css.isFile()
@@ -114,7 +114,7 @@ body
 
     }
 
-    def "sass compiler includes normal files"() {
+    def "sass compiler includes sass files"() {
         given:
         buildFile << """
             plugins {
@@ -132,7 +132,93 @@ body
         '''
 
         testProjectDir.newFile("src/main/resources/sass/colors.sass") << '''
-            $color: green
+$color: green
+        '''
+
+        when:
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('cleanSass', 'sass')
+                .withPluginClasspath(pluginClasspath)
+                .build()
+
+        then:
+        result.output.contains("node-sass@4.5.3")
+        result.task(":cleanSass").outcome == SUCCESS
+        File css = new File(testProjectDir.getRoot(),
+                "/build/generated-resources/cat-sass/META-INF/resources/webjars/${testProjectDir.getRoot().getName()}/unspecified/${testProjectDir.getRoot().getName()}.css"
+        )
+        css.exists()
+        css.isFile()
+        css.canRead()
+
+        Scanner scanner = new Scanner(css)
+        scanner.nextLine() == "body {"
+        scanner.nextLine().trim() == "color: green; }"
+        !scanner.hasNextLine()
+    }
+
+    def "scss compiles scss file to css"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'cc.catalysts.sass'
+            }
+        """
+        testProjectDir.newFolder('build', 'cat-gradle', 'sass')
+        testProjectDir.newFile('build/cat-gradle/sass/package.json') << '{"private":true}'
+
+        testProjectDir.newFolder('src', 'main', 'resources', 'scss')
+        testProjectDir.newFile("src/main/resources/scss/${testProjectDir.getRoot().getName()}.scss") << '''
+            body {
+                color: green;
+            }
+        '''
+
+        when:
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('cleanSass', 'sass')
+                .withPluginClasspath(pluginClasspath)
+                .build()
+
+        then:
+        result.output.contains("node-sass@4.5.3")
+        result.task(":cleanSass").outcome == SUCCESS
+        File css = new File(testProjectDir.getRoot(),
+                "/build/generated-resources/cat-sass/META-INF/resources/webjars/${testProjectDir.getRoot().getName()}/unspecified/${testProjectDir.getRoot().getName()}.css"
+        )
+        css.exists()
+        css.isFile()
+        css.canRead()
+
+        Scanner scanner = new Scanner(css)
+        scanner.nextLine() == "body {"
+        scanner.nextLine().trim() == "color: green; }"
+        !scanner.hasNextLine()
+
+    }
+
+    def "scss compiler includes scss files"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'cc.catalysts.sass'
+            }
+        """
+        testProjectDir.newFolder('build', 'cat-gradle', 'sass')
+        testProjectDir.newFile('build/cat-gradle/sass/package.json') << '{"private":true}'
+
+        testProjectDir.newFolder('src', 'main', 'resources', 'scss')
+        testProjectDir.newFile("src/main/resources/scss/${testProjectDir.getRoot().getName()}.scss") << '''
+            @import "colors";
+            body {
+                color: $color;
+            }
+        '''
+
+        testProjectDir.newFile("src/main/resources/scss/colors.scss") << '''
+            $color: green;
         '''
 
         when:
