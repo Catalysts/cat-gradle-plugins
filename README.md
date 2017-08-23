@@ -201,9 +201,6 @@ Takes a set of sass or scss files and compiles them to css.
 Wejbars are supported by extracting all `css`, `sass` and `scss` files from them and
 providing them to you as importable files.
 
-*Note: As sass doesn't support the '.' character in variable names these will be replaced with a '-'.*
-*For example `org.webjars.npm:imaginary.lib:1.4.9` will produce the variable `webjars-imaginary-lib`*
-
 ```sass
 @import "~webjars/bootstrap/sass/bootstrap";
 ```

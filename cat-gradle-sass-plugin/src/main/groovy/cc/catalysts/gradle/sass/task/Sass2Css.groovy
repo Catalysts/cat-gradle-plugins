@@ -61,7 +61,7 @@ class Sass2Css extends NodeTask {
 
         commonArgs.addAll(getAdditionalArguments())
 
-        Map<String, String> globalVars = [:]
+        Map<String, String> webjarMapping = [:]
 
         project.getConfigurations().findAll {
             GradleHelper.canBeResolved(it)
@@ -75,7 +75,7 @@ class Sass2Css extends NodeTask {
 
                 File f = new File(SassExtension.get(project).nodeModulesDir, 'extracted')
 
-                globalVars.put(artifactId, "${f.getAbsolutePath()}/META-INF/resources/webjars/${it.name}/${it.moduleVersion.id.version}")
+                webjarMapping.put(artifactId, "${f.getAbsolutePath()}/META-INF/resources/webjars/${it.name}/${it.moduleVersion.id.version}")
 
             })
         });
@@ -85,7 +85,7 @@ class Sass2Css extends NodeTask {
 
         File mappingFile = new File(config.getNodeModulesDir(), "mapping.json")
         mappingFile.newWriter().withWriter { w ->
-            w << JsonOutput.toJson(globalVars)
+            w << JsonOutput.toJson(webjarMapping)
         }
 
         File importerJS = new File(config.getNodeModulesDir(), "node-sass-webjar-importer.js")
