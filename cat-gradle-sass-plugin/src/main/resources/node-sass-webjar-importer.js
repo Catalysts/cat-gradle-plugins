@@ -8,7 +8,7 @@ module.exports = function (url, prev, done) {
         if (!mappedPath) {
             done({file: url});
         }
-        splitted.splice(0, 2);
+        splitted.splice(0, 2)
         return { file: mappedPath + '/' + splitted.join('/') };
     }
 
