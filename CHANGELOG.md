@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.26-SNAPSHOT
+## v0.0.26
 * Updated less and bintray plugin
 * Added sass plugin
 

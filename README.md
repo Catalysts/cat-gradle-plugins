@@ -37,7 +37,7 @@ buildscript {
 Changelog
 =====
 
-The latest stable version is 0.0.17
+The latest stable version is 0.0.26
 
 see [CHANGELOG](CHANGELOG.md) for details
 
