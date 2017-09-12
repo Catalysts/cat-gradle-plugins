@@ -28,6 +28,7 @@ buildscript {
         classpath "cc.catalysts.gradle:cat-gradle-dmuncle-plugin:${catGradleVersion}"
         classpath "cc.catalysts.gradle:cat-gradle-hibernate-plugin:${catGradleVersion}"
         classpath "cc.catalysts.gradle:cat-gradle-less-plugin:${catGradleVersion}"
+        classpath "cc.catalysts.gradle:cat-gradle-sass-plugin:${catGradleVersion}"
         classpath "cc.catalysts.gradle:cat-gradle-systemjs-plugin:${catGradleVersion}"
     }
 }
@@ -48,6 +49,7 @@ List of plugins
 * [DMUNCLE](#dmuncle)
 * [HIBERNATE](#hibernate)
 * [LESS](#less)
+* [SASS-SCSS](#sass-scss)
 * [SYSTEMJS](#systemjs)
 * [WEBJARS](#webjars)
 
@@ -191,6 +193,64 @@ task unminifiedLess(type: Less) {
 }
 
 tasks.less.dependsOn('unminifiedLess')
+```
+
+
+SASS-SCSS
+------
+
+Takes a set of sass or scss files and compiles them to css.
+
+Wejbars are supported by extracting all `css`, `sass` and `scss` files from them and
+providing them to you as importable files.
+
+```sass
+@import "~webjars/bootstrap/sass/bootstrap";
+```
+The import statement must follow a special syntax to be recognized as an importable webjar.
+
+ - First it must begin with `~webjars`
+ - After that there is the name of the webjar (with replaced dots as dashes)
+ - After that comes the path to the file INSIDE the webjar
+
+Configuration:
+
+```groovy
+buildscript {
+  dependencies {
+    classpath 'cc.catalysts.gradle:cat-gradle-sass-plugin:' + catGradleVersion
+  }
+}
+  
+apply plugin: 'cc.catalysts.sass'
+ 
+sass {
+
+    // IF the directory `src/main/resources/sass` exists these two settings will be taken by default,
+    srcDir = new File(project.projectDir, 'src/main/resources/sass')
+    srcFiles = ["${project.name}.sass"]
+    
+    // ELSE if the the sass directory does not exist AND the directory `src/main/resources/scss` exists
+    // these will be the default values
+    srcDir = new File(project.projectDir, 'src/main/resources/scss')
+    srcFiles = ["${project.name}.scss"]
+        
+    
+    // The destination directory which will be treated as a 'resource' folder when the java plugin is present
+    destinationDir = new File(project.buildDir, "generated-resources/cat-sass")
+    
+    // The base path for all generated css files (default path matches webjar convention)
+    cssPath = "META-INF/resources/webjars/${project.name}/${project.rootProject.version}"
+    
+    // A map of npm dependencies to use - can be used to change versions and add or remove plugins
+    npmDependencies = [
+        'node-sass': '4.5.3'
+    ]
+    
+    // A list of additional command line arguments to pass to the node-sass compiler
+    // Empty by default
+    additionalArguments = [ ]
+}
 ```
 
 SYSTEMJS

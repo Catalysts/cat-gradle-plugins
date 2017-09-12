@@ -1,5 +1,6 @@
 include 'cat-gradle-hibernate-plugin'
 include 'cat-gradle-less-plugin'
+include 'cat-gradle-sass-plugin'
 include 'cat-gradle-systemjs-plugin'
 include 'cat-gradle-buildinfo-plugin'
 include 'cat-gradle-dmuncle-plugin'
