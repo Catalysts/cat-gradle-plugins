@@ -11,6 +11,7 @@ class SassExtension extends AbstractNpmAwareExtension {
     List<String> additionalArguments = []
     Map<String, String> npmDependencies = [
             'node-sass': '4.5.3',
+            'request': '2.83.0'
     ]
 
     SassExtension(Project project) {
