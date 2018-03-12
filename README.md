@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Catalysts/cat-gradle-plugins.svg?branch=master)](https://travis-ci.org/Catalysts/cat-boot)
+[![Build Status](https://travis-ci.org/Catalysts/cat-gradle-plugins.svg?branch=master)](https://travis-ci.org/Catalysts/cat-gradle-plugins)
 [ ![Download](https://api.bintray.com/packages/catalysts/catalysts-jars/cat-gradle-plugins/images/download.svg) ](https://bintray.com/catalysts/catalysts-jars/cat-gradle-plugins/_latestVersion)
 
 cat-gradle-plugins
