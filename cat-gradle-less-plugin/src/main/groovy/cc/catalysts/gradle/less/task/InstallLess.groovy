@@ -23,6 +23,7 @@ class InstallLess extends NpmTask {
 
             setWorkingDir(config.nodeModulesDir)
             setNpmCommand('install')
+            setArgs(["--verbose"])
 
             outputs.dir(new File(config.nodeModulesDir, 'node_modules'))
         })
