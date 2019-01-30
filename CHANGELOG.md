@@ -1,7 +1,10 @@
 # Changelog
 
-## v0.0.27-SNAPSHOT
+## v0.0.30-SNAPSHOT
 _no changes yet_
+
+## v0.0.29
+* Updated to node version 8.15.0 to fix javascript version problems
 
 ## v0.0.26
 * Updated less and bintray plugin
