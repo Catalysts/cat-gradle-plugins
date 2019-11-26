@@ -1,2 +1,3 @@
-depenencies {
+dependencies {
+    compile project(':cat-gradle-utils')
 }
