@@ -14,7 +14,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.2.1.RELEASE'
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.10'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.7.2'
     }
