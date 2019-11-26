@@ -42,10 +42,12 @@ class SystemjsPlugin implements Plugin<Project> {
     }
 
     private void applyNodePluginAndDefaults(Project project) {
-        project.plugins.apply('com.moowork.node')
+        if (!project.parent.hasProperty("skipApplyNodePlugin")) {
+            project.plugins.apply('com.moowork.node')
 
-        project.node.version = '8.15.0'
-        project.node.download = true
+            project.node.version = '8.15.0'
+            project.node.download = true
+        }
     }
 }
 
